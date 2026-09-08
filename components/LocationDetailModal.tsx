@@ -1,0 +1,355 @@
+'use client';
+
+import React from 'react';
+import { 
+  X, 
+  MapPin, 
+  ExternalLink, 
+  ShieldAlert, 
+  ShieldCheck, 
+  CheckCircle2, 
+  AlertTriangle, 
+  Building2, 
+  Truck, 
+  Zap, 
+  Volume2, 
+  Phone, 
+  FileText,
+  Sparkles,
+  Bookmark
+} from 'lucide-react';
+import { LocationCandidate } from '@/lib/types';
+
+interface LocationDetailModalProps {
+  candidate: LocationCandidate | null;
+  onClose: () => void;
+  onToggleSave: (candidate: LocationCandidate) => void;
+  isSaved: boolean;
+}
+
+export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
+  candidate,
+  onClose,
+  onToggleSave,
+  isSaved
+}) => {
+  if (!candidate) return null;
+
+  const getTrustBadge = (status: string) => {
+    switch (status) {
+      case 'VERIFIED BY SOURCES':
+        return <span className="badge badge-verified"><ShieldCheck size={12} /> VERIFIED BY SOURCES</span>;
+      case 'PUBLIC INFORMATION FOUND':
+        return <span className="badge badge-cyan"><CheckCircle2 size={12} /> PUBLIC INFORMATION FOUND</span>;
+      case 'REQUIRES CONFIRMATION':
+        return <span className="badge badge-warning"><AlertTriangle size={12} /> REQUIRES CONFIRMATION</span>;
+      default:
+        return <span className="badge badge-danger"><ShieldAlert size={12} /> UNVERIFIED / UNKNOWN</span>;
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div 
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+        style={{ padding: '32px' }}
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              {getTrustBadge(candidate.trustStatus)}
+              <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Confidence: {candidate.confidence}%</span>
+            </div>
+            <h2 className="font-display" style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
+              {candidate.name}
+            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '0.9rem', marginTop: '4px' }}>
+              <MapPin size={15} color="#f59e0b" />
+              <span>{candidate.area}, {candidate.city}</span>
+              <span style={{ color: '#64748b' }}>•</span>
+              <span style={{ color: '#cbd5e1' }}>{candidate.productionConsiderations.ownershipStatus}</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <button
+              onClick={() => onToggleSave(candidate)}
+              className="btn-cinema btn-secondary"
+              style={{ padding: '8px 14px', fontSize: '0.84rem' }}
+            >
+              <Bookmark size={15} fill={isSaved ? '#fbbf24' : 'none'} color={isSaved ? '#fbbf24' : '#ffffff'} />
+              <span>{isSaved ? 'Saved' : 'Save'}</span>
+            </button>
+
+            <button
+              onClick={onClose}
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: 'none',
+                color: '#ffffff',
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Score Overview Bar */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: '12px',
+          padding: '16px',
+          borderRadius: '10px',
+          background: 'rgba(0, 0, 0, 0.4)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          marginBottom: '24px'
+        }}>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase' }}>Scene Match</div>
+            <div className="font-display" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fbbf24' }}>
+              {candidate.sceneMatchScore}<span style={{ fontSize: '0.8rem', color: '#64748b' }}>/100</span>
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase' }}>Accessibility</div>
+            <div className="font-display" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#38bdf8' }}>
+              {candidate.accessibilityScore}<span style={{ fontSize: '0.8rem', color: '#64748b' }}>/100</span>
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase' }}>Production Risk</div>
+            <div className="font-display" style={{ 
+              fontSize: '1.5rem', 
+              fontWeight: 800, 
+              color: candidate.productionRiskScore <= 35 ? '#34d399' : candidate.productionRiskScore <= 60 ? '#fbbf24' : '#f87171' 
+            }}>
+              {candidate.productionRiskScore}<span style={{ fontSize: '0.8rem', color: '#64748b' }}>%</span>
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase' }}>Evidence Quality</div>
+            <div className="font-display" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#10b981' }}>
+              {candidate.evidenceQualityScore}<span style={{ fontSize: '0.8rem', color: '#64748b' }}>/100</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 1: Overview */}
+        <div style={{ marginBottom: '24px' }}>
+          <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '8px' }}>
+            Location Overview
+          </h4>
+          <p style={{ color: '#cbd5e1', fontSize: '0.94rem', lineHeight: 1.6 }}>
+            {candidate.description}
+          </p>
+        </div>
+
+        {/* Section 2: Agent Recommendation */}
+        <div style={{
+          padding: '16px',
+          borderRadius: '10px',
+          background: 'rgba(245, 158, 11, 0.08)',
+          borderLeft: '4px solid #f59e0b',
+          marginBottom: '24px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', color: '#fbbf24', fontWeight: 700, fontSize: '0.86rem' }}>
+            <Sparkles size={16} />
+            <span>SceneScout Agent Recommendation</span>
+          </div>
+          <p style={{ color: '#fef3c7', fontSize: '0.92rem', lineHeight: 1.5 }}>
+            {candidate.recommendation}
+          </p>
+        </div>
+
+        {/* Section 3: Why It Matches */}
+        <div style={{ marginBottom: '24px' }}>
+          <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '12px' }}>
+            Why It Matches the Production Brief
+          </h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
+            {candidate.visualCharacteristics.map((trait, idx) => (
+              <div 
+                key={idx}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  fontSize: '0.86rem',
+                  color: '#e2e8f0',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '8px'
+                }}
+              >
+                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b', marginTop: '6px' }} />
+                <span>{trait}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Section 4: Production Considerations & Logistics */}
+        <div style={{ marginBottom: '24px' }}>
+          <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '12px' }}>
+            Production Considerations & Logistics
+          </h4>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '12px',
+            background: 'rgba(0, 0, 0, 0.25)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            borderRadius: '10px',
+            padding: '16px'
+          }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}>
+                <Truck size={14} color="#38bdf8" />
+                <span>ACCESSIBILITY & ROADS</span>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
+                {candidate.productionConsiderations.accessibility}
+              </p>
+            </div>
+
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}>
+                <Building2 size={14} color="#38bdf8" />
+                <span>PARKING & BASECAMP</span>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
+                {candidate.productionConsiderations.parking}
+              </p>
+            </div>
+
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}>
+                <Zap size={14} color="#fbbf24" />
+                <span>POWER AVAILABILITY</span>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
+                {candidate.productionConsiderations.powerAvailability || 'Generator backup recommended'}
+              </p>
+            </div>
+
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}>
+                <Volume2 size={14} color="#10b981" />
+                <span>ACOUSTICS & NOISE</span>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
+                {candidate.productionConsiderations.noiseProfile || 'Standard urban ambient noise profile'}
+              </p>
+            </div>
+
+            {candidate.contactInformation && (
+              <div style={{ gridColumn: '1 / -1' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}>
+                  <Phone size={14} color="#38bdf8" />
+                  <span>PUBLIC CONTACT / PERMITTING DESK</span>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: '#cbd5e1', fontFamily: 'monospace' }}>
+                  {candidate.contactInformation}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Section 5: Potential Restrictions & Legal Hazards */}
+        <div style={{ marginBottom: '24px' }}>
+          <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '10px' }}>
+            Potential Restrictions & Filming Hazards
+          </h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {candidate.potentialRestrictions.map((res, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  background: 'rgba(239, 68, 68, 0.06)',
+                  borderLeft: '3px solid #ef4444',
+                  fontSize: '0.86rem',
+                  color: '#fca5a5'
+                }}
+              >
+                ⚠️ {res}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Section 6: Specific Evidence & Citations */}
+        <div style={{ marginBottom: '28px' }}>
+          <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '10px' }}>
+            Verified Web Evidence & Source Citations
+          </h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {candidate.evidenceQuotes.map((eq, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)'
+                }}
+              >
+                <div style={{ color: '#f1f5f9', fontSize: '0.88rem', fontStyle: 'italic', marginBottom: '6px' }}>
+                  "{eq.claim}"
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                    Source: <strong>{eq.sourceTitle}</strong>
+                  </span>
+                  <a
+                    href={eq.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: '#38bdf8',
+                      fontSize: '0.74rem',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <span>View Web Document</span>
+                    <ExternalLink size={11} />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Section 7: Mandatory Legal Disclaimer */}
+        <div style={{
+          padding: '14px',
+          borderRadius: '8px',
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          fontSize: '0.76rem',
+          color: '#94a3b8',
+          lineHeight: 1.45
+        }}>
+          <strong>Legal & Production Notice: </strong>
+          SceneScout provides research assistance, not legal or permit approval. Production teams should independently confirm permissions, availability, commercial rates, curfew restrictions, and access clearances with local municipal, police, or property owner authorities.
+        </div>
+      </div>
+    </div>
+  );
+};
