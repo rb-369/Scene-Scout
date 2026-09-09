@@ -71,6 +71,27 @@ export function LocationCard({
         <strong>{candidate.estimatedTariff || 'Rate on inquiry'}</strong>
       </div>
 
+      <div className="location-card-scores">
+        <div className="location-score-item">
+          <div className="location-score-label">
+            <span>Scene Match</span>
+            <strong>{candidate.sceneMatchScore}%</strong>
+          </div>
+          <div className="location-score-track">
+            <div className="location-score-bar bar-match" style={{ width: `${candidate.sceneMatchScore}%` }} />
+          </div>
+        </div>
+        <div className="location-score-item">
+          <div className="location-score-label">
+            <span>Accessibility</span>
+            <strong>{candidate.accessibilityScore}%</strong>
+          </div>
+          <div className="location-score-track">
+            <div className="location-score-bar bar-access" style={{ width: `${candidate.accessibilityScore}%` }} />
+          </div>
+        </div>
+      </div>
+
       <div className="location-compact-meta">
         <div className="location-compact-risk">
           <span>Risk Level</span>

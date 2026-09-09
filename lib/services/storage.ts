@@ -1,5 +1,5 @@
 import { LocationCandidate, ResearchSession } from '../types';
-import { DEMO_CANDIDATES } from '../demoData';
+import { DEMO_CANDIDATES, ADDITIONAL_SUGGESTED_CANDIDATES } from '../demoData';
 
 const SAVED_LOCATIONS_KEY = 'scenescout_saved_locations_v1';
 const SESSIONS_HISTORY_KEY = 'scenescout_sessions_history_v1';
@@ -167,12 +167,15 @@ export const storageService = {
     const foundSaved = saved.find(c => c.id.toLowerCase() === cleanId);
     if (foundSaved) return foundSaved;
 
-    // 3. Check demo candidates
+    // 3. Check demo candidates and additional suggested candidates
     const foundDemo = DEMO_CANDIDATES.find(c => c.id.toLowerCase() === cleanId);
     if (foundDemo) return foundDemo;
 
+    const foundSuggested = ADDITIONAL_SUGGESTED_CANDIDATES.find(c => c.id.toLowerCase() === cleanId);
+    if (foundSuggested) return foundSuggested;
+
     // 4. Fuzzy fallback (slug or partial ID match)
-    const all = [...active, ...saved, ...DEMO_CANDIDATES];
+    const all = [...active, ...saved, ...DEMO_CANDIDATES, ...ADDITIONAL_SUGGESTED_CANDIDATES];
     const fuzzy = all.find(c => 
       c.id.toLowerCase().includes(cleanId) || 
       cleanId.includes(c.id.toLowerCase()) ||

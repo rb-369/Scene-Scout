@@ -84,6 +84,15 @@ export function DashboardContent({
   const [isSuggestingMore, setIsSuggestingMore] = useState<boolean>(false);
   const [suggestionFeedback, setSuggestionFeedback] = useState<string | null>(null);
 
+  // Floating Toast State
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 2800);
+  };
+
   // Modals & Sub-views
   const [selectedCandidate, setSelectedCandidate] = useState<LocationCandidate | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
@@ -336,9 +345,11 @@ export function DashboardContent({
     if (storageService.isSaved(candidate.id)) {
       storageService.removeSavedLocation(candidate.id, user?.id);
       setSavedLocations(prev => prev.filter(c => c.id !== candidate.id));
+      showToast(`Removed "${candidate.name}" from saved shortlist`);
     } else {
       storageService.saveLocation(candidate, user?.id);
       setSavedLocations(prev => [...prev, candidate]);
+      showToast(`Saved "${candidate.name}" to production portfolio`);
     }
   };
 
@@ -996,6 +1007,14 @@ export function DashboardContent({
       {/* Authentication & Filmmaker Persona Onboarding Modals */}
       <AuthModal />
       <FilmmakerOnboardingModal />
+
+      {/* Floating Bookmark / Action Toast Notification */}
+      {toastMessage && (
+        <div className="cinema-toast" role="status" aria-live="polite">
+          <CheckCircle2 size={17} color="#10b981" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
     </div>
   );
 }

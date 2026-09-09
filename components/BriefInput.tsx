@@ -499,18 +499,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                 "Mumbai",
                 "Industrial Warehouse Thriller"
               )}
-              style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '20px',
-                padding: '6px 12px',
-                color: '#cbd5e1',
-                fontSize: '0.78rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
+              className="preset-chip"
             >
               <span>🏭 Mumbai Industrial Thriller (Primary Demo)</span>
             </button>
@@ -522,18 +511,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                 "Mumbai",
                 "Espionage Maritime Docklands"
               )}
-              style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '20px',
-                padding: '6px 12px',
-                color: '#cbd5e1',
-                fontSize: '0.78rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
+              className="preset-chip"
             >
               <span>🚢 Coastal Port & Freight Depots</span>
             </button>
@@ -545,18 +523,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                 "Mumbai",
                 "Abandoned Gothic Mill Ruins"
               )}
-              style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '20px',
-                padding: '6px 12px',
-                color: '#cbd5e1',
-                fontSize: '0.78rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
+              className="preset-chip"
             >
               <span>🏚️ Heritage Mill Ruins</span>
             </button>
