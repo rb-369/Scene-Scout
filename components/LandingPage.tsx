@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ArrowRight, Film, MapPin, ShieldCheck } from 'lucide-react';
 
@@ -61,10 +61,44 @@ const roles = [
 
 export function LandingPage({ onLaunchStudio }: LandingPageProps) {
   const [activeDossier, setActiveDossier] = useState(0);
+  const [timecode, setTimecode] = useState('01:24:18:09');
   const dossier = dossiers[activeDossier];
+
+  // Authentic 24fps cinema timecode clock ticker
+  useEffect(() => {
+    let frame = 9;
+    let sec = 18;
+    const interval = setInterval(() => {
+      frame++;
+      if (frame >= 24) {
+        frame = 0;
+        sec = (sec + 1) % 60;
+      }
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      setTimecode(`01:24:${pad(sec)}:${pad(frame)}`);
+    }, 1000 / 24);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="scenescout-landing">
+      {/* Dynamic Animated Cinematic Background */}
+      <div className="scene-ambient-bg" aria-hidden="true">
+        <div className="ambient-orb ambient-orb-amber" />
+        <div className="ambient-orb ambient-orb-cyan" />
+        <div className="ambient-orb ambient-orb-warm" />
+        <div className="ambient-dust-field">
+          <span className="dust-particle p1" />
+          <span className="dust-particle p2" />
+          <span className="dust-particle p3" />
+          <span className="dust-particle p4" />
+          <span className="dust-particle p5" />
+          <span className="dust-particle p6" />
+          <span className="dust-particle p7" />
+          <span className="dust-particle p8" />
+        </div>
+      </div>
+
       <nav className="scene-nav" aria-label="Primary navigation">
         <div className="scene-nav-inner">
           <a className="scene-brand" href="#top" aria-label="SceneScout home">
@@ -112,6 +146,10 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
                 <span className="reticle-bl">+</span>
                 <span className="reticle-br">+</span>
                 <span className="reticle-center">✛</span>
+                <span className="reticle-timecode">
+                  <span className="rec-dot animate-pulse-subtle" />
+                  TC {timecode}
+                </span>
                 <span className="reticle-tag">2.39:1 · LIVE MONITOR</span>
               </div>
               <div className="scene-frame-data">

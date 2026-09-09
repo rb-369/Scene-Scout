@@ -68,12 +68,47 @@ button,input,select,textarea { font:inherit; } button { -webkit-tap-highlight-co
 .scene-hero-visual img { filter:saturate(.8) contrast(1.05); height:100%; object-fit:cover; position:absolute; width:100%; transition:transform .8s cubic-bezier(.16,1,.3,1); }
 .scene-hero-visual:hover img { transform:scale(1.025); }
 .scene-hero-visual::after { background:linear-gradient(180deg,transparent 40%,rgba(11,14,14,.92) 100%); content:''; inset:0; position:absolute; pointer-events:none; }
+.scene-hero-visual::before {
+  animation:anamorphicSweep 8s ease-in-out infinite;
+  background:linear-gradient(90deg,transparent 0%,rgba(211,138,69,.0) 25%,rgba(237,170,97,.12) 50%,rgba(211,138,69,.0) 75%,transparent 100%);
+  bottom:0;
+  content:'';
+  left:-100%;
+  pointer-events:none;
+  position:absolute;
+  top:0;
+  transform:skewX(-25deg);
+  width:50%;
+  z-index:2;
+}
+@keyframes anamorphicSweep {
+  0%, 65% { left:-100%; opacity:0; }
+  75% { opacity:1; }
+  88% { left:160%; opacity:.8; }
+  100% { left:160%; opacity:0; }
+}
 .scene-hero-viewfinder-reticle { inset:16px; pointer-events:none; position:absolute; z-index:2; }
 .reticle-tl { color:rgba(232,235,226,.45); font-family:var(--font-mono); font-size:.9rem; left:0; position:absolute; top:0; }
 .reticle-tr { color:rgba(232,235,226,.45); font-family:var(--font-mono); font-size:.9rem; position:absolute; right:0; top:0; }
 .reticle-bl { bottom:0; color:rgba(232,235,226,.45); font-family:var(--font-mono); font-size:.9rem; left:0; position:absolute; }
 .reticle-br { bottom:0; color:rgba(232,235,226,.45); font-family:var(--font-mono); font-size:.9rem; position:absolute; right:0; }
 .reticle-center { color:rgba(232,235,226,.22); font-size:.8rem; left:50%; position:absolute; top:50%; transform:translate(-50%,-50%); }
+.reticle-timecode {
+  align-items:center;
+  background:rgba(11,14,14,.76);
+  border:1px solid rgba(232,235,226,.18);
+  border-radius:3px;
+  color:var(--paper);
+  display:inline-flex;
+  font-family:var(--font-mono);
+  font-size:.6rem;
+  gap:6px;
+  left:0;
+  letter-spacing:.08em;
+  padding:3px 8px;
+  position:absolute;
+  top:0;
+}
 .reticle-tag {
   background:rgba(11,14,14,.76);
   border:1px solid rgba(211,138,69,.4);
@@ -92,6 +127,90 @@ button,input,select,textarea { font:inherit; } button { -webkit-tap-highlight-co
 .scene-frame-data span { color:var(--muted); font-family:var(--font-mono); font-size:.63rem; letter-spacing:.06em; text-transform:uppercase; }
 .scene-frame-score { border-left:1px solid var(--line-strong); padding-left:18px; text-align:right; }
 .scene-frame-score strong { color:var(--amber-bright); display:block; font-family:var(--font-mono); font-size:1.6rem; font-weight:500; }
+
+/* Dynamic Animated Cinematic Background */
+.scene-ambient-bg {
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  position:fixed;
+  z-index:0;
+}
+.ambient-orb {
+  border-radius:50%;
+  filter:blur(110px);
+  position:absolute;
+  will-change:transform, opacity;
+}
+.ambient-orb-amber {
+  animation:ambientFloatAmber 18s ease-in-out infinite alternate;
+  background:radial-gradient(circle, rgba(211,138,69,.7) 0%, rgba(237,170,97,.25) 50%, transparent 80%);
+  height:680px;
+  right:-80px;
+  top:-120px;
+  width:680px;
+}
+.ambient-orb-cyan {
+  animation:ambientFloatCyan 22s ease-in-out infinite alternate;
+  background:radial-gradient(circle, rgba(30,90,125,.75) 0%, rgba(16,185,129,.18) 60%, transparent 80%);
+  height:720px;
+  left:-140px;
+  top:42%;
+  width:720px;
+}
+.ambient-orb-warm {
+  animation:ambientFloatWarm 20s ease-in-out infinite alternate;
+  background:radial-gradient(circle, rgba(180,83,9,.5) 0%, transparent 70%);
+  bottom:6%;
+  height:560px;
+  right:12%;
+  width:560px;
+}
+@keyframes ambientFloatAmber {
+  0% { opacity:.10; transform:translate(0, 0) scale(1); }
+  50% { opacity:.17; transform:translate(-70px, 90px) scale(1.16); }
+  100% { opacity:.11; transform:translate(-130px, 35px) scale(.95); }
+}
+@keyframes ambientFloatCyan {
+  0% { opacity:.08; transform:translate(0, 0) scale(1); }
+  50% { opacity:.15; transform:translate(100px, -60px) scale(1.22); }
+  100% { opacity:.09; transform:translate(60px, 70px) scale(.9); }
+}
+@keyframes ambientFloatWarm {
+  0% { opacity:.07; transform:translate(0, 0) scale(.95); }
+  50% { opacity:.13; transform:translate(-90px, -50px) scale(1.12); }
+  100% { opacity:.08; transform:translate(50px, -75px) scale(1); }
+}
+
+/* Floating Cinematic Dust Motes */
+.ambient-dust-field {
+  inset:0;
+  overflow:hidden;
+  position:absolute;
+}
+.dust-particle {
+  animation:dustDrift linear infinite;
+  background:rgba(232,235,226,.65);
+  border-radius:50%;
+  box-shadow:0 0 6px rgba(237,170,97,.85);
+  pointer-events:none;
+  position:absolute;
+}
+.dust-particle.p1 { animation-delay:0s; animation-duration:14s; bottom:-20px; height:3px; left:16%; opacity:.35; width:3px; }
+.dust-particle.p2 { animation-delay:3s; animation-duration:18s; bottom:-20px; height:4px; left:34%; opacity:.45; width:4px; }
+.dust-particle.p3 { animation-delay:1s; animation-duration:12s; bottom:-20px; height:2px; left:52%; opacity:.3; width:2px; }
+.dust-particle.p4 { animation-delay:5s; animation-duration:16s; bottom:-20px; height:3px; left:68%; opacity:.4; width:3px; }
+.dust-particle.p5 { animation-delay:2s; animation-duration:15s; bottom:-20px; height:2px; left:82%; opacity:.35; width:2px; }
+.dust-particle.p6 { animation-delay:7s; animation-duration:20s; bottom:-20px; height:4px; left:9%; opacity:.3; width:4px; }
+.dust-particle.p7 { animation-delay:4s; animation-duration:17s; bottom:-20px; height:3px; left:44%; opacity:.4; width:3px; }
+.dust-particle.p8 { animation-delay:6s; animation-duration:13s; bottom:-20px; height:2px; left:91%; opacity:.35; width:2px; }
+@keyframes dustDrift {
+  0% { opacity:0; transform:translateY(0) translateX(0); }
+  15% { opacity:.45; }
+  50% { opacity:.55; transform:translateY(-50vh) translateX(30px); }
+  85% { opacity:.35; }
+  100% { opacity:0; transform:translateY(-105vh) translateX(-20px); }
+}
 .scene-divider { border:0; border-top:1px solid var(--line); margin:0; }
 .scene-section { padding:112px 0; }
 .scene-section-head { margin-bottom:42px; max-width:660px; }
