@@ -63,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const personaMeta = activePersona ? PERSONA_LABELS[activePersona] : null;
 
   return (
-    <aside style={{
+    <aside className="scene-sidebar" style={{
       width: '260px',
       position: 'fixed',
       top: 0,

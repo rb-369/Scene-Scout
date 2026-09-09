@@ -40,7 +40,7 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
   const progressPercent = Math.min(100, Math.round(((currentStepIndex + 1) / Math.max(1, steps.length)) * 100));
 
   return (
-    <div className="glass-panel" style={{
+    <div className="glass-panel studio-timeline" style={{
       padding: '20px 24px',
       marginBottom: '32px',
       borderLeft: '4px solid #f59e0b',

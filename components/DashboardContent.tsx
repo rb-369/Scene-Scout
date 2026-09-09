@@ -608,8 +608,8 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
             )}
 
             {/* Candidate Shortlist Section */}
-            <div ref={shortlistRef} id="shortlist-section" style={{ scrollMarginTop: '24px', marginBottom: '40px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <div ref={shortlistRef} id="shortlist-section" className="studio-shortlist" style={{ scrollMarginTop: '24px', marginBottom: '40px' }}>
+              <div className="studio-shortlist-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <h3 className="font-display" style={{ fontSize: '1.65rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
@@ -638,7 +638,7 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
               </div>
 
               {/* Candidate Cards Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+              <div className="studio-card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
                 {candidates.map((candidate, idx) => (
                   <LocationCard
                     key={candidate.id}

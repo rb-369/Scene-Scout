@@ -57,7 +57,7 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
   ];
 
   return (
-    <div className="glass-panel" style={{
+    <div className="glass-panel studio-conversation" style={{
       padding: '24px',
       marginBottom: '32px',
       background: 'linear-gradient(135deg, rgba(14, 18, 28, 0.95) 0%, rgba(18, 24, 38, 0.9) 100%)'
