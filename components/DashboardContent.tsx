@@ -23,7 +23,8 @@ import {
   DEMO_BRIEF, 
   DEMO_CANDIDATES, 
   DEMO_ACTIVITY_STEPS, 
-  DEMO_SESSION 
+  DEMO_SESSION,
+  ADDITIONAL_SUGGESTED_CANDIDATES 
 } from '@/lib/demoData';
 import { storageService } from '@/lib/services/storage';
 import { 
@@ -41,7 +42,8 @@ import {
   CheckCircle,
   ArrowDown,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  PlusCircle
 } from 'lucide-react';
 
 export function DashboardContent({ 
@@ -76,6 +78,11 @@ export function DashboardContent({
   const shortlistRef = useRef<HTMLDivElement>(null);
   const conversationalRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
+  const newlyAddedRef = useRef<HTMLDivElement>(null);
+
+  // Suggest more state
+  const [isSuggestingMore, setIsSuggestingMore] = useState<boolean>(false);
+  const [suggestionFeedback, setSuggestionFeedback] = useState<string | null>(null);
 
   // Modals & Sub-views
   const [selectedCandidate, setSelectedCandidate] = useState<LocationCandidate | null>(null);
@@ -345,6 +352,60 @@ export function DashboardContent({
         return;
       }
       setCompareIds(prev => [...prev, candidate.id]);
+    }
+  };
+
+  // Handler: Suggest more candidate locations if user wants more alternatives
+  const handleSuggestMore = async () => {
+    setIsSuggestingMore(true);
+    setSuggestionFeedback(null);
+
+    try {
+      // Identify candidate locations from reserve pool not currently in active list
+      const currentIds = new Set(candidates.map(c => c.id));
+      const unlisted = ADDITIONAL_SUGGESTED_CANDIDATES.filter(c => !currentIds.has(c.id));
+
+      if (unlisted.length === 0) {
+        // If all 9 curated pool locations have already been added, notify user & guide to AI chat
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setSuggestionFeedback('All 9 curated Mumbai industrial locations are already in your shortlist. Use "Ask SceneScout" below to explore other cities or custom scene styles!');
+        setTimeout(() => {
+          conversationalRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 1200);
+        return;
+      }
+
+      // Simulate the agent querying, verifying access, and synthesizing next batch
+      await new Promise(resolve => setTimeout(resolve, 1100));
+
+      // Append next 2 locations from reserve
+      const nextBatch = unlisted.slice(0, 2);
+      const updatedCandidates = [...candidates, ...nextBatch];
+      
+      setCandidates(updatedCandidates);
+      storageService.cacheActiveCandidates(updatedCandidates);
+
+      if (currentSession) {
+        const updatedSession = {
+          ...currentSession,
+          candidates: updatedCandidates,
+          shortlistedCount: updatedCandidates.length,
+          candidatesFoundCount: (currentSession.candidatesFoundCount || 18) + nextBatch.length
+        };
+        setCurrentSession(updatedSession);
+        storageService.saveSession(updatedSession, user?.id);
+      }
+
+      setSuggestionFeedback(`Discovered & added ${nextBatch.length} more verified candidate dossiers (${nextBatch.map(c => c.name.split(' ')[0]).join(', ')}). Total: ${updatedCandidates.length} locations.`);
+
+      // Smoothly scroll to the newly appended cards
+      setTimeout(() => {
+        newlyAddedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 300);
+    } catch (err) {
+      console.error('Failed to suggest more candidates:', err);
+    } finally {
+      setIsSuggestingMore(false);
     }
   };
 
@@ -736,17 +797,48 @@ export function DashboardContent({
                   </p>
                 </div>
 
-                {/* Compare Bar Launch Action */}
-                {compareIds.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  {/* Suggest More Action Button */}
                   <button
-                    onClick={() => setShowCompareModal(true)}
-                    className="btn-cinema btn-primary animate-pulse-subtle"
-                    style={{ fontSize: '0.85rem' }}
+                    type="button"
+                    onClick={handleSuggestMore}
+                    disabled={isSuggestingMore}
+                    className="btn-cinema btn-secondary"
+                    style={{ fontSize: '0.84rem', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    title="Synthesize and append more location candidates"
                   >
-                    <Layers size={16} />
-                    <span>Compare Selected Candidates ({compareIds.length}/3)</span>
+                    {isSuggestingMore ? (
+                      <>
+                        <div style={{
+                          width: '13px',
+                          height: '13px',
+                          border: '2px solid rgba(245, 158, 11, 0.3)',
+                          borderTopColor: '#f59e0b',
+                          borderRadius: '50%',
+                          animation: 'spin 0.8s linear infinite'
+                        }} />
+                        <span>Scouting Locations...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles size={15} color="#fbbf24" />
+                        <span>Suggest More</span>
+                      </>
+                    )}
                   </button>
-                )}
+
+                  {/* Compare Bar Launch Action */}
+                  {compareIds.length > 0 && (
+                    <button
+                      onClick={() => setShowCompareModal(true)}
+                      className="btn-cinema btn-primary animate-pulse-subtle"
+                      style={{ fontSize: '0.85rem' }}
+                    >
+                      <Layers size={16} />
+                      <span>Compare Selected Candidates ({compareIds.length}/3)</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Candidate Cards Grid */}
@@ -764,6 +856,106 @@ export function DashboardContent({
                     onAskAbout={(cand) => handleAskAbout(cand)}
                   />
                 ))}
+              </div>
+
+              {/* Reference Anchor for Newly Added Candidates */}
+              <div ref={newlyAddedRef} style={{ scrollMarginTop: '60px' }} />
+
+              {/* Suggestion Feedback Banner if recently added */}
+              {suggestionFeedback && (
+                <div style={{
+                  marginTop: '20px',
+                  padding: '12px 18px',
+                  background: 'linear-gradient(90deg, rgba(56, 189, 248, 0.12) 0%, rgba(37, 99, 235, 0.08) 100%)',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  color: '#bae6fd',
+                  fontSize: '0.86rem',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+                }}>
+                  <CheckCircle2 size={18} color="#38bdf8" />
+                  <span style={{ fontWeight: 500 }}>{suggestionFeedback}</span>
+                </div>
+              )}
+
+              {/* Dedicated "Suggest More Locations" Action Card */}
+              <div style={{
+                marginTop: '24px',
+                padding: '24px 28px',
+                background: 'linear-gradient(135deg, rgba(14, 20, 36, 0.85) 0%, rgba(10, 14, 26, 0.95) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.28)',
+                borderRadius: '14px',
+                boxShadow: '0 10px 36px rgba(0, 0, 0, 0.45)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '20px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '18px', minWidth: '280px', flex: 1 }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(56, 189, 248, 0.15) 100%)',
+                    border: '1px solid rgba(245, 158, 11, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: '0 4px 14px rgba(245, 158, 11, 0.15)'
+                  }}>
+                    <Sparkles size={24} color="#fbbf24" />
+                  </div>
+                  <div>
+                    <h4 className="font-display" style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', marginBottom: '4px' }}>
+                      Not satisfied with these options? Suggest more locations
+                    </h4>
+                    <p style={{ color: '#94a3b8', fontSize: '0.84rem', lineHeight: 1.5, maxWidth: '640px' }}>
+                      Expand SceneScout&apos;s autonomous intelligence across Mumbai&apos;s naval shipyards, chemical corridors, rail maintenance sheds, and coastal salt pan complexes to discover alternative candidate dossiers.
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={handleSuggestMore}
+                    disabled={isSuggestingMore}
+                    className="btn-cinema btn-primary"
+                    style={{ padding: '11px 20px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  >
+                    {isSuggestingMore ? (
+                      <>
+                        <div style={{
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid rgba(0,0,0,0.3)',
+                          borderTopColor: '#000000',
+                          borderRadius: '50%',
+                          animation: 'spin 0.8s linear infinite'
+                        }} />
+                        <span>Discovering New Locations...</span>
+                      </>
+                    ) : (
+                      <>
+                        <PlusCircle size={17} />
+                        <span>Suggest More Locations</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => conversationalRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                    className="btn-cinema btn-ghost"
+                    style={{ fontSize: '0.84rem', padding: '11px 16px' }}
+                  >
+                    <span>Ask Agent Custom Brief</span>
+                  </button>
+                </div>
               </div>
             </div>
 

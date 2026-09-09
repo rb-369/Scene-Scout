@@ -411,6 +411,313 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
   }
 ];
 
+export const ADDITIONAL_SUGGESTED_CANDIDATES: LocationCandidate[] = [
+  {
+    id: "loc-mumbai-06",
+    name: "Mazagon Docks Marine Fabricators Shed & Slipways",
+    area: "Mazagon / Dockyard Road",
+    city: "Mumbai",
+    description: "Towering historic naval fabrication workshop featuring 50-foot overhead gantry cranes, massive oxidised steel bulkhead plates, industrial rivets, and direct sea slipways facing the eastern harbor. Unrivaled for intense interrogation and industrial hideout scenes.",
+    sceneMatchScore: 95,
+    accessibilityScore: 84,
+    productionRiskScore: 38,
+    evidenceQualityScore: 90,
+    overallScore: 89,
+    visualCharacteristics: [
+      "Gigantic 50-ft clearance steel gantry framework with traveling chain hoists",
+      "Heavy steel hull plates and industrial sparks from adjacent fabrication docks",
+      "Water-facing slipway ramp opening directly into dark harbor waters",
+      "Cavernous echoing interior with natural blue-tinted coastal daylight shafts"
+    ],
+    productionConsiderations: {
+      accessibility: "Wide approach via Dockyard Road; large gate entrance capable of clearing 40ft sound and grip trucks.",
+      parking: "Dedicated secure shipyard perimeter tarmac accommodating up to 10 production vans.",
+      operatingEnvironment: "Active naval repair facility; access restricted to non-classified fabrication bays.",
+      ownershipStatus: "Defence Public Sector Undertaking (Mazagon Dock Shipbuilders Ltd)",
+      potentialRestrictions: [
+        "Defence security verification: Cast and crew passport/Aadhaar list required 5 working days prior.",
+        "Foreign national crew members require Ministry of Defence security clearance.",
+        "No photography or drone flight facing active drydock defence vessels."
+      ],
+      contactInformation: "Commercial Filming Liaison Officer, Mazagon Dock Shipbuilders Ltd",
+      powerAvailability: "415V 3-phase industrial power supply available directly on shop floor.",
+      noiseProfile: "Moderate to high during daytime shifts (pneumatic riveting); remarkably silent after 19:00."
+    },
+    potentialRestrictions: [
+      "Ministry of Defence clearance required for foreign crew or international distribution",
+      "No drone or high-angle cameras pointed toward naval slips",
+      "Mandatory security escort for all technical crew movements"
+    ],
+    contactInformation: "Mazagon Dock Estates & Public Relations Division, Dockyard Road",
+    estimatedTariff: "₹95,000 / 12-hr shift (Standardized PSU filming rate)",
+    contactDetails: {
+      phone: "+91 22 2378 1120",
+      email: "commercial-shoots@mazdock.gov.in",
+      officeDesk: "MDL Heritage Administration Building, Gate 2, Dockyard Road",
+      notes: "Standardized official PSU tariff; requires 5 days advance crew ID manifest."
+    },
+    sources: [
+      {
+        title: "Mazagon Dock Shipbuilders Commercial Filming Protocol",
+        url: "https://mazagondock.in/filming-in-shipyard-workshops",
+        domain: "mazagondock.in",
+        snippet: "Official guidelines for booking decommissioned workshop sheds and fabrication slipways for approved film and commercial productions.",
+        relevance: "Official legal and tariff authority"
+      },
+      {
+        title: "Indian Cinematography Guild: Maritime Industrial Locations Guide",
+        url: "https://cinematographyindia.org/locations/mumbai-dockyards",
+        domain: "cinematographyindia.org",
+        snippet: "Pioneering thriller directors utilize Mazagon's soaring steel girders and deep industrial shadows for high-stakes climactic scenes.",
+        relevance: "Cinematic precedent and visual suitability"
+      }
+    ],
+    recommendation: "Remarkable visual scale and authentic naval industrial texture. Top-tier choice if security manifest timelines permit.",
+    confidence: 93,
+    trustStatus: "VERIFIED BY SOURCES",
+    evidenceQuotes: [
+      {
+        claim: "50-foot clear ceiling height with functional overhead heavy-lift gantry cranes.",
+        sourceTitle: "Indian Cinematography Guild: Maritime Industrial Locations Guide",
+        sourceUrl: "https://cinematographyindia.org/locations/mumbai-dockyards"
+      },
+      {
+        claim: "Standardized commercial shoot tariff and dedicated security protocol for film crews.",
+        sourceTitle: "Mazagon Dock Shipbuilders Commercial Filming Protocol",
+        sourceUrl: "https://mazagondock.in/filming-in-shipyard-workshops"
+      }
+    ]
+  },
+  {
+    id: "loc-mumbai-07",
+    name: "Wagle Industrial Boiler Works & Chemical Godowns",
+    area: "Thane West / Wagle Industrial Estate",
+    city: "Mumbai",
+    description: "Sprawling 1970s chemical distillation complex featuring exterior steel pipeline corridors, decommissioned vertical storage silos, rusted valve networks, and a 16,000 sq ft column-free warehouse hall.",
+    sceneMatchScore: 92,
+    accessibilityScore: 90,
+    productionRiskScore: 22,
+    evidenceQualityScore: 94,
+    overallScore: 92,
+    visualCharacteristics: [
+      "Extensive external labyrinth of rusty steam pipes, pressure gauges, and catwalks",
+      "Massive polished concrete floor with faded yellow hazard safety striping",
+      "Heavy industrial steel bay doors opening onto broad concrete loading aprons",
+      "Dramatic overhead clerestory windows giving sharp cinematic light shafts"
+    ],
+    productionConsiderations: {
+      accessibility: "Immediate access off Eastern Express Highway and LBS Marg. Ample turning radius for heavy haulers.",
+      parking: "Private gated compound parking for 20+ production vehicles, catering units, and vanity vans.",
+      operatingEnvironment: "Decommissioned private industrial estate. Completely unoccupied and silent.",
+      ownershipStatus: "Private Estate / Maharashtra Industrial Development Corporation (MIDC) Leaseholder",
+      potentialRestrictions: [
+        "MIDC local fire clearance required if using high-wattage tungsten lighting arrays.",
+        "Chemical residue certificate verified: plant fully decommissioned and certified safe for human occupancy.",
+        "Night shooting permitted without decibel restrictions due to industrial zone zoning."
+      ],
+      contactInformation: "Wagle Industrial Complex Management Desk, Road No. 16",
+      powerAvailability: "High-capacity 100kVA industrial transformer on site; dual generator tie-ins ready.",
+      noiseProfile: "Extremely low: enclosed industrial park away from train lines and traffic."
+    },
+    potentialRestrictions: [
+      "Local Thane Municipal Corporation (TMC) single-day shoot notification",
+      "Production fire tender required if special effects fog/haze is utilized",
+      "No structural modifications to historic distillation towers"
+    ],
+    contactInformation: "MIDC Industrial Estate Management Liaison, Thane West",
+    estimatedTariff: "₹50,000 - ₹75,000 / shift (Private MIDC Commercial Rate)",
+    contactDetails: {
+      phone: "+91 22 2582 3410",
+      email: "estates@wagle-midc.co.in",
+      officeDesk: "Wagle Industrial Estate Association Office, Road No. 22, Thane West",
+      notes: "Private industrial leaseholder booking; 24-hour turnaround on shoot agreements."
+    },
+    sources: [
+      {
+        title: "MIDC Maharashtra Film Locations Registry",
+        url: "https://midcindia.org/film-shooting-locations/thane-industrial-belt",
+        domain: "midcindia.org",
+        snippet: "Wagle Estate chemical compound officially registered under single-window filming clearances with unrestricted night shoot permits.",
+        relevance: "Official zoning and clearance authority"
+      },
+      {
+        title: "Western India Cinematographers Association Directory",
+        url: "https://wica.in/locations/thane-chemical-warehouses",
+        domain: "wica.in",
+        snippet: "Highly recommended for action and suspense sequences due to quiet sound conditions and column-free floor plan.",
+        relevance: "Sound and logistical endorsement"
+      }
+    ],
+    recommendation: "The lowest logistical risk candidate in the region. Unrestricted 24-hour filming permissions and flawless sync-sound quietness.",
+    confidence: 96,
+    trustStatus: "VERIFIED BY SOURCES",
+    evidenceQuotes: [
+      {
+        claim: "Unrestricted night shooting permitted without residential noise restrictions.",
+        sourceTitle: "MIDC Maharashtra Film Locations Registry",
+        sourceUrl: "https://midcindia.org/film-shooting-locations/thane-industrial-belt"
+      },
+      {
+        claim: "16,000 sq ft column-free interior with pristine sync-sound acoustic isolation.",
+        sourceTitle: "Western India Cinematographers Association Directory",
+        sourceUrl: "https://wica.in/locations/thane-chemical-warehouses"
+      }
+    ]
+  },
+  {
+    id: "loc-mumbai-08",
+    name: "Kurla Rail Freight Car Shed & Maintenance Yard",
+    area: "Kurla East / Nehrunagar",
+    city: "Mumbai",
+    description: "Historic British-era railway inspection shed with deep subterranean grease pits, retired passenger rail coaches on dead-end sidings, vintage industrial skylights, and weathered railway signal gantries.",
+    sceneMatchScore: 90,
+    accessibilityScore: 86,
+    productionRiskScore: 32,
+    evidenceQualityScore: 89,
+    overallScore: 88,
+    visualCharacteristics: [
+      "Subterranean track inspection pits with grated steel walkways and damp masonry",
+      "Retired vintage maroon passenger carriages on gravel sidings",
+      "Arched steel truss roof with natural haze and dusty spotlighting",
+      "Authentic railway paraphernalia: switch levers, signal boxes, and oxidized steel tracks"
+    ],
+    productionConsiderations: {
+      accessibility: "Direct approach from Santa Cruz-Chembur Link Road (SCLR). Easy crew shuttle access.",
+      parking: "Railway staff parking lot available for production staging (up to 12 vehicles).",
+      operatingEnvironment: "Dedicated heritage rail siding separated from active commuter suburban tracks.",
+      ownershipStatus: "Central Railway (Ministry of Railways, Government of India)",
+      potentialRestrictions: [
+        "Central Railway Chief Public Relations Officer (CPRO) commercial shoot license required.",
+        "Shoot supervisor appointed by Railways must be present during all filming on tracks.",
+        "High-voltage overhead traction wire safety protocol strictly enforced."
+      ],
+      contactInformation: "Central Railway Commercial Filming Cell, CSMT Headquarters",
+      powerAvailability: "Railway electrical hookup point (415V) available via Railway electrical engineer.",
+      noiseProfile: "Moderate: periodic sound of commuter trains on adjacent main lines."
+    },
+    potentialRestrictions: [
+      "Railway safety marshal mandatory during all setup and filming",
+      "No crossing live suburban tracks; crew must remain within demarcated dead-end siding",
+      "7-day advance notice for Railway CPRO filming permissions"
+    ],
+    contactInformation: "Central Railway CPRO Filming Cell, CSMT Mumbai",
+    estimatedTariff: "₹65,000 / 8-hr shift (Central Railway Gazette Rate)",
+    contactDetails: {
+      phone: "+91 22 2262 0123",
+      email: "cpro@cr.railnet.gov.in",
+      officeDesk: "Chief Public Relations Office, Ground Floor, CSMT Heritage Building, Mumbai",
+      notes: "Standardized Railway filming gazette rate; requires advance script synopsis."
+    },
+    sources: [
+      {
+        title: "Indian Railways Commercial Filming Policy & Tariffs",
+        url: "https://indianrailways.gov.in/railwayboard/view_section.jsp?id=filming-policy",
+        domain: "indianrailways.gov.in",
+        snippet: "Indian Railways gazette detailing standardized fees, security deposits, and insurance guidelines for filming on decommissioned sidings.",
+        relevance: "Official legal and tariff authority"
+      },
+      {
+        title: "Mumbai Film Commission Rail Locations Roster",
+        url: "https://mumbaifilmoffice.org/locations/kurla-rail-shed",
+        domain: "mumbaifilmoffice.org",
+        snippet: "Frequently deployed for suspenseful rail yard chase sequences and underworld transit hideouts.",
+        relevance: "Practical filming precedent"
+      }
+    ],
+    recommendation: "Exceptional visual depth and authentic railway textures. Excellent standardized rates with clear bureaucratic clearance.",
+    confidence: 92,
+    trustStatus: "VERIFIED BY SOURCES",
+    evidenceQuotes: [
+      {
+        claim: "Decommissioned rail siding insulated from active commuter train traffic.",
+        sourceTitle: "Mumbai Film Commission Rail Locations Roster",
+        sourceUrl: "https://mumbaifilmoffice.org/locations/kurla-rail-shed"
+      },
+      {
+        claim: "Standardized hourly rates governed by Indian Railways Commercial Filming Policy.",
+        sourceTitle: "Indian Railways Commercial Filming Policy & Tariffs",
+        sourceUrl: "https://indianrailways.gov.in/railwayboard/view_section.jsp?id=filming-policy"
+      }
+    ]
+  },
+  {
+    id: "loc-mumbai-09",
+    name: "Wadala Salt Pan Silos & Brine Pumping Complex",
+    area: "Wadala East / Antop Hill",
+    city: "Mumbai",
+    description: "Surreal minimalist salt flats punctuated by brutalist concrete brine pump houses, rusted conveyor towers, and desolate gravel tracks against wide Mumbai coastal skies. Evokes Nordic noir and high-concept crime thrillers.",
+    sceneMatchScore: 93,
+    accessibilityScore: 82,
+    productionRiskScore: 35,
+    evidenceQualityScore: 86,
+    overallScore: 87,
+    visualCharacteristics: [
+      "Vast geometric salt crystallizing basins reflecting brooding coastal skies",
+      "Brutalist 1960s concrete pump house with stark rectangular geometry",
+      "Rusted iron conveyor trestles and wooden sluice gates with salt crust patina",
+      "360-degree unobstructed horizon ideal for dramatic dawn and dusk anamorphic framing"
+    ],
+    productionConsiderations: {
+      accessibility: "Approach via Eastern Freeway Wadala exit and Salt Pan Road. Firm gravel track for grip trucks.",
+      parking: "Expansive hardpack gravel flat with unlimited parking capacity for large basecamps.",
+      operatingEnvironment: "Quiet coastal wetland margins; salt operations active only during dry harvest season.",
+      ownershipStatus: "Union Ministry of Commerce & Industry (Salt Commissionerate)",
+      potentialRestrictions: [
+        "Coastal Regulation Zone (CRZ) environmental clearance notification required.",
+        "No permanent structures or chemical waste disposal permitted on wetland fringes.",
+        "Tide schedule awareness: specific lower access tracks submerge during spring high tides."
+      ],
+      contactInformation: "Office of the Salt Commissioner, Government of India, Mumbai Division",
+      powerAvailability: "Zero grid power on the salt flats; mobile silent generators required.",
+      noiseProfile: "Very low: secluded coastal expanse with gentle wind noise."
+    },
+    potentialRestrictions: [
+      "CRZ environmental undertaking required",
+      "Tide monitoring mandatory for low-lying peripheral tracks",
+      "Generators must be equipped with spill-containment trays"
+    ],
+    contactInformation: "Salt Commissionerate Regional Office, Antop Hill, Wadala East",
+    estimatedTariff: "₹45,000 / day (Union Government Non-Tax Revenue Tariff)",
+    contactDetails: {
+      phone: "+91 22 2407 1944",
+      email: "saltcomm-mum@nic.in",
+      officeDesk: "Office of the Deputy Salt Commissioner, Antop Hill, Mumbai",
+      notes: "Clearance coordinated via Salt Commissionerate; tide table consultation recommended."
+    },
+    sources: [
+      {
+        title: "Salt Commissionerate Commercial Use Guidelines",
+        url: "https://salt.gov.in/filming-permits-mumbai-salt-lands",
+        domain: "salt.gov.in",
+        snippet: "Statutory rules governing temporary access, filming tariffs, and ecological safety on Mumbai salt lands.",
+        relevance: "Official legal and regulatory authority"
+      },
+      {
+        title: "Screen Daily: Distinctive Architectural Backdrops in Western India",
+        url: "https://screendaily.com/features/mumbai-minimalist-salt-flat-locations",
+        domain: "screendaily.com",
+        snippet: "Wadala salt flats celebrated for unique international visual look, providing high-production-value minimalism.",
+        relevance: "Visual uniqueness and international cinematic value"
+      }
+    ],
+    recommendation: "Incredible visual differentiation from typical indoor warehouses. Perfect for climatic standoff, body disposal, or espionage exchange scenes.",
+    confidence: 90,
+    trustStatus: "VERIFIED BY SOURCES",
+    evidenceQuotes: [
+      {
+        claim: "Unobstructed 360-degree horizon with minimal urban visual pollution.",
+        sourceTitle: "Screen Daily: Distinctive Architectural Backdrops in Western India",
+        sourceUrl: "https://screendaily.com/features/mumbai-minimalist-salt-flat-locations"
+      },
+      {
+        claim: "Standardized Union Government day rate through Salt Commissionerate.",
+        sourceTitle: "Salt Commissionerate Commercial Use Guidelines",
+        sourceUrl: "https://salt.gov.in/filming-permits-mumbai-salt-lands"
+      }
+    ]
+  }
+];
+
 export const DEMO_ACTIVITY_STEPS: AgentActivityStep[] = [
   {
     id: "step-1",
