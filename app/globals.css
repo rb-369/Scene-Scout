@@ -182,34 +182,106 @@ button,input,select,textarea { font:inherit; } button { -webkit-tap-highlight-co
   100% { opacity:.08; transform:translate(50px, -75px) scale(1); }
 }
 
-/* Cinematic Shooting Star Track */
-.shooting-star-track {
-  height:120px;
-  left:-10%;
+/* Cinematic Slow White Shooting Stars */
+.shooting-stars-container {
+  inset:0;
   overflow:hidden;
   pointer-events:none;
   position:absolute;
-  top:12%;
-  transform:rotate(-24deg);
-  width:130%;
   z-index:1;
 }
-.shooting-star {
-  animation:shootingStarAnim 10s cubic-bezier(.25,1,.5,1) infinite;
-  background:linear-gradient(90deg,rgba(237,170,97,.95),rgba(211,138,69,.5),transparent);
-  border-radius:999px;
-  box-shadow:0 0 10px rgba(237,170,97,.8);
-  height:2px;
-  left:0;
+.shooting-star-lane {
+  overflow:visible;
+  pointer-events:none;
   position:absolute;
-  top:45px;
-  width:140px;
 }
-@keyframes shootingStarAnim {
-  0%, 72% { opacity:0; transform:translateX(-160px) scaleX(.2); }
-  78% { opacity:1; transform:translateX(350px) scaleX(1.3); }
-  85% { opacity:0; transform:translateX(1200px) scaleX(.8); }
-  100% { opacity:0; transform:translateX(1200px) scaleX(.1); }
+.shooting-star-lane.lane-1 {
+  height:120px;
+  left:-15%;
+  top:12%;
+  transform:rotate(-22deg);
+  width:130%;
+}
+.shooting-star-lane.lane-2 {
+  height:120px;
+  left:5%;
+  top:38%;
+  transform:rotate(-27deg);
+  width:115%;
+}
+.shooting-star-lane.lane-3 {
+  height:120px;
+  left:-10%;
+  top:65%;
+  transform:rotate(-18deg);
+  width:125%;
+}
+
+.white-shooting-star {
+  background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.05) 20%, rgba(255,255,255,.45) 60%, rgba(255,255,255,.95) 90%, #ffffff 100%);
+  border-radius:999px;
+  box-shadow:0 0 12px rgba(255,255,255,.85), 0 0 24px rgba(255,255,255,.4);
+  height:2px;
+  opacity:0;
+  pointer-events:none;
+  position:absolute;
+  will-change:transform, opacity;
+}
+.white-shooting-star::after {
+  background:#ffffff;
+  border-radius:50%;
+  box-shadow:0 0 10px 2px #ffffff, 0 0 22px 5px rgba(255,255,255,.9), 0 0 35px 8px rgba(255,255,255,.5);
+  content:'';
+  height:5px;
+  position:absolute;
+  right:0;
+  top:-1.5px;
+  width:5px;
+}
+
+/* Star 1: Slow sweeping traverse across upper sky */
+.white-shooting-star.star-1 {
+  animation:slowShootingStar1 15s cubic-bezier(.25,.75,.45,1) infinite;
+  animation-delay:.8s;
+  top:45px;
+  width:200px;
+}
+@keyframes slowShootingStar1 {
+  0% { opacity:0; transform:translateX(-240px) scaleX(.3); }
+  5% { opacity:.95; transform:translateX(80px) scaleX(1); }
+  26% { opacity:.9; transform:translateX(980px) scaleX(1.1); }
+  34% { opacity:0; transform:translateX(1550px) scaleX(.6); }
+  100% { opacity:0; transform:translateX(1550px) scaleX(.6); }
+}
+
+/* Star 2: Gentle diagonal descent through mid-viewport */
+.white-shooting-star.star-2 {
+  animation:slowShootingStar2 19s cubic-bezier(.25,.75,.45,1) infinite;
+  animation-delay:6s;
+  top:50px;
+  width:170px;
+}
+@keyframes slowShootingStar2 {
+  0% { opacity:0; transform:translateX(-200px) scaleX(.35); }
+  6% { opacity:.92; transform:translateX(120px) scaleX(1); }
+  25% { opacity:.88; transform:translateX(820px) scaleX(1.08); }
+  33% { opacity:0; transform:translateX(1300px) scaleX(.5); }
+  100% { opacity:0; transform:translateX(1300px) scaleX(.5); }
+}
+
+/* Star 3: Deep slow glide across lower atmosphere */
+.white-shooting-star.star-3 {
+  animation:slowShootingStar3 23s cubic-bezier(.25,.75,.45,1) infinite;
+  animation-delay:12s;
+  top:40px;
+  width:230px;
+}
+@keyframes slowShootingStar3 {
+  0% { opacity:0; transform:translateX(-260px) scaleX(.3); }
+  5% { opacity:.96; transform:translateX(140px) scaleX(1); }
+  24% { opacity:.88; transform:translateX(1050px) scaleX(1.15); }
+  32% { opacity:0; transform:translateX(1600px) scaleX(.65); }
+  100% { opacity:0; transform:translateX(1600px) scaleX(.65); }
 }
 
 /* 32 Layered Stars & Projector Dust Field */

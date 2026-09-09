@@ -88,9 +88,17 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
         <div className="ambient-orb ambient-orb-cyan" />
         <div className="ambient-orb ambient-orb-warm" />
 
-        {/* Cinematic Shooting Star */}
-        <div className="shooting-star-track">
-          <span className="shooting-star" />
+        {/* Cinematic Slow White Shooting Stars */}
+        <div className="shooting-stars-container">
+          <div className="shooting-star-lane lane-1">
+            <span className="white-shooting-star star-1" />
+          </div>
+          <div className="shooting-star-lane lane-2">
+            <span className="white-shooting-star star-2" />
+          </div>
+          <div className="shooting-star-lane lane-3">
+            <span className="white-shooting-star star-3" />
+          </div>
         </div>
 
         {/* 32 Layered Stars & Projector Dust Particles across Viewport */}
