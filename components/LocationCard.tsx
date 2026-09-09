@@ -63,9 +63,8 @@ export function LocationCard({
       </div>
 
       <div className="location-tariff">
-        <span>Location fee</span>
+        <span>Est. Fee</span>
         <strong>{candidate.estimatedTariff || 'Rate on inquiry'}</strong>
-        <small>{candidate.productionConsiderations?.ownershipStatus || 'Authority to be confirmed'}</small>
       </div>
 
       <p className="location-description">{candidate.description}</p>
@@ -97,7 +96,7 @@ export function LocationCard({
           </button>
         </div>
         <button className="location-open-dossier" onClick={() => onViewDetails(candidate)}>
-          Dossier <Eye size={14} />
+          View <Eye size={14} />
         </button>
       </footer>
 
