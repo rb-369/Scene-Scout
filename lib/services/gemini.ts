@@ -6,20 +6,26 @@ export class GeminiAgentService {
   private modelName: string;
 
   constructor() {
-    const apiKey = process.env.GEMINI_API_KEY?.trim();
     this.modelName = process.env.GEMINI_MODEL?.trim() || 'gemini-2.5-flash';
+    this.getGenAI();
+  }
 
+  private getGenAI(): GoogleGenerativeAI | null {
+    if (this.genAI) return this.genAI;
+    const apiKey = process.env.GEMINI_API_KEY?.trim();
     if (apiKey && apiKey.length > 5) {
       try {
         this.genAI = new GoogleGenerativeAI(apiKey);
+        return this.genAI;
       } catch (err) {
         console.error('[Gemini Service] Failed to initialize GoogleGenerativeAI:', err);
       }
     }
+    return null;
   }
 
   public isConfigured(): boolean {
-    return Boolean(this.genAI);
+    return Boolean(this.getGenAI());
   }
 
   /**
@@ -36,7 +42,7 @@ export class GeminiAgentService {
     }
 
     try {
-      const model = this.genAI!.getGenerativeModel({ model: this.modelName });
+      const model = this.getGenAI()!.getGenerativeModel({ model: this.modelName });
       const prompt = `You are SceneScout, an elite autonomous AI film production scout.
 A producer provided this production brief:
 "${brief}"
@@ -77,7 +83,7 @@ Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
     }
 
     try {
-      const model = this.genAI!.getGenerativeModel({ 
+      const model = this.getGenAI()!.getGenerativeModel({ 
         model: this.modelName,
         generationConfig: { responseMimeType: "application/json" }
       });
@@ -237,7 +243,7 @@ IMPORTANT:
 
     if (this.isConfigured()) {
       try {
-        const model = this.genAI!.getGenerativeModel({ model: this.modelName });
+        const model = this.getGenAI()!.getGenerativeModel({ model: this.modelName });
         const historyText = conversationHistory.slice(-6).map(m => 
           `${m.sender === 'user' ? 'Filmmaker' : 'SceneScout Agent'}: ${m.text}`
         ).join('\n');

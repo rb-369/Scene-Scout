@@ -12,24 +12,32 @@ declare global {
 }
 
 export function isMongoDBConfigured(): boolean {
-  return Boolean(uri && uri.trim().length > 0);
+  const currentUri = process.env.MONGODB_URI || '';
+  return Boolean(currentUri && currentUri.trim().length > 0);
 }
 
 export async function getMongoClient(): Promise<MongoClient | null> {
-  if (!isMongoDBConfigured()) {
+  const currentUri = process.env.MONGODB_URI || '';
+  if (!currentUri || currentUri.trim().length === 0) {
     return null;
   }
 
   if (process.env.NODE_ENV === 'development') {
     if (!global._mongoClientPromise) {
-      client = new MongoClient(uri, options);
-      global._mongoClientPromise = client.connect();
+      client = new MongoClient(currentUri, options);
+      global._mongoClientPromise = client.connect().catch((err) => {
+        global._mongoClientPromise = undefined;
+        throw err;
+      });
     }
     return global._mongoClientPromise;
   } else {
     if (!clientPromise) {
-      client = new MongoClient(uri, options);
-      clientPromise = client.connect();
+      client = new MongoClient(currentUri, options);
+      clientPromise = client.connect().catch((err) => {
+        clientPromise = null;
+        throw err;
+      });
     }
     return clientPromise;
   }

@@ -274,8 +274,11 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
     }
   };
 
-  // Compare candidates subset
-  const comparedCandidates = candidates.filter(c => compareIds.includes(c.id));
+  // Compare candidates subset (pools from both active scout and saved locations)
+  const allKnownCandidates = [...candidates, ...savedLocations].filter(
+    (c, idx, arr) => arr.findIndex(x => x.id === c.id) === idx
+  );
+  const comparedCandidates = allKnownCandidates.filter(c => compareIds.includes(c.id));
   const recentSessions = storageService.getSessions();
 
   return (
@@ -397,7 +400,7 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${comparedCandidates.length}, 1fr)`, gap: '18px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '18px' }}>
                 {comparedCandidates.map((candidate) => (
                   <div key={candidate.id} className="glass-panel" style={{ padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -461,7 +464,7 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
                       className="btn-cinema btn-secondary"
                       style={{ width: '100%', fontSize: '0.82rem', padding: '8px' }}
                     >
-                      View Full Dossier
+                      View Details
                     </button>
                   </div>
                 ))}

@@ -26,8 +26,13 @@ export class ParallelSearchClient {
     this.apiKey = process.env.PARALLEL_API_KEY?.trim();
   }
 
+  private getApiKey(): string | undefined {
+    return this.apiKey || process.env.PARALLEL_API_KEY?.trim();
+  }
+
   public isConfigured(): boolean {
-    return Boolean(this.apiKey && this.apiKey.length > 5);
+    const key = this.getApiKey();
+    return Boolean(key && key.length > 5);
   }
 
   /**
@@ -57,7 +62,7 @@ export class ParallelSearchClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': this.apiKey!
+          'x-api-key': this.getApiKey()!
         },
         body: JSON.stringify(payload)
       });

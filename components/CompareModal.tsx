@@ -84,21 +84,23 @@ export const CompareModal: React.FC<CompareModalProps> = ({
             <span>Which location should you choose? - SceneScout Verdict</span>
           </div>
           <p style={{ color: '#e0f2fe', fontSize: '0.88rem', lineHeight: 1.5 }}>
-            • For <strong>maximum visual drama</strong>: <strong>{bestScene.name}</strong> ({bestScene.sceneMatchScore}/100 match).<br />
-            • For <strong>lowest legal hazard & easiest permits</strong>: <strong>{lowestRisk.name}</strong> (Risk: {lowestRisk.productionRiskScore}%).<br />
-            • For <strong>heavy gear & logistics</strong>: <strong>{bestAccess.name}</strong> ({bestAccess.accessibilityScore}/100 access).
+            • For <strong>maximum visual drama</strong>: <strong>{bestScene?.name || 'Top match'}</strong> ({bestScene?.sceneMatchScore || 0}/100 match).<br />
+            • For <strong>lowest legal hazard & easiest permits</strong>: <strong>{lowestRisk?.name || 'Verified option'}</strong> (Risk: {lowestRisk?.productionRiskScore || 0}%).<br />
+            • For <strong>heavy gear & logistics</strong>: <strong>{bestAccess?.name || 'Accessible site'}</strong> ({bestAccess?.accessibilityScore || 0}/100 access).
           </p>
         </div>
 
         {/* Matrix Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: `180px repeat(${candidates.length}, 1fr)`,
-          gap: '1px',
-          background: 'rgba(255, 255, 255, 0.08)',
-          borderRadius: '10px',
-          overflow: 'hidden'
-        }}>
+        <div style={{ overflowX: 'auto', borderRadius: '10px' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: `180px repeat(${candidates.length}, minmax(180px, 1fr))`,
+            minWidth: `${180 + candidates.length * 180}px`,
+            gap: '1px',
+            background: 'rgba(255, 255, 255, 0.08)',
+            borderRadius: '10px',
+            overflow: 'hidden'
+          }}>
           {/* Header Row */}
           <div style={{ padding: '16px', background: 'rgba(10, 14, 22, 0.8)', fontWeight: 700, color: '#94a3b8', fontSize: '0.82rem' }}>
             Criteria Dimension
@@ -221,6 +223,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
               "{c.recommendation}"
             </div>
           ))}
+        </div>
         </div>
       </div>
     </div>

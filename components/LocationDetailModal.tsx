@@ -307,7 +307,9 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
                   type="button"
                   onClick={() => {
                     const text = `${candidate.name} Filming Liaison:\nPhone: ${candidate.contactDetails?.phone || ''}\nEmail: ${candidate.contactDetails?.email || ''}\nOffice Desk: ${candidate.contactDetails?.officeDesk || candidate.contactInformation || ''}\nProtocol: ${candidate.contactDetails?.notes || ''}\nDaily Tariff: ${candidate.estimatedTariff || ''}`;
-                    navigator.clipboard.writeText(text);
+                    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+                      navigator.clipboard.writeText(text).catch(() => {});
+                    }
                     setCopiedContact(true);
                     setTimeout(() => setCopiedContact(false), 2000);
                   }}
