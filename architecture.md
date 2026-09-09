@@ -46,7 +46,9 @@ flowchart TD
     end
 
     subgraph Storage_Layer ["Persistence & Session Store"]
-        MultiCriteriaRanker --> LocalSessionStore[(Session & Bookmarks Storage)]
+        MultiCriteriaRanker --> CloudStore[(Supabase PostgreSQL\nProfiles, Bookmarks, Sessions)]
+        MultiCriteriaRanker --> LocalSessionStore[(Client-Side Local Storage Fallback)]
+        API_FollowUp --> CloudStore
         API_FollowUp --> LocalSessionStore
     end
 

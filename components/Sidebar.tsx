@@ -9,9 +9,16 @@ import {
   Sparkles, 
   Radio, 
   Film,
-  ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  User,
+  LogIn,
+  LogOut,
+  SlidersHorizontal,
+  Cloud,
+  HardDrive
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { FilmmakerType } from '@/lib/supabase/types';
 
 interface SidebarProps {
   currentTab: 'scout' | 'saved' | 'compare' | 'history';
@@ -23,6 +30,14 @@ interface SidebarProps {
   isLiveConfigured: boolean;
 }
 
+const PERSONA_LABELS: Record<FilmmakerType, { label: string; icon: string }> = {
+  indie: { label: 'Indie Filmmaker', icon: '🎬' },
+  commercial: { label: 'Commercial House', icon: '🏢' },
+  line_producer: { label: 'Line Producer', icon: '📍' },
+  student: { label: 'Film Student', icon: '🎓' },
+  documentary: { label: 'Documentary', icon: '🎥' }
+};
+
 export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
   setCurrentTab,
@@ -32,6 +47,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setIsDemoMode,
   isLiveConfigured
 }) => {
+  const { 
+    user, 
+    profile, 
+    isConfigured, 
+    setShowAuthModal, 
+    setShowOnboardingModal, 
+    signOut, 
+    demoPersona, 
+    setDemoPersona 
+  } = useAuth();
+
+  const activePersona = profile?.filmmaker_type || demoPersona;
+  const personaMeta = activePersona ? PERSONA_LABELS[activePersona] : null;
+
   return (
     <aside style={{
       width: '260px',
@@ -45,7 +74,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       flexDirection: 'column',
       justifyContent: 'space-between',
       padding: '24px 16px',
-      zIndex: 100
+      zIndex: 100,
+      overflowY: 'auto'
     }}>
       {/* Top Header & Branding */}
       <div>
@@ -73,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Live vs Demo Badge */}
-        <div style={{ marginTop: '16px', marginBottom: '24px' }}>
+        <div style={{ marginTop: '16px', marginBottom: '20px' }}>
           <div style={{
             background: isDemoMode ? 'rgba(245, 158, 11, 0.08)' : 'rgba(6, 182, 212, 0.08)',
             border: `1px solid ${isDemoMode ? 'rgba(245, 158, 11, 0.25)' : 'rgba(6, 182, 212, 0.25)'}`,
@@ -238,8 +268,156 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
       </div>
 
-      {/* Footer / Attribution */}
-      <div>
+      {/* User Identity & Persona Card */}
+      <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{
+          padding: '12px',
+          borderRadius: '10px',
+          background: 'rgba(255, 255, 255, 0.025)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          {user || demoPersona ? (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    background: '#f59e0b',
+                    color: '#07090e',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 800,
+                    fontSize: '0.78rem'
+                  }}>
+                    {profile?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'P'}
+                  </div>
+                  <div style={{ overflow: 'hidden' }}>
+                    <div style={{
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      maxWidth: '120px'
+                    }}>
+                      {profile?.full_name || user?.email?.split('@')[0] || 'Guest Creator'}
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
+                      {user ? 'Authenticated' : 'Local Preview'}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    if (user) {
+                      signOut();
+                    } else {
+                      setDemoPersona(null);
+                    }
+                  }}
+                  title="Sign out"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#64748b',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <LogOut size={14} />
+                </button>
+              </div>
+
+              {/* Active Persona Pill (Clickable to change) */}
+              <button
+                type="button"
+                onClick={() => setShowOnboardingModal(true)}
+                title="Click to switch your production persona"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '6px 10px',
+                  borderRadius: '6px',
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  color: '#fbbf24',
+                  fontSize: '0.74rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textAlign: 'left'
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>{personaMeta?.icon || '🎬'}</span>
+                  <span>{personaMeta?.label || 'Indie Filmmaker'}</span>
+                </span>
+                <SlidersHorizontal size={11} color="#f59e0b" />
+              </button>
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginBottom: '8px' }}>
+                Join to sync bookmarks & custom scout briefs to Supabase.
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(true)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '8px 12px',
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  color: '#07090e',
+                  borderRadius: '6px',
+                  border: 'none',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(245, 158, 11, 0.25)'
+                }}
+              >
+                <LogIn size={13} strokeWidth={2.4} />
+                <span>Sign In / Join</span>
+              </button>
+            </div>
+          )}
+
+          {/* Cloud vs Local Sync Indicator */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingTop: '6px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            fontSize: '0.66rem',
+            color: '#64748b'
+          }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {isConfigured ? <Cloud size={11} color="#10b981" /> : <HardDrive size={11} color="#38bdf8" />}
+              <span>{isConfigured ? 'Supabase Cloud' : 'Local Persistence'}</span>
+            </span>
+            <span style={{ color: isConfigured ? '#10b981' : '#38bdf8', fontWeight: 600 }}>
+              {isConfigured ? 'Live' : 'Active'}
+            </span>
+          </div>
+        </div>
+
+        {/* Footer / Attribution */}
         <div style={{
           padding: '12px',
           borderRadius: '8px',
@@ -254,6 +432,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <div>Powered by <strong>Gemini</strong></div>
           <div>Integrated with <strong>Parallel API</strong></div>
+          <div>Database: <strong>Supabase</strong></div>
         </div>
       </div>
     </aside>

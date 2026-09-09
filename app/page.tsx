@@ -9,6 +9,9 @@ import { LocationDetailModal } from '@/components/LocationDetailModal';
 import { ConversationalPanel } from '@/components/ConversationalPanel';
 import { CompareModal } from '@/components/CompareModal';
 import { SavedLocationsView } from '@/components/SavedLocationsView';
+import { AuthModal } from '@/components/AuthModal';
+import { FilmmakerOnboardingModal } from '@/components/FilmmakerOnboardingModal';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { 
   LocationCandidate, 
   ResearchSession, 
@@ -38,7 +41,9 @@ import {
   ArrowDown
 } from 'lucide-react';
 
-export default function Home() {
+function DashboardContent() {
+  const { user } = useAuth();
+
   // Navigation
   const [currentTab, setCurrentTab] = useState<'scout' | 'saved' | 'compare' | 'history'>('scout');
 
@@ -83,7 +88,7 @@ export default function Home() {
         setIsDemoMode(true);
       });
 
-    // Load saved locations from local storage
+    // Load saved locations from storage
     const saved = storageService.getSavedLocations();
     setSavedLocations(saved);
 
@@ -92,6 +97,15 @@ export default function Home() {
     setCandidates(DEMO_CANDIDATES);
     setCurrentStepIndex(DEMO_ACTIVITY_STEPS.length - 1);
   }, []);
+
+  // Sync saved locations from Supabase whenever user logs in
+  useEffect(() => {
+    if (user?.id) {
+      storageService.syncSavedLocationsWithCloud(user.id).then(synced => {
+        setSavedLocations(synced);
+      });
+    }
+  }, [user?.id]);
 
   // Handler: Start Scout (or Demo Scout)
   const handleStartScout = async (brief: string, criteria: ScoutCriteria, forceDemo: boolean) => {
@@ -136,7 +150,7 @@ export default function Home() {
       if (data.success && data.session && Array.isArray(data.session.candidates) && data.session.candidates.length > 0) {
         setCurrentSession(data.session);
         setCandidates(data.session.candidates);
-        storageService.saveSession(data.session);
+        storageService.saveSession(data.session, user?.id);
       } else {
         console.warn('Scout returned incomplete session or error, falling back to curated candidates:', data?.error);
         setCurrentSession(DEMO_SESSION);
@@ -160,7 +174,7 @@ export default function Home() {
     }
   };
 
-  // Handler: Ask Agent about a specific candidate location (with automatic scroll down to chat)
+  // Handler: Ask Agent about a specific candidate location
   const handleAskAbout = (cand: LocationCandidate) => {
     // 1. Smoothly scroll down to conversational panel
     setTimeout(() => {
@@ -239,10 +253,10 @@ export default function Home() {
   // Toggle bookmark / save
   const handleToggleSave = (candidate: LocationCandidate) => {
     if (storageService.isSaved(candidate.id)) {
-      storageService.removeSavedLocation(candidate.id);
+      storageService.removeSavedLocation(candidate.id, user?.id);
       setSavedLocations(prev => prev.filter(c => c.id !== candidate.id));
     } else {
-      storageService.saveLocation(candidate);
+      storageService.saveLocation(candidate, user?.id);
       setSavedLocations(prev => [...prev, candidate]);
     }
   };
@@ -262,6 +276,7 @@ export default function Home() {
 
   // Compare candidates subset
   const comparedCandidates = candidates.filter(c => compareIds.includes(c.id));
+  const recentSessions = storageService.getSessions();
 
   return (
     <div className="app-container">
@@ -278,7 +293,7 @@ export default function Home() {
 
       {/* Main Working Area */}
       <main className="main-content">
-        {/* Top Status Bar: Explicit Hackathon Runtime Verification */}
+        {/* Top Status Bar */}
         <header className="top-status-bar" aria-label="System status">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -335,7 +350,7 @@ export default function Home() {
           <SavedLocationsView
             savedLocations={savedLocations}
             onRemove={(id) => {
-              storageService.removeSavedLocation(id);
+              storageService.removeSavedLocation(id, user?.id);
               setSavedLocations(prev => prev.filter(c => c.id !== id));
             }}
             onViewDetails={(c) => setSelectedCandidate(c)}
@@ -349,7 +364,7 @@ export default function Home() {
                   Candidate Comparison
                 </h2>
                 <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
-                  Select 2–3 locations from your scout results to analyze side-by-side.
+                  Select 2-3 locations from your scout results to analyze side-by-side.
                 </p>
               </div>
 
@@ -404,31 +419,59 @@ export default function Home() {
               Scout Research History
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '24px' }}>
-              Previous autonomous scouting briefs and synthesized shortlist dossiers.
+              Previous autonomous scouting briefs and synthesized shortlist dossiers {user ? 'synced with Supabase' : 'stored locally'}.
             </p>
 
-            <div className="glass-panel" style={{ padding: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <span className="badge badge-verified">Primary Hackathon Session</span>
-                <span style={{ fontSize: '0.74rem', color: '#64748b' }}>Mumbai Industrial Thriller</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="glass-panel" style={{ padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <span className="badge badge-verified">Primary Hackathon Benchmark Session</span>
+                  <span style={{ fontSize: '0.74rem', color: '#64748b' }}>Mumbai Industrial Thriller</span>
+                </div>
+                <h4 className="font-display" style={{ fontSize: '1.15rem', color: '#ffffff', marginBottom: '6px' }}>
+                  {DEMO_BRIEF}
+                </h4>
+                <p style={{ color: '#94a3b8', fontSize: '0.84rem', marginBottom: '16px' }}>
+                  Researched 14 web sources across Mumbai Port Authority, Maharashtra Film City, and architectural registries. 5 candidates shortlisted.
+                </p>
+                <button
+                  onClick={() => {
+                    setCurrentSession(DEMO_SESSION);
+                    setCandidates(DEMO_CANDIDATES);
+                    setCurrentTab('scout');
+                  }}
+                  className="btn-cinema btn-secondary"
+                  style={{ fontSize: '0.82rem' }}
+                >
+                  Reload Benchmark Session
+                </button>
               </div>
-              <h4 className="font-display" style={{ fontSize: '1.15rem', color: '#ffffff', marginBottom: '6px' }}>
-                {DEMO_BRIEF}
-              </h4>
-              <p style={{ color: '#94a3b8', fontSize: '0.84rem', marginBottom: '16px' }}>
-                Researched 14 web sources across Mumbai Port Authority, Maharashtra Film City, and architectural registries. 5 candidates shortlisted.
-              </p>
-              <button
-                onClick={() => {
-                  setCurrentSession(DEMO_SESSION);
-                  setCandidates(DEMO_CANDIDATES);
-                  setCurrentTab('scout');
-                }}
-                className="btn-cinema btn-secondary"
-                style={{ fontSize: '0.82rem' }}
-              >
-                Reload This Session
-              </button>
+
+              {recentSessions.filter(s => s.id !== DEMO_SESSION.id).map((s) => (
+                <div key={s.id} className="glass-panel" style={{ padding: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span className="badge badge-cyan">User Scouting Session</span>
+                    <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>{s.criteria.city} • {s.criteria.sceneType}</span>
+                  </div>
+                  <h4 className="font-display" style={{ fontSize: '1.05rem', color: '#ffffff', marginBottom: '6px' }}>
+                    {s.userBrief}
+                  </h4>
+                  <p style={{ color: '#94a3b8', fontSize: '0.82rem', marginBottom: '12px' }}>
+                    Budget: {s.criteria.budgetRange || 'Flexible'} • {s.candidates.length} candidates evaluated
+                  </p>
+                  <button
+                    onClick={() => {
+                      setCurrentSession(s);
+                      setCandidates(s.candidates);
+                      setCurrentTab('scout');
+                    }}
+                    className="btn-cinema btn-primary"
+                    style={{ fontSize: '0.8rem', padding: '6px 14px' }}
+                  >
+                    Restore Shortlist
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         ) : (
@@ -500,78 +543,56 @@ export default function Home() {
                     <ArrowDown size={12} />
                     <span>View Shortlist</span>
                   </button>
-                  <button
-                    onClick={() => setJustCompletedScout(false)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#94a3b8',
-                      cursor: 'pointer',
-                      padding: '4px 8px',
-                      fontSize: '0.9rem'
-                    }}
-                    title="Dismiss notification"
-                  >
-                    ✕
-                  </button>
                 </div>
               </div>
             )}
 
-            {/* Scout Report Header */}
-            <div 
-              ref={shortlistRef}
-              id="scout-results"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '16px',
-                marginBottom: '20px',
-                scrollMarginTop: '24px'
-              }}
-            >
-              <div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }} className="badge badge-verified">
-                  <FileCheck2 size={12} />
-                  Scout Report
+            {/* Candidate Shortlist Section */}
+            <div ref={shortlistRef} id="shortlist-section" style={{ scrollMarginTop: '24px', marginBottom: '40px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <h3 className="font-display" style={{ fontSize: '1.65rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
+                      Synthesized Candidate Shortlist
+                    </h3>
+                    <span className="badge badge-gold" style={{ fontSize: '0.72rem' }}>
+                      {candidates.length} Verified
+                    </span>
+                  </div>
+                  <p style={{ color: '#94a3b8', fontSize: '0.88rem', marginTop: '4px' }}>
+                    Multi-criteria scored across aesthetic match, road & power accessibility, evidence grounding, and permit risk.
+                  </p>
                 </div>
-                <h3 className="font-display" style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff' }}>
-                  Production Shortlist ({candidates.length} Candidates)
-                </h3>
-                <p style={{ color: '#94a3b8', fontSize: '0.86rem' }}>
-                  {currentSession?.summary || '18 candidates researched and 5 shortlisted based on your scene criteria.'}
-                </p>
+
+                {/* Compare Bar Launch Action */}
+                {compareIds.length > 0 && (
+                  <button
+                    onClick={() => setShowCompareModal(true)}
+                    className="btn-cinema btn-primary animate-pulse-subtle"
+                    style={{ fontSize: '0.85rem' }}
+                  >
+                    <Layers size={16} />
+                    <span>Compare Selected Candidates ({compareIds.length}/3)</span>
+                  </button>
+                )}
               </div>
 
-              {compareIds.length > 1 && (
-                <button
-                  onClick={() => setShowCompareModal(true)}
-                  className="btn-cinema btn-cyan"
-                  style={{ fontSize: '0.84rem' }}
-                >
-                  <Layers size={14} />
-                  <span>Compare Selected ({compareIds.length})</span>
-                </button>
-              )}
-            </div>
-
-            {/* Candidates Cards Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-              {candidates.map((c, index) => (
-                <LocationCard
-                  key={c.id}
-                  candidate={c}
-                  rankIndex={index}
-                  onViewDetails={(cand) => setSelectedCandidate(cand)}
-                  onToggleSave={handleToggleSave}
-                  isSaved={storageService.isSaved(c.id)}
-                  onToggleCompare={handleToggleCompare}
-                  isCompared={compareIds.includes(c.id)}
-                  onAskAbout={(cand) => handleAskAbout(cand)}
-                />
-              ))}
+              {/* Candidate Cards Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+                {candidates.map((candidate, idx) => (
+                  <LocationCard
+                    key={candidate.id}
+                    candidate={candidate}
+                    rankIndex={idx}
+                    onViewDetails={(cand) => setSelectedCandidate(cand)}
+                    onToggleSave={handleToggleSave}
+                    isSaved={storageService.isSaved(candidate.id)}
+                    onToggleCompare={handleToggleCompare}
+                    isCompared={compareIds.includes(candidate.id)}
+                    onAskAbout={(cand) => handleAskAbout(cand)}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Conversational Refinement Panel ("Ask SceneScout") */}
@@ -607,6 +628,18 @@ export default function Home() {
           }}
         />
       )}
+
+      {/* Supabase Authentication & Filmmaker Persona Onboarding Modals */}
+      <AuthModal />
+      <FilmmakerOnboardingModal />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <AuthProvider>
+      <DashboardContent />
+    </AuthProvider>
   );
 }

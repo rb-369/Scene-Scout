@@ -147,7 +147,8 @@ Calls are made server-side to protect API keys from exposure:
 | **Design System** | Custom Vanilla CSS with Dark Cinematic Theme, Glassmorphism, Google Fonts (`Inter` & `Outfit`), Lucide Icons |
 | **Agent Reasoning** | Google Gemini (`@google/generative-ai`, `gemini-2.5-flash`), Google Cloud Agent Builder paradigm |
 | **Live Web Search** | Parallel Search API (`api.parallel.ai/v1/search`) |
-| **Local Storage** | Client-side Session and Bookmark Persistence |
+| **Cloud Database & Auth** | Supabase (PostgreSQL, Row Level Security, Google OAuth, Email/Password, Filmmaker Personas) |
+| **Local Fallback** | Client-side Session and Bookmark Persistence |
 
 ---
 
@@ -155,8 +156,8 @@ Calls are made server-side to protect API keys from exposure:
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/your-username/scenescout.git
-cd scenescout
+git clone https://github.com/rb-369/Scene-Scout.git
+cd Scene-Scout
 npm install
 ```
 
@@ -166,21 +167,28 @@ Copy `.env.example` to `.env`:
 cp .env.example .env
 ```
 
-Open `.env` and fill in your API credentials:
+Open `.env` and fill in your credentials:
 ```ini
 # 1. Parallel Search API (Hackathon Partner Track)
-# Get your key at: https://platform.parallel.ai
 PARALLEL_API_KEY=your_parallel_api_key_here
 
 # 2. Google Gemini / Google Cloud (Hackathon Agent Track)
-# Get your free key at: https://aistudio.google.com
 GEMINI_API_KEY=your_gemini_api_key_here
-
-# Optional model selection (default: gemini-2.5-flash)
 GEMINI_MODEL=gemini-2.5-flash
+
+# 3. Supabase Cloud Database & Auth (Optional for cloud sync)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-*(Note: If you leave these blank, SceneScout will seamlessly run in **Demo Mode** with full functionality).*
+### 3. Supabase Database Setup (Optional)
+SceneScout works out-of-the-box with local persistence, but connects to Supabase for multi-device sync and authentication:
+1. Create a free project at [supabase.com](https://supabase.com).
+2. Go to **SQL Editor** in your Supabase dashboard and execute [`supabase/schema.sql`](supabase/schema.sql).
+3. Enable **Google** in **Authentication -> Providers** (with redirect URI `https://<your-project>.supabase.co/auth/v1/callback`).
+4. Paste your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` into `.env`.
+
+*(Note: If you leave Supabase keys blank, SceneScout runs in seamless offline/local preview mode without breaking).*
 
 ### 3. Run Development Server
 ```bash

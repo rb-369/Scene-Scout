@@ -67,15 +67,30 @@ SceneScout utilizes **Google Gemini** (`gemini-2.5-flash`) through the Google Cl
 
 ---
 
+
 ## 7. Measurable Impact
-- **Time Savings**: Reduces preliminary location scouting research from **3–5 days** of manual web searching to **under 30 seconds**.
+- **Time Savings**: Reduces preliminary location scouting research from 3-5 days of manual web searching to under 30 seconds.
 - **Risk Mitigation**: Prevents costly shoot disruptions by surfacing curfews, structural hazards, and judicial disputes before location scouts travel to the site.
 - **Production Transparency**: Gives production teams defensible research dossiers backed by clickable web evidence and transparent mathematical scoring.
 
 ---
 
-## 8. Functional Demonstration Video & Script
+## 8. Cloud Persistence & Filmmaker Persona Onboarding
+SceneScout features an enterprise-grade cloud persistence layer backed by **Supabase PostgreSQL**:
+- **Authentication**: Native **Google OAuth** and **Email/Password authentication** with Row Level Security (RLS) policies ensuring users only access their own production data.
+- **Filmmaker Persona Onboarding**: When creators sign up or launch the app, SceneScout tailors the experience to their specific production persona:
+  1. 🎬 **Indie Filmmaker / DIY Director** (Optimized for micro/low-budgets &lt; ₹50k/day, flexible guerrilla shooting, atmospheric character).
+  2. 🏢 **Commercial Production House** (Optimized for brand TVC studio stages, ₹100k-₹250k daily budgets, rapid turnaround).
+  3. 📍 **Line Producer / Location Manager** (Optimized for physical logistics, unit base truck parking, generator tie-ins, and direct liaison phone desks).
+  4. 🎓 **Film Student / Emerging Creator** (Optimized for zero-budget public access, university waiver locations, and minimal crew footprints).
+  5. 🎥 **Documentary / Non-Fiction Filmmaker** (Optimized for heritage trust clearances, authentic periods, and natural lighting).
+- **Multi-Device Synchronization**: Bookmarked candidates, comparison selections, and custom scouting search histories synchronize automatically across devices via Supabase.
+
+---
+
+## 9. Functional Demonstration Video & Script
 - **3-Minute Functional Demo Video**: Located at [`docs/scenescout_demo.mp4`](file:///d:/agentic-cinema-hackathon/docs/scenescout_demo.mp4)
 - **Interactive Browser Recording Session**: Located at [`docs/scenescout_live_session.webp`](file:///d:/agentic-cinema-hackathon/docs/scenescout_live_session.webp)
 - **Demo Script**: Documented in [`DEMO_SCRIPT.md`](file:///d:/agentic-cinema-hackathon/DEMO_SCRIPT.md) adhering strictly to hackathon organizer guidelines (functional project demonstration of runtime Google Cloud/Gemini and Parallel Search API execution).
+
 

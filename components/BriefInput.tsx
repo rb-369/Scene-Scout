@@ -16,20 +16,68 @@ import {
 } from 'lucide-react';
 import { ScoutCriteria } from '@/lib/types';
 import { DEMO_BRIEF } from '@/lib/demoData';
+import { useAuth } from '@/contexts/AuthContext';
+import { FilmmakerType } from '@/lib/supabase/types';
 
 interface BriefInputProps {
   onStartScout: (brief: string, criteria: ScoutCriteria, forceDemo: boolean) => void;
   isLoading: boolean;
 }
 
+const PERSONA_SUMMARIES: Record<FilmmakerType, { title: string; icon: string; summary: string; defaultBudget: string }> = {
+  indie: { 
+    title: 'Indie Filmmaker', 
+    icon: '🎬', 
+    summary: 'Guerrilla-friendly, low-cost permits (< ₹50k/day)', 
+    defaultBudget: '< ₹50,000 / day (Cost-Effective / Indie)' 
+  },
+  commercial: { 
+    title: 'Commercial Production House', 
+    icon: '🏢', 
+    summary: 'Studio facilities & brand TVC turnarounds', 
+    defaultBudget: '₹1,00,000 - ₹2,50,000 / day (Premium Heritage)' 
+  },
+  line_producer: { 
+    title: 'Line Producer', 
+    icon: '📍', 
+    summary: 'Heavy crew footprint, parking & union liaison', 
+    defaultBudget: 'Flexible / Unrestricted' 
+  },
+  student: { 
+    title: 'Film Student', 
+    icon: '🎓', 
+    summary: 'Zero-budget public spots & university waivers', 
+    defaultBudget: '< ₹50,000 / day (Cost-Effective / Indie)' 
+  },
+  documentary: { 
+    title: 'Documentary Filmmaker', 
+    icon: '🎥', 
+    summary: 'Authentic heritage sites & natural lighting', 
+    defaultBudget: '₹50,000 - ₹1,00,000 / day (Commercial standard)' 
+  }
+};
+
 export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading }) => {
+  const { profile, demoPersona, setShowOnboardingModal } = useAuth();
+  const activePersona = profile?.filmmaker_type || demoPersona;
+  const personaMeta = activePersona ? PERSONA_SUMMARIES[activePersona] : null;
+
   const [brief, setBrief] = useState(DEMO_BRIEF);
   const [city, setCity] = useState('Mumbai');
   const [sceneType, setSceneType] = useState('Industrial Warehouse Thriller');
   const [budgetSensitivity, setBudgetSensitivity] = useState<'Low' | 'Moderate' | 'High'>('Moderate');
-  const [budgetRange, setBudgetRange] = useState<string>('₹50,000 - ₹1,00,000 / day (Commercial standard)');
+  const [budgetRange, setBudgetRange] = useState<string>(
+    personaMeta?.defaultBudget || '₹50,000 - ₹1,00,000 / day (Commercial standard)'
+  );
   const [maxDistance, setMaxDistance] = useState<number>(35);
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Sync default budget when persona changes
+  React.useEffect(() => {
+    if (personaMeta?.defaultBudget) {
+      setBudgetRange(personaMeta.defaultBudget);
+    }
+  }, [activePersona]);
 
   // Weights
   const [sceneMatchWeight, setSceneMatchWeight] = useState(40);
@@ -82,6 +130,78 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
 
       {/* Main Input Form Card */}
       <div className="glass-panel" style={{ padding: '24px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
+        {/* Persona Integration Banner */}
+        {personaMeta ? (
+          <div style={{
+            marginBottom: '20px',
+            padding: '10px 14px',
+            borderRadius: '8px',
+            background: 'rgba(245, 158, 11, 0.08)',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '10px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem' }}>
+              <span style={{ fontSize: '1.1rem' }}>{personaMeta.icon}</span>
+              <span style={{ color: '#fbbf24', fontWeight: 700 }}>{personaMeta.title} Mode</span>
+              <span style={{ color: '#cbd5e1' }}>- {personaMeta.summary}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowOnboardingModal(true)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                color: '#e2e8f0',
+                fontSize: '0.74rem',
+                fontWeight: 600,
+                padding: '3px 10px',
+                borderRadius: '6px',
+                cursor: 'pointer'
+              }}
+            >
+              Change Persona
+            </button>
+          </div>
+        ) : (
+          <div style={{
+            marginBottom: '20px',
+            padding: '10px 14px',
+            borderRadius: '8px',
+            background: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '10px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#94a3b8' }}>
+              <Sparkles size={14} color="#f59e0b" />
+              <span>Are you an Indie Filmmaker, Commercial Studio, or Line Producer?</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowOnboardingModal(true)}
+              style={{
+                background: 'rgba(245, 158, 11, 0.2)',
+                border: '1px solid #f59e0b',
+                color: '#fbbf24',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                padding: '4px 10px',
+                borderRadius: '6px',
+                cursor: 'pointer'
+              }}
+            >
+              Select Persona
+            </button>
+          </div>
+        )}
+
         <form onSubmit={(e) => handleSubmit(e, false)}>
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#e2e8f0', marginBottom: '8px' }}>
