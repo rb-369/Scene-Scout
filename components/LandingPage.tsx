@@ -10,18 +10,6 @@ interface LandingPageProps {
 
 const dossiers = [
   {
-    id: 'mukesh-mills',
-    name: 'Mukesh Textile Compound',
-    area: 'Colaba, South Mumbai',
-    archetype: 'Industrial warehouse · Dilapidated mill',
-    image: '/images/cinema_warehouse_still.jpg',
-    camera: 'ARRI Alexa 35 · 35mm Master Prime',
-    notes: 'High steel rafters, generous depth, and afternoon dust rays. Practical tungsten can carry naturally into blue hour.',
-    match: '96%',
-    access: '3 phase power',
-    tariff: '₹45,000 / day',
-  },
-  {
     id: 'ballard-pier',
     name: 'Ballard Pier Marine Berth',
     area: 'Port Trust Area, Mumbai',
@@ -32,6 +20,18 @@ const dossiers = [
     match: '91%',
     access: 'Shore power tie-in',
     tariff: '₹85,000 / day',
+  },
+  {
+    id: 'mukesh-mills',
+    name: 'Mukesh Textile Compound',
+    area: 'Colaba, South Mumbai',
+    archetype: 'Industrial warehouse · Dilapidated mill',
+    image: '/images/cinema_warehouse_still.jpg',
+    camera: 'ARRI Alexa 35 · 35mm Master Prime',
+    notes: 'High steel rafters, generous depth, and afternoon dust rays. Practical tungsten can carry naturally into blue hour.',
+    match: '96%',
+    access: '3 phase power',
+    tariff: '₹45,000 / day',
   },
   {
     id: 'worli-coastal',
@@ -106,6 +106,14 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
             </div>
             <div className="scene-hero-visual" aria-label="Industrial warehouse location preview">
               <Image src="/images/cinema_warehouse_still.jpg" alt="Industrial warehouse prepared for a film shoot" fill priority sizes="(max-width: 1024px) 100vw, 55vw" />
+              <div className="scene-hero-viewfinder-reticle" aria-hidden="true">
+                <span className="reticle-tl">+</span>
+                <span className="reticle-tr">+</span>
+                <span className="reticle-bl">+</span>
+                <span className="reticle-br">+</span>
+                <span className="reticle-center">✛</span>
+                <span className="reticle-tag">2.39:1 · LIVE MONITOR</span>
+              </div>
               <div className="scene-frame-data">
                 <div><span>Current reference</span><p>Mukesh Textile Compound</p><span>Colaba, South Mumbai</span></div>
                 <div className="scene-frame-score"><span>Scene fit</span><strong>96</strong></div>
@@ -138,18 +146,36 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
             </header>
             <div className="scene-dossier">
               <div className="scene-dossier-media">
-                <Image src={dossier.image} alt={dossier.name} fill sizes="(max-width: 700px) 100vw, 50vw" />
+                <Image
+                  key={dossier.id}
+                  className="scene-dossier-animated-img"
+                  src={dossier.image}
+                  alt={dossier.name}
+                  fill
+                  sizes="(max-width: 700px) 100vw, 50vw"
+                />
+                <div className="scene-dossier-cam-badge" aria-label="Camera sensor package">
+                  <span className="rec-dot animate-pulse-subtle" />
+                  <span>{dossier.camera}</span>
+                </div>
+                <div className="scene-dossier-viewfinder-overlay" aria-hidden="true" />
               </div>
               <div className="scene-dossier-content">
                 <div className="scene-tabs" role="tablist" aria-label="Sample location dossiers">
                   {dossiers.map((item, index) => (
-                    <button key={item.id} className={`scene-tab ${index === activeDossier ? 'active' : ''}`} role="tab" aria-selected={index === activeDossier} onClick={() => setActiveDossier(index)}>
+                    <button
+                      key={item.id}
+                      className={`scene-tab ${index === activeDossier ? 'active' : ''}`}
+                      role="tab"
+                      aria-selected={index === activeDossier}
+                      onClick={() => setActiveDossier(index)}
+                    >
                       {item.name}
                     </button>
                   ))}
                 </div>
                 <p className="scene-dossier-label"><MapPin size={11} style={{ marginRight: 5, verticalAlign: 'text-bottom' }} />{dossier.area}</p>
-                <h3>{dossier.name}</h3>
+                <h3 key={`title-${dossier.id}`} className="scene-dossier-animated-text">{dossier.name}</h3>
                 <p className="scene-dossier-type">{dossier.archetype}</p>
                 <p className="scene-dossier-notes">{dossier.notes}</p>
                 <div className="scene-metrics">
