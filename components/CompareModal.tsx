@@ -81,7 +81,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', color: '#38bdf8', fontWeight: 700, fontSize: '0.9rem' }}>
             <Sparkles size={16} />
-            <span>Which location should you choose? — SceneScout Verdict</span>
+            <span>Which location should you choose? - SceneScout Verdict</span>
           </div>
           <p style={{ color: '#e0f2fe', fontSize: '0.88rem', lineHeight: 1.5 }}>
             • For <strong>maximum visual drama</strong>: <strong>{bestScene.name}</strong> ({bestScene.sceneMatchScore}/100 match).<br />
@@ -93,39 +93,31 @@ export const CompareModal: React.FC<CompareModalProps> = ({
         {/* Matrix Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: `200px repeat(${candidates.length}, minmax(260px, 1fr))`,
-          gap: '12px',
-          overflowX: 'auto',
-          paddingBottom: '16px'
+          gridTemplateColumns: `180px repeat(${candidates.length}, 1fr)`,
+          gap: '1px',
+          background: 'rgba(255, 255, 255, 0.08)',
+          borderRadius: '10px',
+          overflow: 'hidden'
         }}>
-          {/* Top Row: Headers */}
-          <div style={{ fontWeight: 700, color: '#94a3b8', fontSize: '0.84rem', padding: '12px' }}>
-            CRITERIA
+          {/* Header Row */}
+          <div style={{ padding: '16px', background: 'rgba(10, 14, 22, 0.8)', fontWeight: 700, color: '#94a3b8', fontSize: '0.82rem' }}>
+            Criteria Dimension
           </div>
           {candidates.map((c) => (
-            <div 
-              key={c.id} 
-              style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                borderRadius: '8px',
-                padding: '16px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                position: 'relative'
-              }}
-            >
+            <div key={c.id} style={{ padding: '16px', background: 'rgba(10, 14, 22, 0.8)', position: 'relative' }}>
               <button
                 onClick={() => onRemoveFromCompare(c.id)}
-                title="Remove from comparison"
+                title="Remove location from comparison"
                 style={{
                   position: 'absolute',
-                  top: '8px',
-                  right: '8px',
-                  background: 'rgba(255, 255, 255, 0.1)',
+                  top: '10px',
+                  right: '10px',
+                  background: 'rgba(255,255,255,0.06)',
                   border: 'none',
                   color: '#94a3b8',
-                  width: '22px',
-                  height: '22px',
-                  borderRadius: '4px',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -147,6 +139,16 @@ export const CompareModal: React.FC<CompareModalProps> = ({
               >
                 Open Full Dossier
               </button>
+            </div>
+          ))}
+
+          {/* Row: Daily Filming Tariff */}
+          <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#fbbf24', padding: '12px', background: 'rgba(245, 158, 11, 0.05)' }}>
+            Daily Tariff
+          </div>
+          {candidates.map((c) => (
+            <div key={c.id} style={{ padding: '12px', background: 'rgba(245, 158, 11, 0.05)', fontWeight: 700, color: '#ffffff', fontSize: '0.84rem' }}>
+              {c.estimatedTariff || 'Commercial rate on inquiry'}
             </div>
           ))}
 
@@ -175,6 +177,17 @@ export const CompareModal: React.FC<CompareModalProps> = ({
               }}>
                 {c.productionRiskScore}% ({c.productionRiskScore <= 35 ? 'Low' : c.productionRiskScore <= 60 ? 'Moderate' : 'High'})
               </span>
+            </div>
+          ))}
+
+          {/* Row: Contact & Liaison */}
+          <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#38bdf8', padding: '12px', background: 'rgba(6, 182, 212, 0.05)' }}>
+            Liaison & Contact
+          </div>
+          {candidates.map((c) => (
+            <div key={c.id} style={{ padding: '12px', background: 'rgba(6, 182, 212, 0.05)', fontSize: '0.78rem' }}>
+              <div style={{ color: '#38bdf8', fontWeight: 600 }}>{c.contactDetails?.phone || '+91 22 6656 4051'}</div>
+              <div style={{ color: '#94a3b8', fontSize: '0.72rem', marginTop: '2px' }}>{c.contactDetails?.officeDesk || c.contactInformation}</div>
             </div>
           ))}
 

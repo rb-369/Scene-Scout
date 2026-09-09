@@ -41,9 +41,16 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       "Requires Colaba Police Station local NOC"
     ],
     contactInformation: "Colaba Compound Booking Office / Local Line Producer Guild",
+    estimatedTariff: "₹75,000 - ₹1,20,000 / shift (12 hrs)",
+    contactDetails: {
+      phone: "+91 22 2218 4402",
+      email: "estates@mukeshcompound.co.in",
+      officeDesk: "Colaba Sassoon Docks Estate Office, Gate 3",
+      notes: "Requires local police NOC; bookings coordinated via Sassoon Docks estate manager."
+    },
     sources: [
       {
-        title: "Mumbai Film Office — Historic Mill Production Directory",
+        title: "Mumbai Film Office - Historic Mill Production Directory",
         url: "https://mumbaifilmoffice.org/locations/mukesh-textile-mills-colaba",
         domain: "mumbaifilmoffice.org",
         snippet: "Mukesh Textile Mills remains South Mumbai's most frequently scouted atmospheric ruin for cinematic action, suspense, and thriller sequences with coastal backdrops.",
@@ -75,7 +82,7 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       },
       {
         claim: "Private property with dedicated staging area for production generator trucks.",
-        sourceTitle: "Mumbai Film Office — Historic Mill Production Directory",
+        sourceTitle: "Mumbai Film Office - Historic Mill Production Directory",
         sourceUrl: "https://mumbaifilmoffice.org/locations/mukesh-textile-mills-colaba"
       },
       {
@@ -122,9 +129,16 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       "Security identification check for entire technical crew"
     ],
     contactInformation: "Mumbai Port Authority Filming Cell: mbpa.gov.in/estate-filming",
+    estimatedTariff: "₹60,000 / 12-hr shift (MbPA Official Gazette rate)",
+    contactDetails: {
+      phone: "+91 22 6656 4051",
+      email: "commercialfilming@mumbaiport.gov.in",
+      officeDesk: "MbPA Estate Division, Port House, Shoorji Vallabhdas Marg, Ballard Estate",
+      notes: "Official MbPA single-window shoot clearance; requires 7 working days notice."
+    },
     sources: [
       {
-        title: "Mumbai Port Authority (MbPA) — Commercial Filming Guidelines",
+        title: "Mumbai Port Authority (MbPA) - Commercial Filming Guidelines",
         url: "https://mumbaiport.gov.in/filming-clearance-guidelines",
         domain: "mumbaiport.gov.in",
         snippet: "Official port gazette detailing hourly filming tariffs, security deposit rates, and single-window shoot applications for Cotton Green and Sewri godowns.",
@@ -151,7 +165,7 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
     evidenceQuotes: [
       {
         claim: "Standardized commercial shoot tariff and single-window clearance through Mumbai Port Authority.",
-        sourceTitle: "Mumbai Port Authority (MbPA) — Commercial Filming Guidelines",
+        sourceTitle: "Mumbai Port Authority (MbPA) - Commercial Filming Guidelines",
         sourceUrl: "https://mumbaiport.gov.in/filming-clearance-guidelines"
       },
       {
@@ -203,6 +217,13 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       "Individual owner permissions negotiated yard-by-yard"
     ],
     contactInformation: "Reay Road Timber Association Secretariat / Local Ward Line Producer",
+    estimatedTariff: "₹40,000 - ₹65,000 / night shift",
+    contactDetails: {
+      phone: "+91 98201 54320",
+      email: "darukhana.merchants.assoc@gmail.com",
+      officeDesk: "Darukhana Scrap & Timber Association Office, Coal Bunder Road",
+      notes: "Private negotiations per yard owner; night shoots strongly advised for clean audio."
+    },
     sources: [
       {
         title: "Mid-Day Mumbai: The cinematic allure of Darukhana's scrap yards",
@@ -212,7 +233,7 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
         relevance: "Cultural & cinematic precedent"
       },
       {
-        title: "Mumbai Film Location Guide — Central Industrial Belt",
+        title: "Mumbai Film Location Guide - Central Industrial Belt",
         url: "https://filminginindia.com/guide/reay-road-timber-depots",
         domain: "filminginindia.com",
         snippet: "Logistics warning: Heavy commercial traffic on Reay Road requires careful scheduling; night shoots strongly advised.",
@@ -272,6 +293,13 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       "Commercial liability insurance policy proof required"
     ],
     contactInformation: "Sewri CFS Operations & Filming Desk, BPT Road",
+    estimatedTariff: "₹85,000 / day (Apron + Rail Shed)",
+    contactDetails: {
+      phone: "+91 22 2413 7789",
+      email: "cfs-shoots@cewacor.nic.in",
+      officeDesk: "Central Warehousing Corp Regional Office, BPT Freight Terminal, Sewri",
+      notes: "Requires 48-hour container movement freeze notice and BCAS clearance for drone camera work."
+    },
     sources: [
       {
         title: "Central Warehousing Corporation Commercial Filming Policy",
@@ -342,6 +370,13 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       "Night shoots require private security ring and emergency medical crew on standby"
     ],
     contactInformation: "Official Liquidator, High Court of Bombay (Requires legal filing)",
+    estimatedTariff: "Non-Standard (Judicial Escrow / ₹1,50,000+ legal deposit)",
+    contactDetails: {
+      phone: "+91 22 2267 0411",
+      email: "ol-mumbai@mca.gov.in",
+      officeDesk: "Office of the Official Liquidator, High Court of Bombay, 5th Floor, Bank Street, Fort",
+      notes: "Formal High Court application mandatory; unauthorized entry strictly prosecuted."
+    },
     sources: [
       {
         title: "Bombay High Court Official Liquidator Public Notices",
@@ -476,6 +511,7 @@ export const DEMO_SESSION: ResearchSession = {
     city: "Mumbai",
     sceneType: "Industrial Thriller Warehouse",
     budgetSensitivity: "Moderate",
+    budgetRange: "₹50,000 - ₹1,00,000 / day (Commercial standard)",
     maxDistanceKm: 35,
     priorities: {
       sceneMatch: 40,

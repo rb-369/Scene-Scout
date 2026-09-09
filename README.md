@@ -1,4 +1,4 @@
-# 🎬 SceneScout — Production Intelligence Agent
+# 🎬 SceneScout - Production Intelligence Agent
 
 > **"Your AI production scout. From scene brief to production-ready shortlist."**
 
@@ -191,7 +191,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 🎬 Video Demonstration & Demo Script
 
 - **3-Minute Functional Demo Video**: [`docs/scenescout_demo.mp4`](file:///d:/agentic-cinema-hackathon/docs/scenescout_demo.mp4)
-- **Demo Script**: [`DEMO_SCRIPT.md`](file:///d:/agentic-cinema-hackathon/DEMO_SCRIPT.md) — Follows the exact 3-minute functional breakdown with runtime Gemini & Parallel API verification.
+- **Demo Script**: [`DEMO_SCRIPT.md`](file:///d:/agentic-cinema-hackathon/DEMO_SCRIPT.md) - Follows the exact 3-minute functional breakdown with runtime Gemini & Parallel API verification.
 
 ---
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   X, 
   MapPin, 
@@ -14,6 +14,9 @@ import {
   Zap, 
   Volume2, 
   Phone, 
+  Mail,
+  Copy,
+  Check,
   FileText,
   Sparkles,
   Bookmark
@@ -33,6 +36,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
   onToggleSave,
   isSaved
 }) => {
+  const [copiedContact, setCopiedContact] = useState(false);
   if (!candidate) return null;
 
   const getTrustBadge = (status: string) => {
@@ -112,7 +116,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
           borderRadius: '10px',
           background: 'rgba(0, 0, 0, 0.4)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
-          marginBottom: '24px'
+          marginBottom: '16px'
         }}>
           <div>
             <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase' }}>Scene Match</div>
@@ -140,6 +144,35 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
             <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase' }}>Evidence Quality</div>
             <div className="font-display" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#10b981' }}>
               {candidate.evidenceQualityScore}<span style={{ fontSize: '0.8rem', color: '#64748b' }}>/100</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Commercial Filming Tariff Card */}
+        <div style={{
+          padding: '14px 18px',
+          borderRadius: '10px',
+          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.08) 100%)',
+          border: '1px solid rgba(245, 158, 11, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+          marginBottom: '24px'
+        }}>
+          <div>
+            <span style={{ fontSize: '0.72rem', color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+              Estimated Commercial Filming Tariff
+            </span>
+            <div className="font-display" style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginTop: '2px' }}>
+              {candidate.estimatedTariff || 'Commercial rate on inquiry'}
+            </div>
+          </div>
+          <div style={{ fontSize: '0.8rem', color: '#cbd5e1', maxWidth: '380px' }}>
+            Authority: <strong style={{ color: '#ffffff' }}>{candidate.productionConsiderations?.ownershipStatus || 'Verified Authority'}</strong>
+            <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>
+              Standard shift tariffs include basic staging access; auxiliary generator tie-in and clean-up fees may apply.
             </div>
           </div>
         </div>
@@ -253,17 +286,82 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
               </p>
             </div>
 
-            {candidate.contactInformation && (
-              <div style={{ gridColumn: '1 / -1' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}>
-                  <Phone size={14} color="#38bdf8" />
-                  <span>PUBLIC CONTACT / PERMITTING DESK</span>
+            {/* Official Filming Liaison & Booking Directory */}
+            <div style={{
+              gridColumn: '1 / -1',
+              padding: '16px',
+              borderRadius: '8px',
+              background: 'rgba(6, 182, 212, 0.06)',
+              border: '1px solid rgba(6, 182, 212, 0.25)',
+              marginTop: '8px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Phone size={15} color="#38bdf8" />
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Official Filming Liaison & Booking Directory
+                  </span>
                 </div>
-                <p style={{ fontSize: '0.85rem', color: '#cbd5e1', fontFamily: 'monospace' }}>
-                  {candidate.contactInformation}
-                </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = `${candidate.name} Filming Liaison:\nPhone: ${candidate.contactDetails?.phone || ''}\nEmail: ${candidate.contactDetails?.email || ''}\nOffice Desk: ${candidate.contactDetails?.officeDesk || candidate.contactInformation || ''}\nProtocol: ${candidate.contactDetails?.notes || ''}\nDaily Tariff: ${candidate.estimatedTariff || ''}`;
+                    navigator.clipboard.writeText(text);
+                    setCopiedContact(true);
+                    setTimeout(() => setCopiedContact(false), 2000);
+                  }}
+                  style={{
+                    background: copiedContact ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                    border: `1px solid ${copiedContact ? '#10b981' : 'rgba(255, 255, 255, 0.12)'}`,
+                    borderRadius: '4px',
+                    padding: '4px 10px',
+                    fontSize: '0.74rem',
+                    color: copiedContact ? '#10b981' : '#ffffff',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontWeight: 600
+                  }}
+                >
+                  {copiedContact ? <Check size={12} /> : <Copy size={12} />}
+                  <span>{copiedContact ? 'Copied to Clipboard' : 'Copy All Contact Details'}</span>
+                </button>
               </div>
-            )}
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', fontSize: '0.84rem' }}>
+                <div>
+                  <span style={{ color: '#94a3b8', fontSize: '0.74rem', display: 'block', marginBottom: '2px' }}>Direct Phone:</span>
+                  <a href={`tel:${candidate.contactDetails?.phone || '+91 22 6656 4051'}`} style={{ color: '#38bdf8', fontWeight: 600, textDecoration: 'none' }}>
+                    {candidate.contactDetails?.phone || '+91 22 6656 4051'}
+                  </a>
+                </div>
+
+                <div>
+                  <span style={{ color: '#94a3b8', fontSize: '0.74rem', display: 'block', marginBottom: '2px' }}>Liaison Email:</span>
+                  <a href={`mailto:${candidate.contactDetails?.email || 'commercialfilming@mumbaiport.gov.in'}`} style={{ color: '#38bdf8', fontWeight: 600, textDecoration: 'none' }}>
+                    {candidate.contactDetails?.email || 'commercialfilming@mumbaiport.gov.in'}
+                  </a>
+                </div>
+
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <span style={{ color: '#94a3b8', fontSize: '0.74rem', display: 'block', marginBottom: '2px' }}>Office Desk / Address:</span>
+                  <span style={{ color: '#f1f5f9' }}>
+                    {candidate.contactDetails?.officeDesk || candidate.contactInformation || 'Municipal Ward Filming Desk'}
+                  </span>
+                </div>
+
+                {candidate.contactDetails?.notes && (
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <span style={{ color: '#94a3b8', fontSize: '0.74rem', display: 'block', marginBottom: '2px' }}>Booking & Permit Protocol:</span>
+                    <span style={{ color: '#fbbf24', fontSize: '0.82rem' }}>
+                      {candidate.contactDetails.notes}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

@@ -11,8 +11,8 @@ export async function GET() {
     status: 'ok',
     mode,
     modeLabel: mode === 'live' 
-      ? 'Live Research — Gemini + Parallel Search' 
-      : 'Demo Mode — simulated research data',
+      ? 'Live Research - Gemini + Parallel Search' 
+      : 'Demo Mode - simulated research data',
     providers: {
       parallel: {
         configured: parallelConfigured,

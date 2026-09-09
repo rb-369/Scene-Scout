@@ -8,12 +8,13 @@ export async function POST(req: NextRequest) {
     const prompt: string = body.prompt?.trim();
     const candidates: LocationCandidate[] = body.candidates || [];
     const brief: string = body.brief || '';
+    const messages = body.messages || [];
 
     if (!prompt) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    const result = await geminiService.handleFollowUp(prompt, candidates, brief);
+    const result = await geminiService.handleFollowUp(prompt, candidates, brief, messages);
 
     return NextResponse.json({
       success: true,

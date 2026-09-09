@@ -11,7 +11,8 @@ import {
   DollarSign, 
   Bot, 
   User, 
-  Loader2 
+  Loader2,
+  Phone
 } from 'lucide-react';
 import { FollowUpMessage, LocationCandidate } from '@/lib/types';
 
@@ -41,16 +42,18 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLoading) return;
-    const msg = inputPrompt.trim() || "Which location on this shortlist has the best logistical access and lowest production risk?";
+    const msg = inputPrompt.trim();
+    if (!msg) return;
     setInputPrompt('');
     await onSendMessage(msg);
   };
 
   const presetChips = [
-    { label: "Remove locations with uncertain access", icon: Filter },
-    { label: "Re-rank by lowest production risk", icon: ArrowUpDown },
+    { label: "How can I contact them for filming permissions?", icon: Phone },
+    { label: "Compare daily filming budgets & tariffs", icon: DollarSign },
     { label: "Which location is best for night shoot?", icon: Moon },
-    { label: "Find cheaper alternatives with standard tariffs", icon: DollarSign },
+    { label: "Re-rank by lowest production risk", icon: ArrowUpDown },
+    { label: "Remove locations with uncertain legal status", icon: Filter },
   ];
 
   return (
@@ -75,10 +78,10 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
           </div>
           <div>
             <h3 className="font-display" style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ffffff' }}>
-              Ask SceneScout — Conversational Refinement
+              Ask SceneScout - Production Q&A & Re-ranking
             </h3>
             <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-              Reason over current candidates, filter by constraints, or command the agent to re-rank.
+              Ask about contacts, daily tariffs, night curfews, or command the agent to re-rank the shortlist.
             </span>
           </div>
         </div>
@@ -188,7 +191,7 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
                   <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{msg.timestamp}</span>
                 </div>
 
-                <p style={{ fontSize: '0.84rem', color: '#cbd5e1', lineHeight: 1.4 }}>
+                <p style={{ fontSize: '0.84rem', color: '#cbd5e1', lineHeight: 1.55, whiteSpace: 'pre-line' }}>
                   {msg.text}
                 </p>
 

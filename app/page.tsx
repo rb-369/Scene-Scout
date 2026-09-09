@@ -77,7 +77,7 @@ export default function Home() {
         const live = data.providers?.parallel?.configured && data.providers?.gemini?.configured;
         setIsLiveConfigured(Boolean(live));
         setIsDemoMode(!live);
-        setModeLabel(data.modeLabel || 'Demo Mode — simulated research data');
+        setModeLabel(data.modeLabel || 'Demo Mode - simulated research data');
       })
       .catch(() => {
         setIsDemoMode(true);
@@ -100,15 +100,16 @@ export default function Home() {
     setCurrentStepIndex(0);
     setFollowUpMessages([]);
 
-    // Simulating step-by-step agent animation for visceral visual feedback
-    const stepInterval = setInterval(() => {
-      setCurrentStepIndex(prev => {
-        if (prev < DEMO_ACTIVITY_STEPS.length - 1) {
-          return prev + 1;
-        }
-        return prev;
-      });
-    }, 450);
+    const totalSteps = DEMO_ACTIVITY_STEPS.length;
+    let currentStep = 0;
+
+    // Advance through agent steps sequentially so the multi-agent pipeline is visibly experienced
+    const stepTimer = setInterval(() => {
+      if (currentStep < totalSteps - 1) {
+        currentStep += 1;
+        setCurrentStepIndex(currentStep);
+      }
+    }, 600);
 
     try {
       const response = await fetch('/api/scout', {
@@ -122,8 +123,15 @@ export default function Home() {
       });
 
       const data = await response.json();
-      clearInterval(stepInterval);
-      setCurrentStepIndex(DEMO_ACTIVITY_STEPS.length - 1);
+
+      // Ensure user sees the agent progression even if server responds quickly
+      const remainingSteps = Math.max(0, totalSteps - 1 - currentStep);
+      if (remainingSteps > 0) {
+        await new Promise(resolve => setTimeout(resolve, Math.min(remainingSteps * 450, 2200)));
+      }
+
+      clearInterval(stepTimer);
+      setCurrentStepIndex(totalSteps - 1);
 
       if (data.success && data.session && Array.isArray(data.session.candidates) && data.session.candidates.length > 0) {
         setCurrentSession(data.session);
@@ -136,17 +144,19 @@ export default function Home() {
       }
     } catch (err) {
       console.error('Scout request failed:', err);
-      clearInterval(stepInterval);
+      clearInterval(stepTimer);
+      setCurrentStepIndex(totalSteps - 1);
       // Fallback
       setCurrentSession(DEMO_SESSION);
       setCandidates(DEMO_CANDIDATES);
     } finally {
       setIsLoading(false);
       setJustCompletedScout(true);
-      // Auto-navigate user down to the shortlist report
+
+      // Pause briefly so user can see completed pipeline before gentle scroll
       setTimeout(() => {
         shortlistRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
+      }, 2200);
     }
   };
 
@@ -182,7 +192,8 @@ export default function Home() {
         body: JSON.stringify({
           prompt: promptText,
           candidates,
-          brief: currentSession?.userBrief || DEMO_BRIEF
+          brief: currentSession?.userBrief || DEMO_BRIEF,
+          messages: [...followUpMessages, userMsg]
         })
       });
 
@@ -438,6 +449,9 @@ export default function Home() {
               shortlistedCount={candidates.length}
               isLoading={isLoading}
               mode={isDemoMode ? 'demo' : 'live'}
+              onExploreShortlist={() => {
+                shortlistRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
             />
 
             {/* Completion Banner */}

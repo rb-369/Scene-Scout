@@ -27,6 +27,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
   const [city, setCity] = useState('Mumbai');
   const [sceneType, setSceneType] = useState('Industrial Warehouse Thriller');
   const [budgetSensitivity, setBudgetSensitivity] = useState<'Low' | 'Moderate' | 'High'>('Moderate');
+  const [budgetRange, setBudgetRange] = useState<string>('₹50,000 - ₹1,00,000 / day (Commercial standard)');
   const [maxDistance, setMaxDistance] = useState<number>(35);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -44,6 +45,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
       city,
       sceneType,
       budgetSensitivity,
+      budgetRange,
       maxDistanceKm: maxDistance,
       priorities: {
         sceneMatch: sceneMatchWeight,
@@ -153,6 +155,30 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
 
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
+                Daily Location Budget
+              </label>
+              <select
+                value={budgetRange}
+                onChange={(e) => setBudgetRange(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: '#0a0e16',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '6px',
+                  padding: '8px 12px',
+                  color: '#ffffff',
+                  fontSize: '0.88rem'
+                }}
+              >
+                <option value="< ₹50,000 / day (Cost-Effective / Indie)">&lt; ₹50,000 / day (Cost-Effective / Indie)</option>
+                <option value="₹50,000 - ₹1,00,000 / day (Commercial standard)">₹50,000 - ₹1,00,000 / day (Commercial standard)</option>
+                <option value="₹1,00,000 - ₹2,50,000 / day (Premium Heritage)">₹1,00,000 - ₹2,50,000 / day (Premium Heritage)</option>
+                <option value="Flexible / Unrestricted">Flexible / Unrestricted</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
                 Budget Sensitivity
               </label>
               <select
@@ -168,9 +194,9 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                   fontSize: '0.88rem'
                 }}
               >
-                <option value="Low">Low (Premium heritage sites)</option>
-                <option value="Moderate">Moderate (Standard commercial rates)</option>
-                <option value="High">High (Cost-effective / municipal lands)</option>
+                <option value="Low">Low (Prioritize visual fit over cost)</option>
+                <option value="Moderate">Moderate (Standard commercial balance)</option>
+                <option value="High">High (Strict budget compliance)</option>
               </select>
             </div>
 

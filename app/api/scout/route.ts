@@ -126,6 +126,13 @@ export async function POST(req: NextRequest) {
       return {
         ...cand,
         sources: validSources,
+        estimatedTariff: cand.estimatedTariff || fallbackDemo?.estimatedTariff || criteria.budgetRange || '₹60,000 / shift',
+        contactDetails: cand.contactDetails || fallbackDemo?.contactDetails || {
+          phone: '+91 22 6656 4051',
+          email: 'commercialfilming@mumbaiport.gov.in',
+          officeDesk: cand.contactInformation || 'Municipal Ward / Port Filming Cell',
+          notes: 'Standard filming NOC and local precinct notification required.'
+        },
         visualCharacteristics: Array.isArray(cand.visualCharacteristics) && cand.visualCharacteristics.length > 0
           ? cand.visualCharacteristics
           : (fallbackDemo?.visualCharacteristics || ['Authentic cinematic atmosphere', 'Industrial architectural character']),

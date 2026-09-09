@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   MapPin, 
   ShieldAlert, 
@@ -11,7 +11,10 @@ import {
   MessageSquare,
   CheckCircle,
   AlertTriangle,
-  FileCheck
+  FileCheck,
+  Phone,
+  Copy,
+  Check
 } from 'lucide-react';
 import { LocationCandidate } from '@/lib/types';
 
@@ -36,6 +39,8 @@ export const LocationCard: React.FC<LocationCardProps> = ({
   onAskAbout,
   rankIndex
 }) => {
+  const [copiedContact, setCopiedContact] = useState(false);
+
   // Helpers for badge styling
   const getRiskBadge = (riskScore: number) => {
     if (riskScore <= 35) {
@@ -179,6 +184,30 @@ export const LocationCard: React.FC<LocationCardProps> = ({
         </div>
       </div>
 
+      {/* Estimated Daily Filming Tariff */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '8px 12px',
+        borderRadius: '8px',
+        background: 'rgba(245, 158, 11, 0.08)',
+        border: '1px solid rgba(245, 158, 11, 0.2)',
+        marginBottom: '14px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            Est. Daily Tariff:
+          </span>
+          <span style={{ fontSize: '0.86rem', color: '#ffffff', fontWeight: 700 }}>
+            {candidate.estimatedTariff || 'Commercial rate on inquiry'}
+          </span>
+        </div>
+        <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+          {candidate.productionConsiderations?.ownershipStatus || 'Verified Authority'}
+        </span>
+      </div>
+
       {/* Description */}
       <p style={{ color: '#cbd5e1', fontSize: '0.88rem', lineHeight: 1.5, marginBottom: '16px' }}>
         {candidate.description}
@@ -248,6 +277,61 @@ export const LocationCard: React.FC<LocationCardProps> = ({
             </span>
           ))}
         </div>
+      </div>
+
+      {/* Actionable Public Contact & Permit Liaison */}
+      <div style={{
+        marginBottom: '14px',
+        padding: '10px 12px',
+        borderRadius: '8px',
+        background: 'rgba(6, 182, 212, 0.04)',
+        border: '1px solid rgba(6, 182, 212, 0.15)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '8px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '220px' }}>
+          <Phone size={14} color="#38bdf8" />
+          <div style={{ fontSize: '0.78rem' }}>
+            <span style={{ color: '#94a3b8', marginRight: '6px' }}>Liaison:</span>
+            <span style={{ color: '#38bdf8', fontWeight: 600, fontFamily: 'monospace' }}>
+              {candidate.contactDetails?.phone || '+91 22 6656 4051'}
+            </span>
+            {candidate.contactDetails?.email && (
+              <span style={{ color: '#cbd5e1', marginLeft: '6px', fontSize: '0.74rem' }}>
+                ({candidate.contactDetails.email})
+              </span>
+            )}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            const textToCopy = `${candidate.name}\nPhone: ${candidate.contactDetails?.phone || ''}\nEmail: ${candidate.contactDetails?.email || ''}\nDesk: ${candidate.contactDetails?.officeDesk || candidate.contactInformation || ''}\nTariff: ${candidate.estimatedTariff || ''}`;
+            navigator.clipboard.writeText(textToCopy);
+            setCopiedContact(true);
+            setTimeout(() => setCopiedContact(false), 2000);
+          }}
+          style={{
+            background: copiedContact ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+            border: `1px solid ${copiedContact ? '#10b981' : 'rgba(255, 255, 255, 0.1)'}`,
+            borderRadius: '4px',
+            padding: '3px 8px',
+            fontSize: '0.7rem',
+            color: copiedContact ? '#10b981' : '#cbd5e1',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}
+          title="Copy location contact and liaison info"
+        >
+          {copiedContact ? <Check size={11} /> : <Copy size={11} />}
+          <span>{copiedContact ? 'Copied' : 'Copy Contact'}</span>
+        </button>
       </div>
 
       {/* Potential Concerns / Risk Notice */}

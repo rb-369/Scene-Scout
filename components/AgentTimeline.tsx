@@ -23,6 +23,7 @@ interface AgentTimelineProps {
   shortlistedCount: number;
   isLoading: boolean;
   mode: 'live' | 'demo';
+  onExploreShortlist?: () => void;
 }
 
 export const AgentTimeline: React.FC<AgentTimelineProps> = ({
@@ -32,8 +33,12 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
   candidatesFoundCount,
   shortlistedCount,
   isLoading,
-  mode
+  mode,
+  onExploreShortlist
 }) => {
+  const isDone = !isLoading && currentStepIndex >= steps.length - 1;
+  const progressPercent = Math.min(100, Math.round(((currentStepIndex + 1) / Math.max(1, steps.length)) * 100));
+
   return (
     <div className="glass-panel" style={{
       padding: '20px 24px',
@@ -48,38 +53,53 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '16px',
-        marginBottom: '20px',
+        marginBottom: '16px',
         paddingBottom: '16px',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
-            width: '28px',
-            height: '28px',
+            width: '32px',
+            height: '32px',
             borderRadius: '50%',
             background: isLoading ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)',
             border: `1px solid ${isLoading ? '#f59e0b' : '#10b981'}`,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            flexShrink: 0
           }}>
             {isLoading ? (
-              <Loader2 size={16} color="#f59e0b" className="animate-spin-slow" />
+              <Loader2 size={17} color="#f59e0b" className="animate-spin-slow" />
             ) : (
-              <CheckCircle2 size={16} color="#10b981" />
+              <CheckCircle2 size={17} color="#10b981" />
             )}
           </div>
           <div>
-            <h3 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.01em' }}>
-              Autonomous Scout Activity
-            </h3>
-            <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-              {isLoading ? 'Agent actively researching and verifying web sources...' : 'Research completed. Shortlist compiled.'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h3 className="font-display" style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.01em' }}>
+                Autonomous Scout Pipeline
+              </h3>
+              {isLoading && (
+                <span className="badge badge-warning" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
+                  Step {currentStepIndex + 1} of {steps.length}
+                </span>
+              )}
+              {isDone && (
+                <span className="badge badge-verified" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
+                  100% Pipeline Complete
+                </span>
+              )}
+            </div>
+            <span style={{ fontSize: '0.78rem', color: isLoading ? '#fbbf24' : '#94a3b8', marginTop: '2px', display: 'block' }}>
+              {isLoading 
+                ? `Executing: ${steps[currentStepIndex]?.title || 'Analyzing candidate data'} (${progressPercent}%)` 
+                : 'All multi-agent research and verification stages complete. Ranked shortlist ready below.'}
             </span>
           </div>
         </div>
 
-        {/* Live Metrics Pills */}
+        {/* Live Metrics Pills & Explore Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <div style={{
             background: 'rgba(255, 255, 255, 0.04)',
@@ -125,7 +145,36 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
               {shortlistedCount}
             </div>
           </div>
+
+          {onExploreShortlist && isDone && (
+            <button
+              onClick={onExploreShortlist}
+              className="btn-cinema btn-primary"
+              style={{ padding: '8px 16px', fontSize: '0.84rem' }}
+            >
+              <span>Explore Shortlist ↓</span>
+            </button>
+          )}
         </div>
+      </div>
+
+      {/* Progress Track Bar */}
+      <div style={{
+        width: '100%',
+        height: '4px',
+        background: 'rgba(255, 255, 255, 0.06)',
+        borderRadius: '2px',
+        overflow: 'hidden',
+        marginBottom: '16px'
+      }}>
+        <div style={{
+          height: '100%',
+          width: `${progressPercent}%`,
+          background: isDone 
+            ? 'linear-gradient(90deg, #10b981 0%, #06b6d4 100%)' 
+            : 'linear-gradient(90deg, #f59e0b 0%, #38bdf8 100%)',
+          transition: 'width 0.4s ease'
+        }} />
       </div>
 
       {/* Stepped Timeline */}

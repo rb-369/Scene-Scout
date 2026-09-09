@@ -15,6 +15,13 @@ export interface LocationSource {
   relevance: string;
 }
 
+export interface ContactDetails {
+  phone?: string;
+  email?: string;
+  officeDesk?: string;
+  notes?: string;
+}
+
 export interface ProductionConsiderations {
   accessibility: string;
   parking: string;
@@ -44,6 +51,8 @@ export interface LocationCandidate {
   productionConsiderations: ProductionConsiderations;
   potentialRestrictions: string[];
   contactInformation: string;
+  estimatedTariff?: string;
+  contactDetails?: ContactDetails;
   sources: LocationSource[];
   recommendation: string;
   confidence: number; // 0-100
@@ -61,6 +70,7 @@ export interface ScoutCriteria {
   city: string;
   sceneType: string;
   budgetSensitivity: 'Low' | 'Moderate' | 'High';
+  budgetRange?: string;
   maxDistanceKm: number;
   priorities: {
     sceneMatch: number; // weight percentage (e.g. 40)

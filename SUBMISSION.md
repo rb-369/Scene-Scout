@@ -1,7 +1,7 @@
 # Hackathon Submission: SceneScout
 
 ## Project Name
-**SceneScout — Autonomous Production Intelligence Agent**
+**SceneScout - Autonomous Production Intelligence Agent**
 
 ## One-Line Description
 *An autonomous production intelligence agent that researches real-world filming locations and turns scattered web information into a verified, risk-evaluated production shortlist.*

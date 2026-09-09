@@ -38,16 +38,18 @@ export const SavedLocationsView: React.FC<SavedLocationsViewProps> = ({
   };
 
   const exportAsBrief = () => {
-    let md = `# SceneScout — Production Location Shortlist Dossier\nGenerated: ${new Date().toLocaleDateString()}\n\n`;
+    let md = `# SceneScout - Production Location Shortlist Dossier\nGenerated: ${new Date().toLocaleDateString()}\n\n`;
     savedLocations.forEach((loc, idx) => {
       md += `## ${idx + 1}. ${loc.name} (${loc.area}, ${loc.city})\n`;
+      md += `* **Daily Tariff**: ${loc.estimatedTariff || 'Commercial rate on inquiry'}\n`;
+      md += `* **Contact**: ${loc.contactDetails?.phone || loc.contactInformation || 'N/A'} | ${loc.contactDetails?.email || ''}\n`;
+      md += `* **Liaison Desk**: ${loc.contactDetails?.officeDesk || loc.contactInformation || 'Municipal / Property Desk'}\n`;
       md += `* **Scene Match**: ${loc.sceneMatchScore}/100\n`;
       md += `* **Accessibility**: ${loc.accessibilityScore}/100\n`;
       md += `* **Production Risk**: ${loc.productionRiskScore}%\n`;
       md += `* **Trust Status**: ${loc.trustStatus}\n`;
       md += `* **Description**: ${loc.description || 'N/A'}\n`;
       md += `* **Key Restrictions**: ${(loc.potentialRestrictions || []).join('; ') || 'None noted'}\n`;
-      md += `* **Contact**: ${loc.contactInformation || 'N/A'}\n`;
       md += `* **Sources**:\n`;
       (loc.sources || []).forEach(s => {
         md += `  - [${s.title || 'Source'}](${s.url || '#'}) (${s.domain || 'web'})\n`;
