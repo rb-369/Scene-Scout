@@ -116,9 +116,9 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
     <div style={{ marginBottom: '32px' }}>
       {/* Hero Header */}
       <div style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }} className="badge badge-cyan">
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }} className="badge badge-gold">
           <Clapperboard size={12} />
-          Autonomous Production Intelligence
+          <span>Director Production Intelligence</span>
         </div>
         <h2 className="font-display" style={{ fontSize: '2.4rem', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.15, marginBottom: '8px' }}>
           Give your next scene a <span className="text-gradient-gold">place</span>.
@@ -330,7 +330,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                 max={100}
                 value={maxDistance}
                 onChange={(e) => setMaxDistance(Number(e.target.value))}
-                style={{ width: '100%', accentColor: '#38bdf8', marginTop: '6px' }}
+                style={{ width: '100%', accentColor: '#fbbf24', marginTop: '6px' }}
               />
             </div>
           </div>
@@ -379,7 +379,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                     max={60}
                     value={sceneMatchWeight}
                     onChange={(e) => setSceneMatchWeight(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: '#38bdf8' }}
+                    style={{ width: '100%', accentColor: '#fbbf24' }}
                   />
                 </div>
 

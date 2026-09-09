@@ -86,10 +86,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             position: 'relative',
             width: '38px',
             height: '38px',
-            borderRadius: '10px',
+            borderRadius: '8px',
             overflow: 'hidden',
-            border: '1px solid rgba(96, 165, 250, 0.4)',
-            boxShadow: '0 0 14px rgba(56, 189, 248, 0.25)',
+            border: '1px solid rgba(245, 158, 11, 0.4)',
+            boxShadow: '0 0 14px rgba(245, 158, 11, 0.25)',
             flexShrink: 0
           }}>
             <Image 
@@ -103,9 +103,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <div>
             <h1 className="font-display" style={{ fontSize: '1.22rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#ffffff' }}>
-              Scene<span style={{ color: '#60a5fa' }}>Scout</span>
+              Scene<span style={{ color: '#fbbf24' }}>Scout</span>
             </h1>
-            <div style={{ fontSize: '0.64rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.64rem', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600 }}>
               Find Stories Around You
             </div>
           </div>
@@ -122,9 +122,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               alignItems: 'center',
               gap: '8px',
               background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(148, 163, 184, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '8px',
-              color: '#94a3b8',
+              color: '#d4d4d8',
               fontSize: '0.78rem',
               fontWeight: 600,
               padding: '8px 10px',
@@ -133,7 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               transition: 'all 0.2s'
             }}
           >
-            <ArrowLeft size={14} color="#38bdf8" />
+            <ArrowLeft size={14} color="#fbbf24" />
             <span>Back to Overview</span>
           </button>
         )}
@@ -141,8 +141,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Live vs Demo Badge */}
         <div style={{ marginBottom: '18px' }}>
           <div style={{
-            background: isDemoMode ? 'rgba(245, 158, 11, 0.08)' : 'rgba(56, 189, 248, 0.08)',
-            border: `1px solid ${isDemoMode ? 'rgba(245, 158, 11, 0.25)' : 'rgba(56, 189, 248, 0.28)'}`,
+            background: isDemoMode ? 'rgba(245, 158, 11, 0.08)' : 'rgba(16, 185, 129, 0.08)',
+            border: `1px solid ${isDemoMode ? 'rgba(245, 158, 11, 0.25)' : 'rgba(16, 185, 129, 0.28)'}`,
             borderRadius: '8px',
             padding: '10px 12px',
           }}>
@@ -153,10 +153,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 gap: '6px', 
                 fontSize: '0.74rem', 
                 fontWeight: 700,
-                color: isDemoMode ? '#fbbf24' : '#38bdf8'
+                color: isDemoMode ? '#fbbf24' : '#10b981'
               }}>
                 <Radio size={12} className={!isDemoMode ? 'animate-pulse-subtle' : ''} />
-                {isDemoMode ? 'DEMO MODE' : 'LIVE RESEARCH'}
+                {isDemoMode ? 'DEMO REEL' : 'LIVE PRODUCTION'}
               </span>
               
               <button 
@@ -175,7 +175,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 Switch
               </button>
             </div>
-            <p style={{ fontSize: '0.7rem', color: '#94a3b8', lineHeight: 1.3 }}>
+            <p style={{ fontSize: '0.7rem', color: '#a1a1aa', lineHeight: 1.3 }}>
               {isDemoMode 
                 ? 'Curated Mumbai industrial thriller dataset' 
                 : 'Parallel Search API + Gemini 2.5 active'}
@@ -193,9 +193,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'space-between',
               padding: '10px 14px',
               borderRadius: '8px',
-              background: currentTab === 'scout' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
-              color: currentTab === 'scout' ? '#38bdf8' : '#94a3b8',
-              border: currentTab === 'scout' ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent',
+              background: currentTab === 'scout' ? 'rgba(245, 158, 11, 0.14)' : 'transparent',
+              color: currentTab === 'scout' ? '#fbbf24' : '#a1a1aa',
+              border: currentTab === 'scout' ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid transparent',
               cursor: 'pointer',
               fontWeight: 600,
               fontSize: '0.88rem',
@@ -217,9 +217,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'space-between',
               padding: '10px 14px',
               borderRadius: '8px',
-              background: currentTab === 'saved' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
-              color: currentTab === 'saved' ? '#38bdf8' : '#94a3b8',
-              border: currentTab === 'saved' ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent',
+              background: currentTab === 'saved' ? 'rgba(245, 158, 11, 0.14)' : 'transparent',
+              color: currentTab === 'saved' ? '#fbbf24' : '#a1a1aa',
+              border: currentTab === 'saved' ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid transparent',
               cursor: 'pointer',
               fontWeight: 600,
               fontSize: '0.88rem',
@@ -233,8 +233,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {savedCount > 0 && (
               <span style={{
                 fontSize: '0.7rem',
-                background: '#38bdf8',
-                color: '#07090e',
+                background: '#fbbf24',
+                color: '#07080a',
                 fontWeight: 700,
                 padding: '2px 7px',
                 borderRadius: '10px'
@@ -252,9 +252,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'space-between',
               padding: '10px 14px',
               borderRadius: '8px',
-              background: currentTab === 'compare' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
-              color: currentTab === 'compare' ? '#38bdf8' : '#94a3b8',
-              border: currentTab === 'compare' ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent',
+              background: currentTab === 'compare' ? 'rgba(245, 158, 11, 0.14)' : 'transparent',
+              color: currentTab === 'compare' ? '#fbbf24' : '#a1a1aa',
+              border: currentTab === 'compare' ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid transparent',
               cursor: 'pointer',
               fontWeight: 600,
               fontSize: '0.88rem',
@@ -268,8 +268,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {compareCount > 0 && (
               <span style={{
                 fontSize: '0.7rem',
-                background: '#60a5fa',
-                color: '#ffffff',
+                background: '#fbbf24',
+                color: '#07080a',
                 fontWeight: 700,
                 padding: '2px 7px',
                 borderRadius: '10px'
@@ -287,9 +287,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'space-between',
               padding: '10px 14px',
               borderRadius: '8px',
-              background: currentTab === 'history' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
-              color: currentTab === 'history' ? '#38bdf8' : '#94a3b8',
-              border: currentTab === 'history' ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent',
+              background: currentTab === 'history' ? 'rgba(245, 158, 11, 0.14)' : 'transparent',
+              color: currentTab === 'history' ? '#fbbf24' : '#a1a1aa',
+              border: currentTab === 'history' ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid transparent',
               cursor: 'pointer',
               fontWeight: 600,
               fontSize: '0.88rem',
@@ -310,7 +310,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           padding: '12px',
           borderRadius: '10px',
           background: 'rgba(255, 255, 255, 0.025)',
-          border: '1px solid rgba(148, 163, 184, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           flexDirection: 'column',
           gap: '8px'
@@ -323,15 +323,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     width: '28px',
                     height: '28px',
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)',
-                    color: '#ffffff',
+                    background: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)',
+                    color: '#07080a',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: 800,
                     fontSize: '0.78rem'
                   }}>
-                    {profile?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'P'}
+                    {profile?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'D'}
                   </div>
                   <div style={{ overflow: 'hidden' }}>
                     <div style={{
@@ -343,10 +343,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       overflow: 'hidden',
                       maxWidth: '120px'
                     }}>
-                      {profile?.full_name || user?.email?.split('@')[0] || 'Guest Creator'}
+                      {profile?.full_name || user?.email?.split('@')[0] || 'Film Director'}
                     </div>
-                    <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
-                      {user ? 'Authenticated' : 'Local Preview'}
+                    <div style={{ fontSize: '0.68rem', color: '#a1a1aa' }}>
+                      {user ? 'Production Head' : 'Director Preview'}
                     </div>
                   </div>
                 </div>
@@ -363,7 +363,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   style={{
                     background: 'transparent',
                     border: 'none',
-                    color: '#64748b',
+                    color: '#71717a',
                     cursor: 'pointer',
                     padding: '4px',
                     display: 'flex',
@@ -386,9 +386,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   justifyContent: 'space-between',
                   padding: '6px 10px',
                   borderRadius: '6px',
-                  background: 'rgba(56, 189, 248, 0.1)',
-                  border: '1px solid rgba(56, 189, 248, 0.3)',
-                  color: '#7dd3fc',
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  color: '#fbbf24',
                   fontSize: '0.74rem',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -397,15 +397,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span>{personaMeta?.icon || '🎬'}</span>
-                  <span>{personaMeta?.label || 'Indie Filmmaker'}</span>
+                  <span>{personaMeta?.label || 'Director of Photography'}</span>
                 </span>
-                <SlidersHorizontal size={11} color="#38bdf8" />
+                <SlidersHorizontal size={11} color="#fbbf24" />
               </button>
             </div>
           ) : (
             <div>
-              <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginBottom: '8px' }}>
-                Sync bookmarks & custom briefs to MongoDB Atlas cloud.
+              <div style={{ fontSize: '0.74rem', color: '#a1a1aa', marginBottom: '8px' }}>
+                Sync location dossiers to MongoDB Atlas cloud.
               </div>
               <button
                 type="button"
@@ -432,14 +432,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             paddingTop: '6px',
             borderTop: '1px solid rgba(255, 255, 255, 0.05)',
             fontSize: '0.66rem',
-            color: '#64748b'
+            color: '#71717a'
           }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Database size={11} color="#38bdf8" />
+              <Database size={11} color="#fbbf24" />
               <span>MongoDB Atlas</span>
             </span>
-            <span style={{ color: '#38bdf8', fontWeight: 600 }}>
-              Active
+            <span style={{ color: '#10b981', fontWeight: 600 }}>
+              Connected
             </span>
           </div>
         </div>

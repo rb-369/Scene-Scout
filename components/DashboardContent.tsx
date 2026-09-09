@@ -314,21 +314,21 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
             <div style={{ height: '14px', width: '1px', background: 'rgba(255, 255, 255, 0.12)' }} />
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span className="badge badge-ice" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
+              <span className="badge badge-gold" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
                 <Cpu size={11} />
                 Gemini 2.5 Flash
               </span>
-              <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>Agent Reasoning & Synthesis</span>
+              <span style={{ fontSize: '0.72rem', color: '#d4d4d8' }}>Agent Reasoning & Synthesis</span>
             </div>
 
             <div style={{ height: '14px', width: '1px', background: 'rgba(255, 255, 255, 0.12)' }} />
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span className="badge badge-cyan" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
+              <span className="badge badge-titanium" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
                 <Globe size={11} />
                 Parallel Search API
               </span>
-              <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>Autonomous Live Web Crawl</span>
+              <span style={{ fontSize: '0.72rem', color: '#d4d4d8' }}>Autonomous Web Crawl</span>
             </div>
           </div>
 
@@ -615,7 +615,7 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
                     <h3 className="font-display" style={{ fontSize: '1.65rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
                       Synthesized Candidate Shortlist
                     </h3>
-                    <span className="badge badge-ice" style={{ fontSize: '0.72rem' }}>
+                    <span className="badge badge-gold" style={{ fontSize: '0.72rem' }}>
                       {candidates.length} Verified
                     </span>
                   </div>
