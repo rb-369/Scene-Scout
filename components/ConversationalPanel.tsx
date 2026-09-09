@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   MessageSquare, 
   Send, 
@@ -10,8 +10,8 @@ import {
   Moon, 
   DollarSign, 
   Bot, 
-  User,
-  Loader2
+  User, 
+  Loader2 
 } from 'lucide-react';
 import { FollowUpMessage, LocationCandidate } from '@/lib/types';
 
@@ -29,11 +29,19 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
   onApplyPreset
 }) => {
   const [inputPrompt, setInputPrompt] = useState('');
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages, isLoading]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputPrompt.trim() || isLoading) return;
-    const msg = inputPrompt;
+    if (isLoading) return;
+    const msg = inputPrompt.trim() || "Which location on this shortlist has the best logistical access and lowest production risk?";
     setInputPrompt('');
     await onSendMessage(msg);
   };
@@ -124,18 +132,21 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
 
       {/* Conversation Thread */}
       {messages.length > 0 && (
-        <div style={{
-          maxHeight: '260px',
-          overflowY: 'auto',
-          marginBottom: '16px',
-          padding: '12px',
-          borderRadius: '8px',
-          background: 'rgba(0, 0, 0, 0.3)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px'
-        }}>
+        <div 
+          ref={messagesContainerRef}
+          style={{
+            maxHeight: '280px',
+            overflowY: 'auto',
+            marginBottom: '16px',
+            padding: '12px',
+            borderRadius: '8px',
+            background: 'rgba(0, 0, 0, 0.3)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}
+        >
           {messages.map((msg) => (
             <div
               key={msg.id}
@@ -204,6 +215,7 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
       {/* Input Box */}
       <form onSubmit={handleSend} style={{ display: 'flex', gap: '8px' }}>
         <input
+          ref={inputRef}
           type="text"
           value={inputPrompt}
           onChange={(e) => setInputPrompt(e.target.value)}
@@ -225,9 +237,11 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
 
         <button
           type="submit"
-          disabled={isLoading || !inputPrompt.trim()}
+          id="ask-agent-submit-btn"
+          disabled={isLoading}
           className="btn-cinema btn-cyan"
-          style={{ padding: '0 18px' }}
+          style={{ padding: '0 18px', cursor: isLoading ? 'not-allowed' : 'pointer' }}
+          title="Submit question or request to SceneScout Agent"
         >
           {isLoading ? (
             <Loader2 size={16} className="animate-spin-slow" />

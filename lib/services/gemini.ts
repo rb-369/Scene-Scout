@@ -219,8 +219,23 @@ IMPORTANT:
         action = "Filtered for high value and cost-effective permitting";
         reasoning = `Evaluated official commercial tariff tiers. Decommissioned MbPA port godowns provide standardized hourly rates significantly lower than private colonial estate buyouts.`;
       } else {
-        action = "Analyzed candidate portfolio against your prompt";
-        reasoning = `Evaluated all ${currentCandidates.length} candidate dossiers against "${userPrompt}". Cotton Green and Sewri Container Terminal remain the most operationally balanced candidates for crew safety, vehicle turnaround, and visual authenticity.`;
+        const matchingCand = currentCandidates.find(c => 
+          lower.includes(c.name.toLowerCase()) || 
+          lower.includes((c.area || '').toLowerCase()) ||
+          lower.includes(c.id.toLowerCase())
+        );
+
+        if (matchingCand) {
+          action = `Analyzed ${matchingCand.name}`;
+          const restrictionsText = (matchingCand.potentialRestrictions || []).join('; ') || 'Standard BMC and local police NOC required';
+          const accessText = matchingCand.productionConsiderations?.accessibility || 'Vehicular road approach verified';
+          const parkingText = matchingCand.productionConsiderations?.parking || 'Crew and equipment space available';
+          reasoning = `${matchingCand.name} (${matchingCand.area}): Key visual traits include ${(matchingCand.visualCharacteristics || []).slice(0, 2).join(' and ')}. Logistics: ${accessText}; Parking: ${parkingText}. Permitting & risk profile: ${restrictionsText} (Risk: ${matchingCand.productionRiskScore}%). Verified recommendation: ${matchingCand.recommendation}`;
+          updated = [matchingCand, ...currentCandidates.filter(c => c.id !== matchingCand.id)];
+        } else {
+          action = "Analyzed candidate portfolio against your prompt";
+          reasoning = `Evaluated all ${currentCandidates.length} candidate dossiers against "${userPrompt}". Cotton Green and Sewri Container Terminal remain the most operationally balanced candidates for crew safety, vehicle turnaround, and visual authenticity.`;
+        }
       }
 
       return {
@@ -234,18 +249,18 @@ IMPORTANT:
       const model = this.genAI!.getGenerativeModel({ model: this.modelName });
       const prompt = `You are SceneScout AI production scout.
 Current shortlisted candidates:
-${currentCandidates.map((c, i) => `${i + 1}. ${c.name} (Risk: ${c.productionRiskScore}, Access: ${c.accessibilityScore}, Scene: ${c.sceneMatchScore})`).join('\n')}
+${currentCandidates.map((c, i) => `${i + 1}. ID: "${c.id}", Name: "${c.name}", Area: "${c.area}", Risk: ${c.productionRiskScore}%, Access: ${c.accessibilityScore}%, Scene: ${c.sceneMatchScore}%`).join('\n')}
 
 Original Brief: "${brief}"
-User Follow-up Request: "${userPrompt}"
+User Question / Follow-up Request: "${userPrompt}"
 
 Tasks:
-1. Explain what adjustments are made to the shortlist in 2-3 professional, concise sentences.
-2. Specify the ordered array of candidate IDs that best satisfy the updated request.
+1. Provide a direct, professional, expert answer addressing the user's specific request or question about the filming locations in 2-4 sentences.
+2. Specify the ordered array of candidate IDs that best satisfy the updated request (e.g. prioritize the location asked about, or re-order based on constraints).
 Return JSON format:
 {
-  "text": "concise explanation of adjustments and trade-offs",
-  "actionTaken": "short 3-6 word summary of action (e.g. Re-ranked by lowest production risk)",
+  "text": "expert answer and logistical/legal trade-offs",
+  "actionTaken": "short 3-6 word summary (e.g. Analyzed Mukesh Mills permissions)",
   "orderedIds": ["id1", "id2", ...]
 }`;
 
@@ -274,10 +289,17 @@ Return JSON format:
       console.error('[Gemini Service] Follow-up reasoning error:', err);
     }
 
+    const matched = currentCandidates.find(c => 
+      userPrompt.toLowerCase().includes(c.name.toLowerCase()) || 
+      userPrompt.toLowerCase().includes((c.area || '').toLowerCase())
+    );
+
     return {
-      text: `Re-evaluated shortlist against your criteria: "${userPrompt}". Adjusting priority weighting and risk tolerance.`,
-      actionTaken: "Refined candidate rankings",
-      reRankedCandidates: currentCandidates
+      text: matched 
+        ? `${matched.name} (${matched.area}): ${matched.description} Logistical access: ${matched.productionConsiderations?.accessibility || 'Confirmed'}. Key restrictions: ${(matched.potentialRestrictions || []).join('; ') || 'Standard local NOC required'}.`
+        : `Re-evaluated shortlist against your criteria: "${userPrompt}". Adjusting priority weighting and risk tolerance.`,
+      actionTaken: matched ? `Analyzed ${matched.name}` : "Refined candidate rankings",
+      reRankedCandidates: matched ? [matched, ...currentCandidates.filter(c => c.id !== matched.id)] : currentCandidates
     };
   }
 }
