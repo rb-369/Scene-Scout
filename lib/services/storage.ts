@@ -1,7 +1,9 @@
 import { LocationCandidate, ResearchSession } from '../types';
+import { DEMO_CANDIDATES } from '../demoData';
 
 const SAVED_LOCATIONS_KEY = 'scenescout_saved_locations_v1';
 const SESSIONS_HISTORY_KEY = 'scenescout_sessions_history_v1';
+const ACTIVE_CANDIDATES_KEY = 'scenescout_active_candidates_v1';
 
 export const storageService = {
   getSavedLocations(): LocationCandidate[] {
@@ -128,5 +130,55 @@ export const storageService = {
       console.warn('MongoDB Atlas sync check:', err);
       return this.getSavedLocations();
     }
+  },
+
+  cacheActiveCandidates(candidates: LocationCandidate[]): void {
+    if (typeof window === 'undefined' || !Array.isArray(candidates)) return;
+    try {
+      sessionStorage.setItem(ACTIVE_CANDIDATES_KEY, JSON.stringify(candidates));
+      localStorage.setItem(ACTIVE_CANDIDATES_KEY, JSON.stringify(candidates));
+    } catch {}
+  },
+
+  getActiveCandidates(): LocationCandidate[] {
+    if (typeof window === 'undefined') return [];
+    try {
+      const fromSession = sessionStorage.getItem(ACTIVE_CANDIDATES_KEY);
+      if (fromSession) return JSON.parse(fromSession);
+      const fromLocal = localStorage.getItem(ACTIVE_CANDIDATES_KEY);
+      if (fromLocal) return JSON.parse(fromLocal);
+      return [];
+    } catch {
+      return [];
+    }
+  },
+
+  getCandidateById(id: string): LocationCandidate | null {
+    if (!id) return null;
+    const cleanId = decodeURIComponent(id).trim().toLowerCase();
+
+    // 1. Check active session candidates
+    const active = this.getActiveCandidates();
+    const foundActive = active.find(c => c.id.toLowerCase() === cleanId);
+    if (foundActive) return foundActive;
+
+    // 2. Check saved locations
+    const saved = this.getSavedLocations();
+    const foundSaved = saved.find(c => c.id.toLowerCase() === cleanId);
+    if (foundSaved) return foundSaved;
+
+    // 3. Check demo candidates
+    const foundDemo = DEMO_CANDIDATES.find(c => c.id.toLowerCase() === cleanId);
+    if (foundDemo) return foundDemo;
+
+    // 4. Fuzzy fallback (slug or partial ID match)
+    const all = [...active, ...saved, ...DEMO_CANDIDATES];
+    const fuzzy = all.find(c => 
+      c.id.toLowerCase().includes(cleanId) || 
+      cleanId.includes(c.id.toLowerCase()) ||
+      c.name.toLowerCase().replace(/[^a-z0-9]/g, '-').includes(cleanId)
+    );
+
+    return fuzzy || null;
   }
 };

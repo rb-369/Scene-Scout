@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { BriefInput } from '@/components/BriefInput';
 import { AgentTimeline } from '@/components/AgentTimeline';
@@ -42,6 +43,7 @@ import {
 } from 'lucide-react';
 
 export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => void }) {
+  const router = useRouter();
   const { user } = useAuth();
 
   // Navigation
@@ -95,8 +97,16 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
     // Automatically load the pre-curated primary demo session on first load
     setCurrentSession(DEMO_SESSION);
     setCandidates(DEMO_CANDIDATES);
+    storageService.cacheActiveCandidates(DEMO_CANDIDATES);
     setCurrentStepIndex(DEMO_ACTIVITY_STEPS.length - 1);
   }, []);
+
+  // Keep active candidates cached for instant location detail page lookup
+  useEffect(() => {
+    if (candidates.length > 0) {
+      storageService.cacheActiveCandidates(candidates);
+    }
+  }, [candidates]);
 
   // Sync saved locations from MongoDB Atlas cloud whenever user logs in
   useEffect(() => {
@@ -250,6 +260,12 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
     }
   };
 
+  // Handler: View full location dossier on dedicated /location/[id] page
+  const handleViewDetails = (cand: LocationCandidate) => {
+    storageService.cacheActiveCandidates(candidates);
+    router.push(`/location/${encodeURIComponent(cand.id)}`);
+  };
+
   // Toggle bookmark / save
   const handleToggleSave = (candidate: LocationCandidate) => {
     if (storageService.isSaved(candidate.id)) {
@@ -353,11 +369,11 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
         {currentTab === 'saved' ? (
           <SavedLocationsView
             savedLocations={savedLocations}
-            onViewDetails={(cand: LocationCandidate) => setSelectedCandidate(cand)}
             onRemove={(id: string) => {
               storageService.removeSavedLocation(id, user?.id);
               setSavedLocations(prev => prev.filter(c => c.id !== id));
             }}
+            onViewDetails={handleViewDetails}
             onBackToScout={() => setCurrentTab('scout')}
           />
         ) : currentTab === 'compare' ? (
@@ -460,7 +476,7 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
                     </div>
 
                     <button
-                      onClick={() => setSelectedCandidate(candidate)}
+                      onClick={() => handleViewDetails(candidate)}
                       className="btn-cinema btn-secondary"
                       style={{ width: '100%', fontSize: '0.82rem', padding: '8px' }}
                     >
@@ -647,7 +663,7 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
                     key={candidate.id}
                     candidate={candidate}
                     rankIndex={idx}
-                    onViewDetails={(cand) => setSelectedCandidate(cand)}
+                    onViewDetails={handleViewDetails}
                     onToggleSave={handleToggleSave}
                     isSaved={storageService.isSaved(candidate.id)}
                     onToggleCompare={handleToggleCompare}
@@ -687,7 +703,7 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
           onRemoveFromCompare={(id) => setCompareIds(prev => prev.filter(cId => cId !== id))}
           onSelectCandidate={(c) => {
             setShowCompareModal(false);
-            setSelectedCandidate(c);
+            handleViewDetails(c);
           }}
         />
       )}

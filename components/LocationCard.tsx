@@ -48,7 +48,11 @@ export function LocationCard({
   const TrustIcon = trust.Icon;
 
   return (
-    <article className={`location-card ${isCompared ? 'is-compared' : ''}`}>
+    <article 
+      className={`location-card location-card-compact ${isCompared ? 'is-compared' : ''}`}
+      onDoubleClick={() => onViewDetails(candidate)}
+      title="Double click to view full location dossier"
+    >
       <header className="location-card-topline">
         <span className={`location-status status-${trust.tone}`}><TrustIcon size={13} />{trust.label}</span>
         <span className="location-overall"><span>Overall</span><strong>{score(candidate)}</strong></span>
@@ -67,42 +71,41 @@ export function LocationCard({
         <strong>{candidate.estimatedTariff || 'Rate on inquiry'}</strong>
       </div>
 
-      <p className="location-description">{candidate.description}</p>
-
-      <dl className="location-metrics">
-        <div><dt>Scene fit</dt><dd className="metric-accent">{candidate.sceneMatchScore}<small>/100</small></dd></div>
-        <div><dt>Access</dt><dd>{candidate.accessibilityScore}<small>/100</small></dd></div>
-        <div><dt>Risk</dt><dd className={`metric-${risk.tone}`}>{risk.label}</dd></div>
-        <div><dt>Evidence</dt><dd>{candidate.evidenceQualityScore}<small>/100</small></dd></div>
-      </dl>
-
-      {(candidate.visualCharacteristics || []).length > 0 && (
-        <div className="location-traits" aria-label="Visual characteristics">
-          {(candidate.visualCharacteristics || []).slice(0, 2).map((trait) => <span key={trait}>{trait}</span>)}
+      <div className="location-compact-meta">
+        <div className="location-compact-risk">
+          <span>Risk Level</span>
+          <strong className={`metric-${risk.tone}`}>{risk.label} ({candidate.productionRiskScore}%)</strong>
         </div>
-      )}
-
-      {(candidate.potentialRestrictions || []).length > 0 && (
-        <p className="location-notice"><ShieldAlert size={14} />{candidate.potentialRestrictions[0]}</p>
-      )}
+      </div>
 
       <footer className="location-card-actions">
         <div className="location-card-utilities">
-          <button className={isCompared ? 'is-active' : ''} onClick={() => onToggleCompare(candidate)} aria-pressed={isCompared}>
+          <button 
+            type="button"
+            className={isCompared ? 'is-active' : ''} 
+            onClick={(e) => { e.stopPropagation(); onToggleCompare(candidate); }} 
+            aria-pressed={isCompared}
+          >
             <Layers size={14} />{isCompared ? 'Comparing' : 'Compare'}
           </button>
-          <button className={isSaved ? 'is-active' : ''} onClick={() => onToggleSave(candidate)} aria-pressed={isSaved}>
+          <button 
+            type="button"
+            className={isSaved ? 'is-active' : ''} 
+            onClick={(e) => { e.stopPropagation(); onToggleSave(candidate); }} 
+            aria-pressed={isSaved}
+          >
             <Bookmark size={14} fill={isSaved ? 'currentColor' : 'none'} />{isSaved ? 'Saved' : 'Save'}
           </button>
         </div>
-        <button className="location-open-dossier" onClick={() => onViewDetails(candidate)}>
+        <button 
+          type="button"
+          className="location-open-dossier" 
+          onClick={(e) => { e.stopPropagation(); onViewDetails(candidate); }}
+          title="View full location dossier in new page"
+        >
           View <Eye size={14} />
         </button>
       </footer>
-
-      <button className="location-ask-agent" onClick={() => onAskAbout(candidate)} aria-label={`Ask SceneScout about ${candidate.name}`}>
-        <MessageSquare size={14} /> Ask about this location
-      </button>
     </article>
   );
 }
