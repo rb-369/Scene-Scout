@@ -94,13 +94,13 @@ export const LocationCard: React.FC<LocationCardProps> = ({
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
-          background: rankIndex === 0 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.06)',
-          border: `1px solid ${rankIndex === 0 ? 'rgba(245, 158, 11, 0.35)' : 'rgba(255, 255, 255, 0.1)'}`,
+          background: rankIndex === 0 ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+          border: `1px solid ${rankIndex === 0 ? 'rgba(56, 189, 248, 0.35)' : 'rgba(255, 255, 255, 0.1)'}`,
           padding: '3px 10px',
           borderRadius: '20px'
         }}>
           <span style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Overall</span>
-          <span className="font-display" style={{ fontSize: '0.95rem', fontWeight: 800, color: rankIndex === 0 ? '#fbbf24' : '#ffffff' }}>
+          <span className="font-display" style={{ fontSize: '0.95rem', fontWeight: 800, color: rankIndex === 0 ? '#38bdf8' : '#ffffff' }}>
             {candidate.overallScore || Math.round(((candidate.sceneMatchScore || 0) * 0.4) + ((candidate.accessibilityScore || 0) * 0.2) + ((candidate.evidenceQualityScore || 0) * 0.2) + ((100 - (candidate.productionRiskScore || 0)) * 0.2))}
           </span>
         </div>
@@ -114,15 +114,15 @@ export const LocationCard: React.FC<LocationCardProps> = ({
             height: '36px',
             borderRadius: '10px',
             background: rankIndex === 0 
-              ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' 
+              ? 'linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)' 
               : 'rgba(255, 255, 255, 0.07)',
-            color: rankIndex === 0 ? '#06080d' : '#ffffff',
+            color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontWeight: 800,
             fontSize: '1rem',
-            boxShadow: rankIndex === 0 ? '0 4px 14px rgba(245, 158, 11, 0.35)' : undefined
+            boxShadow: rankIndex === 0 ? '0 4px 14px rgba(56, 189, 248, 0.35)' : undefined
           }} className="font-display">
             #{rankIndex + 1}
           </div>
@@ -132,7 +132,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({
               {candidate.name}
             </h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '0.82rem', marginTop: '2px' }}>
-              <MapPin size={13} color="#f59e0b" />
+              <MapPin size={13} color="#38bdf8" />
               <span>{candidate.area}, {candidate.city}</span>
             </div>
           </div>
@@ -144,8 +144,8 @@ export const LocationCard: React.FC<LocationCardProps> = ({
             onClick={() => onToggleCompare(candidate)}
             title={isCompared ? 'Remove from comparison' : 'Add to comparison'}
             style={{
-              background: isCompared ? 'rgba(6, 182, 212, 0.25)' : 'rgba(255, 255, 255, 0.05)',
-              border: `1px solid ${isCompared ? '#06b6d4' : 'rgba(255, 255, 255, 0.1)'}`,
+              background: isCompared ? 'rgba(56, 189, 248, 0.22)' : 'rgba(255, 255, 255, 0.05)',
+              border: `1px solid ${isCompared ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)'}`,
               color: isCompared ? '#38bdf8' : '#cbd5e1',
               padding: '6px 9px',
               borderRadius: '6px',
@@ -165,9 +165,9 @@ export const LocationCard: React.FC<LocationCardProps> = ({
             onClick={() => onToggleSave(candidate)}
             title={isSaved ? 'Remove from saved' : 'Save location to shortlist'}
             style={{
-              background: isSaved ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255, 255, 255, 0.05)',
-              border: `1px solid ${isSaved ? '#f59e0b' : 'rgba(255, 255, 255, 0.1)'}`,
-              color: isSaved ? '#fbbf24' : '#cbd5e1',
+              background: isSaved ? 'rgba(56, 189, 248, 0.22)' : 'rgba(255, 255, 255, 0.05)',
+              border: `1px solid ${isSaved ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)'}`,
+              color: isSaved ? '#38bdf8' : '#cbd5e1',
               padding: '6px 9px',
               borderRadius: '6px',
               fontSize: '0.72rem',
@@ -178,7 +178,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({
               fontWeight: 600
             }}
           >
-            <Bookmark size={13} fill={isSaved ? '#fbbf24' : 'none'} />
+            <Bookmark size={13} fill={isSaved ? '#38bdf8' : 'none'} />
             <span>{isSaved ? 'Saved' : 'Save'}</span>
           </button>
         </div>
@@ -191,12 +191,12 @@ export const LocationCard: React.FC<LocationCardProps> = ({
         justifyContent: 'space-between',
         padding: '8px 12px',
         borderRadius: '8px',
-        background: 'rgba(245, 158, 11, 0.08)',
-        border: '1px solid rgba(245, 158, 11, 0.2)',
+        background: 'rgba(56, 189, 248, 0.08)',
+        border: '1px solid rgba(56, 189, 248, 0.22)',
         marginBottom: '14px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Est. Daily Tariff:
           </span>
           <span style={{ fontSize: '0.86rem', color: '#ffffff', fontWeight: 700 }}>
@@ -228,7 +228,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({
           <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Scene Match
           </div>
-          <div className="font-display" style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fbbf24' }}>
+          <div className="font-display" style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8' }}>
             {candidate.sceneMatchScore}<span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#64748b' }}>/100</span>
           </div>
         </div>

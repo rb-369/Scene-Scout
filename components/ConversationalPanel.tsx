@@ -234,7 +234,7 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
             fontSize: '0.88rem',
             outline: 'none'
           }}
-          onFocus={(e) => e.target.style.borderColor = 'rgba(6, 182, 212, 0.5)'}
+          onFocus={(e) => e.target.style.borderColor = 'rgba(56, 189, 248, 0.5)'}
           onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.12)'}
         />
 
@@ -242,7 +242,7 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
           type="submit"
           id="ask-agent-submit-btn"
           disabled={isLoading}
-          className="btn-cinema btn-cyan"
+          className="btn-cinema btn-primary"
           style={{ padding: '0 18px', cursor: isLoading ? 'not-allowed' : 'pointer' }}
           title="Submit question or request to SceneScout Agent"
         >

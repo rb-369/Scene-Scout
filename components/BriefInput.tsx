@@ -330,7 +330,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                 max={100}
                 value={maxDistance}
                 onChange={(e) => setMaxDistance(Number(e.target.value))}
-                style={{ width: '100%', accentColor: '#f59e0b', marginTop: '6px' }}
+                style={{ width: '100%', accentColor: '#38bdf8', marginTop: '6px' }}
               />
             </div>
           </div>
@@ -371,7 +371,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
                     <span>Visual Match Weight</span>
-                    <span style={{ fontWeight: 700, color: '#fbbf24' }}>{sceneMatchWeight}%</span>
+                    <span style={{ fontWeight: 700, color: '#38bdf8' }}>{sceneMatchWeight}%</span>
                   </div>
                   <input
                     type="range"
@@ -379,14 +379,14 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                     max={60}
                     value={sceneMatchWeight}
                     onChange={(e) => setSceneMatchWeight(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: '#f59e0b' }}
+                    style={{ width: '100%', accentColor: '#38bdf8' }}
                   />
                 </div>
 
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
                     <span>Accessibility & Logistics</span>
-                    <span style={{ fontWeight: 700, color: '#38bdf8' }}>{accessibilityWeight}%</span>
+                    <span style={{ fontWeight: 700, color: '#60a5fa' }}>{accessibilityWeight}%</span>
                   </div>
                   <input
                     type="range"
@@ -394,7 +394,7 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                     max={50}
                     value={accessibilityWeight}
                     onChange={(e) => setAccessibilityWeight(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: '#06b6d4' }}
+                    style={{ width: '100%', accentColor: '#60a5fa' }}
                   />
                 </div>
 
@@ -468,8 +468,8 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
                     <div style={{
                       width: '16px',
                       height: '16px',
-                      border: '2px solid rgba(0,0,0,0.2)',
-                      borderTopColor: '#000',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderTopColor: '#ffffff',
                       borderRadius: '50%',
                       animation: 'spin-slow 0.8s linear infinite'
                     }} />

@@ -132,16 +132,16 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
           </div>
 
           <div style={{
-            background: 'rgba(245, 158, 11, 0.08)',
-            border: '1px solid rgba(245, 158, 11, 0.25)',
+            background: 'rgba(56, 189, 248, 0.08)',
+            border: '1px solid rgba(56, 189, 248, 0.28)',
             borderRadius: '8px',
             padding: '6px 14px',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '0.66rem', color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
+            <div style={{ fontSize: '0.66rem', color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
               Shortlisted
             </div>
-            <div className="font-display" style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f59e0b' }}>
+            <div className="font-display" style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8' }}>
               {shortlistedCount}
             </div>
           </div>
@@ -171,8 +171,8 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
           height: '100%',
           width: `${progressPercent}%`,
           background: isDone 
-            ? 'linear-gradient(90deg, #10b981 0%, #06b6d4 100%)' 
-            : 'linear-gradient(90deg, #f59e0b 0%, #38bdf8 100%)',
+            ? 'linear-gradient(90deg, #10b981 0%, #38bdf8 100%)' 
+            : 'linear-gradient(90deg, #38bdf8 0%, #60a5fa 100%)',
           transition: 'width 0.4s ease'
         }} />
       </div>
@@ -192,13 +192,13 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
               key={step.id || idx}
               style={{
                 background: isCurrent 
-                  ? 'rgba(245, 158, 11, 0.08)' 
+                  ? 'rgba(56, 189, 248, 0.1)' 
                   : isCompleted 
                     ? 'rgba(255, 255, 255, 0.03)' 
                     : 'rgba(255, 255, 255, 0.01)',
                 border: `1px solid ${
                   isCurrent 
-                    ? 'rgba(245, 158, 11, 0.4)' 
+                    ? 'rgba(56, 189, 248, 0.45)' 
                     : isCompleted 
                       ? 'rgba(255, 255, 255, 0.08)' 
                       : 'rgba(255, 255, 255, 0.03)'
@@ -214,7 +214,7 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
             >
               <div style={{ marginTop: '2px' }}>
                 {isCurrent ? (
-                  <Loader2 size={16} color="#f59e0b" className="animate-spin-slow" />
+                  <Loader2 size={16} color="#38bdf8" className="animate-spin-slow" />
                 ) : isCompleted ? (
                   <CheckCircle2 size={16} color="#10b981" />
                 ) : (
@@ -227,7 +227,7 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
                   <span style={{ 
                     fontSize: '0.82rem', 
                     fontWeight: 600, 
-                    color: isCurrent ? '#fbbf24' : isCompleted ? '#ffffff' : '#94a3b8' 
+                    color: isCurrent ? '#38bdf8' : isCompleted ? '#ffffff' : '#94a3b8' 
                   }}>
                     {step.title}
                   </span>

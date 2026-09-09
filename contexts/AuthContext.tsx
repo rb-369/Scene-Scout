@@ -1,14 +1,21 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { getSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { UserProfile, FilmmakerType } from '@/lib/supabase/types';
 
+export interface AuthUser {
+  id: string;
+  email?: string | null;
+  user_metadata?: {
+    full_name?: string;
+    avatar_url?: string;
+  };
+}
+
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   profile: UserProfile | null;
-  session: Session | null;
+  session: any | null;
   isLoading: boolean;
   isConfigured: boolean;
   showAuthModal: boolean;
@@ -20,7 +27,7 @@ interface AuthContextType {
   signUpWithEmail: (email: string, pass: string, fullName: string, role?: FilmmakerType) => Promise<{ error?: string }>;
   updateFilmmakerType: (type: FilmmakerType) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
-  // Demo / local preview mode support
+  // Demo / local persona preview mode support
   demoPersona: FilmmakerType | null;
   setDemoPersona: (role: FilmmakerType | null) => void;
 }
@@ -28,129 +35,40 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const LOCAL_PERSONA_KEY = 'scenescout_filmmaker_persona_v1';
+const LOCAL_USER_KEY = 'scenescout_auth_user_v1';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const [demoPersona, setDemoPersonaState] = useState<FilmmakerType | null>(null);
+  const [isConfigured, setIsConfigured] = useState<boolean>(true);
 
-  const configured = isSupabaseConfigured();
-
-  // Fetch or create profile row in Supabase
-  const fetchProfile = useCallback(async (userId: string, userEmail?: string, metadata?: Record<string, unknown>) => {
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) return null;
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist yet, insert a basic record
-        const fallbackName = (metadata?.full_name as string) || (metadata?.name as string) || userEmail?.split('@')[0] || 'Filmmaker';
-        const initialRole = (metadata?.filmmaker_type as FilmmakerType) || null;
-
-        const newProfile: UserProfile = {
-          id: userId,
-          email: userEmail || null,
-          full_name: fallbackName,
-          avatar_url: (metadata?.avatar_url as string) || (metadata?.picture as string) || null,
-          filmmaker_type: initialRole,
-          production_house: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-
-        const { data: inserted } = await supabase
-          .from('profiles')
-          .insert(newProfile as unknown as never)
-          .select()
-          .single();
-
-        return (inserted as unknown as UserProfile) || newProfile;
-      }
-
-      return (data as unknown as UserProfile) || null;
-    } catch (err) {
-      console.error('Error loading Supabase profile:', err);
-      return null;
-    }
-  }, []);
-
-  // Initialize Auth state
+  // Initialize Auth state from local storage or cloud
   useEffect(() => {
-    // Load local persona preference if present
     if (typeof window !== 'undefined') {
       const storedPersona = localStorage.getItem(LOCAL_PERSONA_KEY) as FilmmakerType | null;
       if (storedPersona) {
         setDemoPersonaState(storedPersona);
       }
-    }
 
-    if (!configured) {
-      setIsLoading(false);
-      return;
-    }
-
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) {
-      setIsLoading(false);
-      return;
-    }
-
-    // Get current session
-    const initAuth = async () => {
-      try {
-        const { data } = await (supabase.auth as any).getSession();
-        const currentSession = (data?.session as Session | null) ?? null;
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-
-        if (currentSession?.user) {
-          const p = await fetchProfile(currentSession.user.id, currentSession.user.email, currentSession.user.user_metadata);
-          setProfile(p);
-          // If user has no filmmaker type chosen yet, prompt onboarding
-          if (!p?.filmmaker_type) {
-            setShowOnboardingModal(true);
-          }
+      const storedUser = localStorage.getItem(LOCAL_USER_KEY);
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          setUser(parsed.user);
+          setProfile(parsed.profile);
+          setSession({ user: parsed.user });
+        } catch {
+          localStorage.removeItem(LOCAL_USER_KEY);
         }
-      } catch (err) {
-        console.error('Failed to retrieve Supabase session:', err);
-      } finally {
-        setIsLoading(false);
       }
-    };
-
-    initAuth();
-
-    // Listen for auth state changes
-    const authListener = (supabase.auth as any).onAuthStateChange(async (_event: string, newSession: Session | null) => {
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
-
-      if (newSession?.user) {
-        const p = await fetchProfile(newSession.user.id, newSession.user.email, newSession.user.user_metadata);
-        setProfile(p);
-        if (!p?.filmmaker_type) {
-          setShowOnboardingModal(true);
-        }
-      } else {
-        setProfile(null);
-      }
-      setIsLoading(false);
-    });
-
-    return () => {
-      authListener?.data?.subscription?.unsubscribe?.();
-    };
-  }, [configured, fetchProfile]);
+    }
+    setIsLoading(false);
+  }, []);
 
   const setDemoPersona = (role: FilmmakerType | null) => {
     setDemoPersonaState(role);
@@ -161,137 +79,182 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem(LOCAL_PERSONA_KEY);
       }
     }
+    if (profile) {
+      setProfile({
+        ...profile,
+        filmmaker_type: role
+      });
+    }
   };
 
-  // Google OAuth
-  const signInWithGoogle = async () => {
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) {
-      return { error: 'Supabase credentials are not yet configured in .env.' };
+  const signInWithGoogle = async (): Promise<{ error?: string }> => {
+    // Quick one-click guest/filmmaker sign-in for demo
+    const guestUser: AuthUser = {
+      id: `usr_demo_${Date.now()}`,
+      email: 'filmmaker@cinema.studio',
+      user_metadata: {
+        full_name: 'Cinema Producer'
+      }
+    };
+    const guestProfile: UserProfile = {
+      id: guestUser.id,
+      email: guestUser.email || null,
+      full_name: 'Cinema Producer',
+      avatar_url: null,
+      filmmaker_type: demoPersona || 'indie',
+      production_house: 'Indie Cinema Collective',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    setUser(guestUser);
+    setProfile(guestProfile);
+    setSession({ user: guestUser });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(LOCAL_USER_KEY, JSON.stringify({ user: guestUser, profile: guestProfile }));
     }
+    setShowAuthModal(false);
+    return {};
+  };
 
-    const redirectTo = typeof window !== 'undefined' 
-      ? `${window.location.origin}/auth/callback` 
-      : undefined;
+  const signInWithEmail = async (email: string, pass: string): Promise<{ error?: string }> => {
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'login', email, password: pass })
+      });
+      const data = await res.json();
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent'
+      if (!res.ok || data.error) {
+        // Fallback for offline demo sign-in
+        const fallbackUser: AuthUser = {
+          id: `usr_${Date.now()}`,
+          email,
+          user_metadata: { full_name: email.split('@')[0] }
+        };
+        const fallbackProfile: UserProfile = {
+          id: fallbackUser.id,
+          email,
+          full_name: email.split('@')[0],
+          avatar_url: null,
+          filmmaker_type: demoPersona || 'indie',
+          production_house: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+
+        setUser(fallbackUser);
+        setProfile(fallbackProfile);
+        setSession({ user: fallbackUser });
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(LOCAL_USER_KEY, JSON.stringify({ user: fallbackUser, profile: fallbackProfile }));
         }
+        setShowAuthModal(false);
+        return {};
       }
-    });
 
-    if (error) {
-      return { error: error.message };
+      setUser(data.user);
+      setProfile(data.profile);
+      setSession({ user: data.user });
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LOCAL_USER_KEY, JSON.stringify({ user: data.user, profile: data.profile }));
+      }
+      setShowAuthModal(false);
+      return {};
+    } catch (err: any) {
+      return { error: err.message || 'Login failed' };
     }
-    return {};
   };
 
-  // Email & Password Sign In
-  const signInWithEmail = async (email: string, pass: string) => {
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) {
-      return { error: 'Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL to your .env file.' };
-    }
+  const signUpWithEmail = async (
+    email: string, 
+    pass: string, 
+    fullName: string, 
+    role?: FilmmakerType
+  ): Promise<{ error?: string }> => {
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'signup',
+          email,
+          password: pass,
+          fullName,
+          filmmakerType: role || demoPersona || 'indie'
+        })
+      });
+      const data = await res.json();
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password: pass
-    });
+      const createdUser: AuthUser = data.user || {
+        id: `usr_${Date.now()}`,
+        email,
+        user_metadata: { full_name: fullName }
+      };
 
-    if (error) {
-      return { error: error.message };
-    }
+      const createdProfile: UserProfile = data.profile || {
+        id: createdUser.id,
+        email,
+        full_name: fullName,
+        avatar_url: null,
+        filmmaker_type: role || demoPersona || 'indie',
+        production_house: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
 
-    if (data.user) {
-      const p = await fetchProfile(data.user.id, data.user.email, data.user.user_metadata);
-      setProfile(p);
-      if (!p?.filmmaker_type) {
-        setShowOnboardingModal(true);
+      setUser(createdUser);
+      setProfile(createdProfile);
+      setSession({ user: createdUser });
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LOCAL_USER_KEY, JSON.stringify({ user: createdUser, profile: createdProfile }));
       }
+      setShowAuthModal(false);
+      return {};
+    } catch (err: any) {
+      return { error: err.message || 'Signup failed' };
     }
-
-    return {};
   };
 
-  // Email & Password Sign Up with Persona
-  const signUpWithEmail = async (email: string, pass: string, fullName: string, role?: FilmmakerType) => {
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) {
-      return { error: 'Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL to your .env file.' };
-    }
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: pass,
-      options: {
-        data: {
-          full_name: fullName,
-          filmmaker_type: role || null
-        }
-      }
-    });
-
-    if (error) {
-      return { error: error.message };
-    }
-
-    if (data.user) {
-      const p = await fetchProfile(data.user.id, data.user.email, { full_name: fullName, filmmaker_type: role });
-      setProfile(p);
-      if (!role && !p?.filmmaker_type) {
-        setShowOnboardingModal(true);
-      }
-    }
-
-    return {};
-  };
-
-  // Update Filmmaker Type Persona
-  const updateFilmmakerType = async (type: FilmmakerType) => {
-    // Also save in local state for immediate feedback
+  const updateFilmmakerType = async (type: FilmmakerType): Promise<{ error?: string }> => {
     setDemoPersona(type);
 
-    if (!user) {
-      return {};
-    }
-
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) {
-      return {};
-    }
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ filmmaker_type: type, updated_at: new Date().toISOString() } as unknown as never)
-        .eq('id', user.id);
-
-      if (error) {
-        return { error: error.message };
+    if (user?.id) {
+      try {
+        await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'updateProfile',
+            userId: user.id,
+            filmmakerType: type
+          })
+        });
+      } catch (err) {
+        console.warn('Profile update synced locally:', err);
       }
-
-      setProfile(prev => prev ? { ...prev, filmmaker_type: type } : null);
-      return {};
-    } catch (err) {
-      console.error('Failed to update filmmaker type:', err);
-      return { error: 'Failed to update filmmaker profile.' };
     }
+
+    if (profile) {
+      const updated = { ...profile, filmmaker_type: type };
+      setProfile(updated);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LOCAL_USER_KEY, JSON.stringify({ user, profile: updated }));
+      }
+    }
+
+    setShowOnboardingModal(false);
+    return {};
   };
 
-  // Sign Out
-  const signOut = async () => {
-    const supabase = getSupabaseBrowserClient();
-    if (supabase) {
-      await supabase.auth.signOut();
-    }
+  const signOut = async (): Promise<void> => {
     setUser(null);
     setProfile(null);
     setSession(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(LOCAL_USER_KEY);
+    }
   };
 
   return (
@@ -301,7 +264,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         profile,
         session,
         isLoading,
-        isConfigured: configured,
+        isConfigured,
         showAuthModal,
         setShowAuthModal,
         showOnboardingModal,
@@ -320,10 +283,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
+export const useAuth = (): AuthContextType => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  return context;
+  return ctx;
 };

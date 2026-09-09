@@ -115,18 +115,18 @@ export const AuthModal: React.FC = () => {
           width: '100%',
           maxWidth: '480px',
           background: '#0c1019',
-          border: '1px solid rgba(245, 158, 11, 0.25)',
+          border: '1px solid rgba(96, 165, 250, 0.25)',
           borderRadius: '16px',
-          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.1)',
+          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.1)',
           overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column'
+          animation: 'modal-in 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
-        {/* Header */}
+        {/* Modal Header */}
         <div style={{
-          padding: '24px 28px 16px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          padding: '24px 28px',
+          background: 'linear-gradient(180deg, rgba(14, 20, 36, 0.7) 0%, rgba(12, 16, 25, 0) 100%)',
+          borderBottom: '1px solid rgba(148, 163, 184, 0.12)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -137,17 +137,17 @@ export const AuthModal: React.FC = () => {
               width: '40px',
               height: '40px',
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              background: 'linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+              boxShadow: '0 4px 12px rgba(56, 189, 248, 0.3)'
             }}>
-              <Film size={22} color="#07090e" strokeWidth={2.4} />
+              <Film size={22} color="#ffffff" strokeWidth={2.4} />
             </div>
             <div>
               <h3 id="auth-modal-title" className="font-display" style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
-                Scene<span style={{ color: '#f59e0b' }}>Scout</span> Account
+                Scene<span style={{ color: '#60a5fa' }}>Scout</span> Account
               </h3>
               <p style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
                 {mode === 'signin' ? 'Sign in to sync saved locations and scout history' : 'Create your cinematic production profile'}

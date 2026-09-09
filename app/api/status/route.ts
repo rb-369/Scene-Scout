@@ -23,6 +23,11 @@ export async function GET() {
         configured: geminiConfigured,
         name: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
         track: 'Google Cloud Agent Track'
+      },
+      mongodb: {
+        configured: Boolean(process.env.MONGODB_URI && process.env.MONGODB_URI.trim().length > 0),
+        name: 'MongoDB Atlas Cloud Database',
+        track: 'Persistence Layer'
       }
     },
     version: '1.0.0'

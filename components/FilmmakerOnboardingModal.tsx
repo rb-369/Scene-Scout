@@ -123,9 +123,9 @@ export const FilmmakerOnboardingModal: React.FC = () => {
           maxWidth: '840px',
           maxHeight: '90vh',
           background: '#0c1019',
-          border: '1px solid rgba(245, 158, 11, 0.3)',
+          border: '1px solid rgba(96, 165, 250, 0.3)',
           borderRadius: '20px',
-          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(245, 158, 11, 0.12)',
+          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(56, 189, 248, 0.12)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden'
@@ -136,12 +136,12 @@ export const FilmmakerOnboardingModal: React.FC = () => {
           padding: '28px 32px 20px',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           position: 'relative',
-          background: 'linear-gradient(180deg, rgba(245, 158, 11, 0.05) 0%, transparent 100%)'
+          background: 'linear-gradient(180deg, rgba(56, 189, 248, 0.08) 0%, transparent 100%)'
         }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span className="badge badge-warning" style={{ fontSize: '0.72rem', padding: '3px 8px' }}>
+                <span className="badge badge-ice" style={{ fontSize: '0.72rem', padding: '3px 8px' }}>
                   <Sparkles size={12} />
                   Filmmaker Persona Setup
                 </span>
@@ -195,10 +195,10 @@ export const FilmmakerOnboardingModal: React.FC = () => {
                 onClick={() => setSelected(opt.type)}
                 style={{
                   background: isSelected 
-                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(15, 20, 32, 0.9) 100%)' 
+                    ? 'linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(15, 20, 32, 0.9) 100%)' 
                     : 'rgba(255, 255, 255, 0.02)',
                   border: isSelected 
-                    ? '2px solid #f59e0b' 
+                    ? '2px solid #38bdf8' 
                     : '1px solid rgba(255, 255, 255, 0.07)',
                   borderRadius: '12px',
                   padding: '16px 20px',
@@ -208,7 +208,7 @@ export const FilmmakerOnboardingModal: React.FC = () => {
                   alignItems: 'flex-start',
                   justifyContent: 'space-between',
                   gap: '16px',
-                  boxShadow: isSelected ? '0 8px 24px rgba(245, 158, 11, 0.15)' : 'none'
+                  boxShadow: isSelected ? '0 8px 24px rgba(56, 189, 248, 0.15)' : 'none'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', flex: 1 }}>
@@ -216,8 +216,8 @@ export const FilmmakerOnboardingModal: React.FC = () => {
                     width: '44px',
                     height: '44px',
                     borderRadius: '10px',
-                    background: isSelected ? '#f59e0b' : 'rgba(255, 255, 255, 0.06)',
-                    color: isSelected ? '#07090e' : '#cbd5e1',
+                    background: isSelected ? 'linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)' : 'rgba(255, 255, 255, 0.06)',
+                    color: '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

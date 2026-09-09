@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { 
   Compass, 
   Bookmark, 
@@ -8,14 +9,13 @@ import {
   History, 
   Sparkles, 
   Radio, 
-  Film,
-  ShieldCheck,
-  User,
-  LogIn,
-  LogOut,
-  SlidersHorizontal,
-  Cloud,
-  HardDrive
+  ShieldCheck, 
+  LogIn, 
+  LogOut, 
+  SlidersHorizontal, 
+  Database, 
+  HardDrive,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { FilmmakerType } from '@/lib/supabase/types';
@@ -28,6 +28,7 @@ interface SidebarProps {
   isDemoMode: boolean;
   setIsDemoMode: (val: boolean) => void;
   isLiveConfigured: boolean;
+  onBackToLanding?: () => void;
 }
 
 const PERSONA_LABELS: Record<FilmmakerType, { label: string; icon: string }> = {
@@ -45,7 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   compareCount,
   isDemoMode,
   setIsDemoMode,
-  isLiveConfigured
+  onBackToLanding
 }) => {
   const { 
     user, 
@@ -68,45 +69,80 @@ export const Sidebar: React.FC<SidebarProps> = ({
       top: 0,
       bottom: 0,
       left: 0,
-      background: '#090c13',
-      borderRight: '1px solid rgba(255, 255, 255, 0.07)',
+      background: '#07090f',
+      borderRight: '1px solid rgba(148, 163, 184, 0.12)',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      padding: '24px 16px',
+      padding: '20px 16px',
       zIndex: 100,
       overflowY: 'auto'
     }}>
       {/* Top Header & Branding */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', paddingLeft: '8px' }}>
+        {/* Logo and Wordmark */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', paddingLeft: '4px' }}>
           <div style={{
-            width: '36px',
-            height: '36px',
+            position: 'relative',
+            width: '38px',
+            height: '38px',
             borderRadius: '10px',
-            background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+            overflow: 'hidden',
+            border: '1px solid rgba(96, 165, 250, 0.4)',
+            boxShadow: '0 0 14px rgba(56, 189, 248, 0.25)',
+            flexShrink: 0
           }}>
-            <Film size={20} color="#07090e" strokeWidth={2.4} />
+            <Image 
+              src="/logo.png" 
+              alt="SceneScout" 
+              fill 
+              sizes="38px"
+              style={{ objectFit: 'cover' }} 
+              priority
+            />
           </div>
           <div>
-            <h1 className="font-display" style={{ fontSize: '1.2rem', fontWeight: 700, letterSpacing: '-0.02em', color: '#ffffff' }}>
-              Scene<span style={{ color: '#f59e0b' }}>Scout</span>
+            <h1 className="font-display" style={{ fontSize: '1.22rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#ffffff' }}>
+              Scene<span style={{ color: '#60a5fa' }}>Scout</span>
             </h1>
-            <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
-              Production Agent
+            <div style={{ fontSize: '0.64rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600 }}>
+              Find Stories Around You
             </div>
           </div>
         </div>
 
+        {/* Back to Landing Page button */}
+        {onBackToLanding && (
+          <button
+            type="button"
+            onClick={onBackToLanding}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(148, 163, 184, 0.12)',
+              borderRadius: '8px',
+              color: '#94a3b8',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              padding: '8px 10px',
+              cursor: 'pointer',
+              marginBottom: '14px',
+              transition: 'all 0.2s'
+            }}
+          >
+            <ArrowLeft size={14} color="#38bdf8" />
+            <span>Back to Overview</span>
+          </button>
+        )}
+
         {/* Live vs Demo Badge */}
-        <div style={{ marginTop: '16px', marginBottom: '20px' }}>
+        <div style={{ marginBottom: '18px' }}>
           <div style={{
-            background: isDemoMode ? 'rgba(245, 158, 11, 0.08)' : 'rgba(6, 182, 212, 0.08)',
-            border: `1px solid ${isDemoMode ? 'rgba(245, 158, 11, 0.25)' : 'rgba(6, 182, 212, 0.25)'}`,
+            background: isDemoMode ? 'rgba(245, 158, 11, 0.08)' : 'rgba(56, 189, 248, 0.08)',
+            border: `1px solid ${isDemoMode ? 'rgba(245, 158, 11, 0.25)' : 'rgba(56, 189, 248, 0.28)'}`,
             borderRadius: '8px',
             padding: '10px 12px',
           }}>
@@ -128,7 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 title="Toggle Demo Mode vs Live Mode"
                 style={{
                   background: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
                   color: '#e2e8f0',
                   fontSize: '0.66rem',
                   padding: '2px 6px',
@@ -139,10 +175,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 Switch
               </button>
             </div>
-            <p style={{ fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.3 }}>
+            <p style={{ fontSize: '0.7rem', color: '#94a3b8', lineHeight: 1.3 }}>
               {isDemoMode 
-                ? 'Simulated research data (no API key required)' 
-                : 'Parallel Search API + Gemini active'}
+                ? 'Curated Mumbai industrial thriller dataset' 
+                : 'Parallel Search API + Gemini 2.5 active'}
             </p>
           </div>
         </div>
@@ -157,12 +193,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'space-between',
               padding: '10px 14px',
               borderRadius: '8px',
-              background: currentTab === 'scout' ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-              color: currentTab === 'scout' ? '#fbbf24' : '#94a3b8',
-              border: currentTab === 'scout' ? '1px solid rgba(245, 158, 11, 0.25)' : '1px solid transparent',
+              background: currentTab === 'scout' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+              color: currentTab === 'scout' ? '#38bdf8' : '#94a3b8',
+              border: currentTab === 'scout' ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent',
               cursor: 'pointer',
-              fontWeight: 500,
-              fontSize: '0.9rem',
+              fontWeight: 600,
+              fontSize: '0.88rem',
               transition: 'all 0.15s ease'
             }}
           >
@@ -181,12 +217,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'space-between',
               padding: '10px 14px',
               borderRadius: '8px',
-              background: currentTab === 'saved' ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-              color: currentTab === 'saved' ? '#fbbf24' : '#94a3b8',
-              border: currentTab === 'saved' ? '1px solid rgba(245, 158, 11, 0.25)' : '1px solid transparent',
+              background: currentTab === 'saved' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+              color: currentTab === 'saved' ? '#38bdf8' : '#94a3b8',
+              border: currentTab === 'saved' ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent',
               cursor: 'pointer',
-              fontWeight: 500,
-              fontSize: '0.9rem',
+              fontWeight: 600,
+              fontSize: '0.88rem',
               transition: 'all 0.15s ease'
             }}
           >
@@ -197,7 +233,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {savedCount > 0 && (
               <span style={{
                 fontSize: '0.7rem',
-                background: '#f59e0b',
+                background: '#38bdf8',
                 color: '#07090e',
                 fontWeight: 700,
                 padding: '2px 7px',
@@ -216,12 +252,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'space-between',
               padding: '10px 14px',
               borderRadius: '8px',
-              background: currentTab === 'compare' ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-              color: currentTab === 'compare' ? '#fbbf24' : '#94a3b8',
-              border: currentTab === 'compare' ? '1px solid rgba(245, 158, 11, 0.25)' : '1px solid transparent',
+              background: currentTab === 'compare' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+              color: currentTab === 'compare' ? '#38bdf8' : '#94a3b8',
+              border: currentTab === 'compare' ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent',
               cursor: 'pointer',
-              fontWeight: 500,
-              fontSize: '0.9rem',
+              fontWeight: 600,
+              fontSize: '0.88rem',
               transition: 'all 0.15s ease'
             }}
           >
@@ -232,7 +268,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {compareCount > 0 && (
               <span style={{
                 fontSize: '0.7rem',
-                background: '#06b6d4',
+                background: '#60a5fa',
                 color: '#ffffff',
                 fontWeight: 700,
                 padding: '2px 7px',
@@ -251,12 +287,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               justifyContent: 'space-between',
               padding: '10px 14px',
               borderRadius: '8px',
-              background: currentTab === 'history' ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-              color: currentTab === 'history' ? '#fbbf24' : '#94a3b8',
-              border: currentTab === 'history' ? '1px solid rgba(245, 158, 11, 0.25)' : '1px solid transparent',
+              background: currentTab === 'history' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+              color: currentTab === 'history' ? '#38bdf8' : '#94a3b8',
+              border: currentTab === 'history' ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent',
               cursor: 'pointer',
-              fontWeight: 500,
-              fontSize: '0.9rem',
+              fontWeight: 600,
+              fontSize: '0.88rem',
               transition: 'all 0.15s ease'
             }}
           >
@@ -269,12 +305,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* User Identity & Persona Card */}
-      <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={{
           padding: '12px',
           borderRadius: '10px',
           background: 'rgba(255, 255, 255, 0.025)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          border: '1px solid rgba(148, 163, 184, 0.1)',
           display: 'flex',
           flexDirection: 'column',
           gap: '8px'
@@ -287,8 +323,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     width: '28px',
                     height: '28px',
                     borderRadius: '50%',
-                    background: '#f59e0b',
-                    color: '#07090e',
+                    background: 'linear-gradient(135deg, #38bdf8 0%, #2563eb 100%)',
+                    color: '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -350,9 +386,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   justifyContent: 'space-between',
                   padding: '6px 10px',
                   borderRadius: '6px',
-                  background: 'rgba(245, 158, 11, 0.12)',
-                  border: '1px solid rgba(245, 158, 11, 0.3)',
-                  color: '#fbbf24',
+                  background: 'rgba(56, 189, 248, 0.1)',
+                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  color: '#7dd3fc',
                   fontSize: '0.74rem',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -363,32 +399,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span>{personaMeta?.icon || '🎬'}</span>
                   <span>{personaMeta?.label || 'Indie Filmmaker'}</span>
                 </span>
-                <SlidersHorizontal size={11} color="#f59e0b" />
+                <SlidersHorizontal size={11} color="#38bdf8" />
               </button>
             </div>
           ) : (
             <div>
               <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginBottom: '8px' }}>
-                Join to sync bookmarks & custom scout briefs to Supabase.
+                Sync bookmarks & custom briefs to MongoDB Atlas cloud.
               </div>
               <button
                 type="button"
                 onClick={() => setShowAuthModal(true)}
+                className="btn-cinema btn-primary"
                 style={{
                   width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '8px 12px',
-                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                  color: '#07090e',
-                  borderRadius: '6px',
-                  border: 'none',
                   fontSize: '0.78rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(245, 158, 11, 0.25)'
+                  padding: '8px 12px',
+                  borderRadius: '6px'
                 }}
               >
                 <LogIn size={13} strokeWidth={2.4} />
@@ -397,7 +424,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* Cloud vs Local Sync Indicator */}
+          {/* Database Persistence Indicator */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -408,31 +435,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
             color: '#64748b'
           }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {isConfigured ? <Cloud size={11} color="#10b981" /> : <HardDrive size={11} color="#38bdf8" />}
-              <span>{isConfigured ? 'Supabase Cloud' : 'Local Persistence'}</span>
+              <Database size={11} color="#38bdf8" />
+              <span>MongoDB Atlas</span>
             </span>
-            <span style={{ color: isConfigured ? '#10b981' : '#38bdf8', fontWeight: 600 }}>
-              {isConfigured ? 'Live' : 'Active'}
+            <span style={{ color: '#38bdf8', fontWeight: 600 }}>
+              Active
             </span>
           </div>
         </div>
 
         {/* Footer / Attribution */}
         <div style={{
-          padding: '12px',
+          padding: '10px 12px',
           borderRadius: '8px',
           background: 'rgba(255, 255, 255, 0.02)',
           border: '1px solid rgba(255, 255, 255, 0.05)',
-          fontSize: '0.72rem',
+          fontSize: '0.7rem',
           color: '#64748b'
         }}>
-          <div style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <ShieldCheck size={14} color="#10b981" />
+          <div style={{ fontWeight: 600, color: '#e2e8f0', marginBottom: '3px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <ShieldCheck size={13} color="#34d399" />
             Agentic Cinema Hackathon
           </div>
-          <div>Powered by <strong>Gemini</strong></div>
-          <div>Integrated with <strong>Parallel API</strong></div>
-          <div>Database: <strong>Supabase</strong></div>
+          <div>Orchestrator: <strong>Gemini 2.5</strong></div>
+          <div>Web Retrieval: <strong>Parallel API</strong></div>
+          <div>Database: <strong>MongoDB Atlas</strong></div>
         </div>
       </div>
     </aside>

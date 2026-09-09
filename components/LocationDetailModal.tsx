@@ -70,7 +70,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
               {candidate.name}
             </h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '0.9rem', marginTop: '4px' }}>
-              <MapPin size={15} color="#f59e0b" />
+              <MapPin size={15} color="#38bdf8" />
               <span>{candidate.area}, {candidate.city}</span>
               <span style={{ color: '#64748b' }}>•</span>
               <span style={{ color: '#cbd5e1' }}>{candidate.productionConsiderations?.ownershipStatus || 'Commercial / Municipal'}</span>
@@ -83,7 +83,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
               className="btn-cinema btn-secondary"
               style={{ padding: '8px 14px', fontSize: '0.84rem' }}
             >
-              <Bookmark size={15} fill={isSaved ? '#fbbf24' : 'none'} color={isSaved ? '#fbbf24' : '#ffffff'} />
+              <Bookmark size={15} fill={isSaved ? '#38bdf8' : 'none'} color={isSaved ? '#38bdf8' : '#ffffff'} />
               <span>{isSaved ? 'Saved' : 'Save'}</span>
             </button>
 
@@ -120,13 +120,13 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
         }}>
           <div>
             <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase' }}>Scene Match</div>
-            <div className="font-display" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fbbf24' }}>
+            <div className="font-display" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#38bdf8' }}>
               {candidate.sceneMatchScore}<span style={{ fontSize: '0.8rem', color: '#64748b' }}>/100</span>
             </div>
           </div>
           <div>
             <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase' }}>Accessibility</div>
-            <div className="font-display" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#38bdf8' }}>
+            <div className="font-display" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#60a5fa' }}>
               {candidate.accessibilityScore}<span style={{ fontSize: '0.8rem', color: '#64748b' }}>/100</span>
             </div>
           </div>
@@ -152,8 +152,8 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
         <div style={{
           padding: '14px 18px',
           borderRadius: '10px',
-          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.08) 100%)',
-          border: '1px solid rgba(245, 158, 11, 0.3)',
+          background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(37, 99, 235, 0.06) 100%)',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -162,7 +162,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
           marginBottom: '24px'
         }}>
           <div>
-            <span style={{ fontSize: '0.72rem', color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+            <span style={{ fontSize: '0.72rem', color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
               Estimated Commercial Filming Tariff
             </span>
             <div className="font-display" style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginTop: '2px' }}>
@@ -191,15 +191,15 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
         <div style={{
           padding: '16px',
           borderRadius: '10px',
-          background: 'rgba(245, 158, 11, 0.08)',
-          borderLeft: '4px solid #f59e0b',
+          background: 'rgba(56, 189, 248, 0.08)',
+          borderLeft: '4px solid #38bdf8',
           marginBottom: '24px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', color: '#fbbf24', fontWeight: 700, fontSize: '0.86rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', color: '#38bdf8', fontWeight: 700, fontSize: '0.86rem' }}>
             <Sparkles size={16} />
             <span>SceneScout Agent Recommendation</span>
           </div>
-          <p style={{ color: '#fef3c7', fontSize: '0.92rem', lineHeight: 1.5 }}>
+          <p style={{ color: '#e0f2fe', fontSize: '0.92rem', lineHeight: 1.5 }}>
             {candidate.recommendation}
           </p>
         </div>

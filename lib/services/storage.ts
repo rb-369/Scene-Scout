@@ -1,5 +1,4 @@
 import { LocationCandidate, ResearchSession } from '../types';
-import { getSupabaseBrowserClient } from '../supabase/client';
 
 const SAVED_LOCATIONS_KEY = 'scenescout_saved_locations_v1';
 const SESSIONS_HISTORY_KEY = 'scenescout_sessions_history_v1';
@@ -23,22 +22,19 @@ export const storageService = {
         saved.push(candidate);
         localStorage.setItem(SAVED_LOCATIONS_KEY, JSON.stringify(saved));
 
-        // Asynchronously persist to Supabase if authenticated
-        if (userId) {
-          const supabase = getSupabaseBrowserClient();
-          if (supabase) {
-            (supabase as any)
-              .from('saved_locations')
-              .upsert({
-                user_id: userId,
-                location_id: candidate.id,
-                candidate_data: candidate as unknown as never
-              })
-              .then((res: any) => {
-                if (res?.error) console.error('Supabase saveLocation error:', res.error.message);
-              });
-          }
-        }
+        // Asynchronously persist to MongoDB Atlas
+        fetch('/api/locations/saved', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save',
+            userId: userId || 'anonymous',
+            candidate
+          })
+        }).catch(err => {
+          console.warn('MongoDB Atlas background save notification:', err.message);
+        });
+
         return true;
       }
       return false;
@@ -53,19 +49,18 @@ export const storageService = {
       const saved = this.getSavedLocations().filter(loc => loc.id !== id);
       localStorage.setItem(SAVED_LOCATIONS_KEY, JSON.stringify(saved));
 
-      // Asynchronously delete from Supabase if authenticated
-      if (userId) {
-        const supabase = getSupabaseBrowserClient();
-        if (supabase) {
-          (supabase as any)
-            .from('saved_locations')
-            .delete()
-            .match({ user_id: userId, location_id: id })
-            .then((res: any) => {
-              if (res?.error) console.error('Supabase removeSavedLocation error:', res.error.message);
-            });
-        }
-      }
+      // Asynchronously delete from MongoDB Atlas
+      fetch('/api/locations/saved', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'remove',
+          userId: userId || 'anonymous',
+          locationId: id
+        })
+      }).catch(err => {
+        console.warn('MongoDB Atlas background remove notification:', err.message);
+      });
     } catch {}
   },
 
@@ -92,44 +87,28 @@ export const storageService = {
       sessions.unshift(session);
       localStorage.setItem(SESSIONS_HISTORY_KEY, JSON.stringify(sessions.slice(0, 10)));
 
-      // Asynchronously persist to Supabase if authenticated
-      if (userId) {
-        const supabase = getSupabaseBrowserClient();
-        if (supabase) {
-          (supabase as any)
-            .from('scout_sessions')
-            .insert({
-              user_id: userId,
-              user_brief: session.userBrief,
-              criteria: session.criteria,
-              candidates: session.candidates as unknown as never
-            })
-            .then((res: any) => {
-              if (res?.error) console.error('Supabase saveSession error:', res.error.message);
-            });
-        }
-      }
+      // Asynchronously persist to MongoDB Atlas
+      fetch('/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session,
+          userId: userId || 'anonymous'
+        })
+      }).catch(err => {
+        console.warn('MongoDB Atlas background session notification:', err.message);
+      });
     } catch {}
   },
 
-  // Pull latest cloud saved locations and merge into local storage
+  // Pull latest cloud saved locations from MongoDB Atlas and merge into local storage
   async syncSavedLocationsWithCloud(userId: string): Promise<LocationCandidate[]> {
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) return this.getSavedLocations();
-
     try {
-      const res: any = await (supabase as any)
-        .from('saved_locations')
-        .select('location_id, candidate_data')
-        .eq('user_id', userId);
+      const res = await fetch(`/api/locations/saved?userId=${encodeURIComponent(userId)}`);
+      const data = await res.json();
 
-      if (res?.error) {
-        console.error('Supabase sync error:', res.error.message);
-        return this.getSavedLocations();
-      }
-
-      if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
-        const cloudCandidates: LocationCandidate[] = res.data.map((row: any) => row.candidate_data as LocationCandidate);
+      if (data.configured && Array.isArray(data.locations) && data.locations.length > 0) {
+        const cloudCandidates: LocationCandidate[] = data.locations;
         const localCandidates: LocationCandidate[] = this.getSavedLocations();
 
         // Merge without duplicates
@@ -146,7 +125,7 @@ export const storageService = {
 
       return this.getSavedLocations();
     } catch (err) {
-      console.error('Failed to sync saved locations:', err);
+      console.warn('MongoDB Atlas sync check:', err);
       return this.getSavedLocations();
     }
   }
