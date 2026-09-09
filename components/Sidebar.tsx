@@ -15,7 +15,8 @@ import {
   SlidersHorizontal, 
   Database, 
   HardDrive,
-  ArrowLeft
+  ArrowLeft,
+  PanelLeftClose
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { FilmmakerType } from '@/lib/supabase/types';
@@ -29,6 +30,8 @@ interface SidebarProps {
   setIsDemoMode: (val: boolean) => void;
   isLiveConfigured: boolean;
   onBackToLanding?: () => void;
+  isOpen?: boolean;
+  onToggle?: () => void;
 }
 
 const PERSONA_LABELS: Record<FilmmakerType, { label: string; icon: string }> = {
@@ -46,7 +49,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   compareCount,
   isDemoMode,
   setIsDemoMode,
-  onBackToLanding
+  onBackToLanding,
+  isOpen = true,
+  onToggle
 }) => {
   const { 
     user, 
@@ -76,11 +81,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       justifyContent: 'space-between',
       padding: '20px 16px',
       zIndex: 100,
-      overflowY: 'auto'
+      overflowY: 'auto',
+      transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
+      transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
     }}>
       {/* Top Header & Branding */}
       <div>
-        {/* Logo and Wordmark */}
+        {/* Logo, Wordmark and Close Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', paddingLeft: '4px' }}>
           <div style={{
             position: 'relative',
@@ -109,6 +116,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
               Find Stories Around You
             </div>
           </div>
+          {onToggle && (
+            <button
+              type="button"
+              onClick={onToggle}
+              className="btn-cinema btn-ghost"
+              style={{
+                marginLeft: 'auto',
+                padding: '6px',
+                borderRadius: '6px',
+                color: '#94a3b8'
+              }}
+              title="Close sidebar"
+              aria-label="Close sidebar"
+            >
+              <PanelLeftClose size={18} />
+            </button>
+          )}
         </div>
 
         {/* Back to Landing Page button */}

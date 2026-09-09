@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { UserProfile, FilmmakerType } from '@/lib/supabase/types';
+import { getSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
 
 export interface AuthUser {
   id: string;
@@ -22,7 +23,7 @@ interface AuthContextType {
   setShowAuthModal: (show: boolean) => void;
   showOnboardingModal: boolean;
   setShowOnboardingModal: (show: boolean) => void;
-  signInWithGoogle: () => Promise<{ error?: string }>;
+  signInWithGoogle: (fallbackEmail?: string) => Promise<{ error?: string }>;
   signInWithEmail: (email: string, pass: string) => Promise<{ error?: string }>;
   signUpWithEmail: (email: string, pass: string, fullName: string, role?: FilmmakerType) => Promise<{ error?: string }>;
   updateFilmmakerType: (type: FilmmakerType) => Promise<{ error?: string }>;
@@ -45,10 +46,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const [demoPersona, setDemoPersonaState] = useState<FilmmakerType | null>(null);
-  const [isConfigured, setIsConfigured] = useState<boolean>(true);
+  const [isConfigured, setIsConfigured] = useState<boolean>(false);
 
   // Initialize Auth state from local storage or cloud
   useEffect(() => {
+    const configured = isSupabaseConfigured();
+    setIsConfigured(configured);
+
     if (typeof window !== 'undefined') {
       const storedPersona = localStorage.getItem(LOCAL_PERSONA_KEY) as FilmmakerType | null;
       if (storedPersona) {
@@ -67,7 +71,82 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
     }
-    setIsLoading(false);
+
+    // Connect real Supabase auth state listener when live credentials exist
+    const supabase = getSupabaseBrowserClient();
+    if (supabase && configured) {
+      supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
+        if (session?.user) {
+          const authUser: AuthUser = {
+            id: session.user.id,
+            email: session.user.email,
+            user_metadata: {
+              full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0],
+              avatar_url: session.user.user_metadata?.avatar_url
+            }
+          };
+          const userProfile: UserProfile = {
+            id: authUser.id,
+            email: authUser.email || null,
+            full_name: authUser.user_metadata?.full_name || 'Filmmaker',
+            avatar_url: authUser.user_metadata?.avatar_url || null,
+            filmmaker_type: demoPersona || 'indie',
+            production_house: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setUser(authUser);
+          setProfile(userProfile);
+          setSession(session);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(LOCAL_USER_KEY, JSON.stringify({ user: authUser, profile: userProfile }));
+          }
+        }
+        setIsLoading(false);
+      });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
+        if (session?.user) {
+          const authUser: AuthUser = {
+            id: session.user.id,
+            email: session.user.email,
+            user_metadata: {
+              full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0],
+              avatar_url: session.user.user_metadata?.avatar_url
+            }
+          };
+          const userProfile: UserProfile = {
+            id: authUser.id,
+            email: authUser.email || null,
+            full_name: authUser.user_metadata?.full_name || 'Filmmaker',
+            avatar_url: authUser.user_metadata?.avatar_url || null,
+            filmmaker_type: demoPersona || 'indie',
+            production_house: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setUser(authUser);
+          setProfile(userProfile);
+          setSession(session);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(LOCAL_USER_KEY, JSON.stringify({ user: authUser, profile: userProfile }));
+          }
+        } else if (_event === 'SIGNED_OUT') {
+          setUser(null);
+          setProfile(null);
+          setSession(null);
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(LOCAL_USER_KEY);
+          }
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    } else {
+      setIsLoading(false);
+    }
   }, []);
 
   const setDemoPersona = (role: FilmmakerType | null) => {
@@ -87,20 +166,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signInWithGoogle = async (): Promise<{ error?: string }> => {
-    // Quick one-click guest/filmmaker sign-in for demo
+  const signInWithGoogle = async (fallbackGoogleEmail?: string): Promise<{ error?: string }> => {
+    const supabase = getSupabaseBrowserClient();
+    if (supabase && isSupabaseConfigured()) {
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/auth/callback`,
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent'
+            }
+          }
+        });
+        if (error) {
+          return { error: error.message };
+        }
+        return {};
+      } catch (err: any) {
+        return { error: err.message || 'Failed to initialize Google OAuth' };
+      }
+    }
+
+    // Interactive fallback: authenticate with provided Google email or default Google Creator profile
+    const emailToUse = fallbackGoogleEmail?.trim() || 'filmmaker.creator@gmail.com';
+    const namePart = emailToUse.split('@')[0].replace(/[._-]/g, ' ');
+    const formattedName = namePart ? namePart.charAt(0).toUpperCase() + namePart.slice(1) : 'Google Filmmaker';
+
     const guestUser: AuthUser = {
-      id: `usr_demo_${Date.now()}`,
-      email: 'filmmaker@cinema.studio',
+      id: `usr_google_${Date.now()}`,
+      email: emailToUse,
       user_metadata: {
-        full_name: 'Cinema Producer'
+        full_name: formattedName,
+        avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(emailToUse)}`
       }
     };
     const guestProfile: UserProfile = {
       id: guestUser.id,
       email: guestUser.email || null,
-      full_name: 'Cinema Producer',
-      avatar_url: null,
+      full_name: formattedName,
+      avatar_url: guestUser.user_metadata?.avatar_url || null,
       filmmaker_type: demoPersona || 'indie',
       production_house: 'Indie Cinema Collective',
       created_at: new Date().toISOString(),

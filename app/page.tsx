@@ -7,6 +7,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 
 export default function Home() {
   const [view, setView] = useState<'landing' | 'studio'>('landing');
+  const [autoStartScout, setAutoStartScout] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -14,18 +15,25 @@ export default function Home() {
       if (params.get('view') === 'studio') {
         setView('studio');
       }
+      if (params.get('scout') === 'start') {
+        setAutoStartScout(true);
+      }
     }
   }, []);
 
-  const handleLaunchStudio = () => {
+  const handleLaunchStudio = (options?: { autoStartScout?: boolean }) => {
+    if (options?.autoStartScout) {
+      setAutoStartScout(true);
+    }
     setView('studio');
     if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', '?view=studio');
+      window.history.pushState(null, '', options?.autoStartScout ? '?view=studio&scout=start' : '?view=studio');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleBackToLanding = () => {
+    setAutoStartScout(false);
     setView('landing');
     if (typeof window !== 'undefined') {
       window.history.pushState(null, '', '/');
@@ -38,7 +46,10 @@ export default function Home() {
       {view === 'landing' ? (
         <LandingPage onLaunchStudio={handleLaunchStudio} />
       ) : (
-        <DashboardContent onBackToLanding={handleBackToLanding} />
+        <DashboardContent
+          onBackToLanding={handleBackToLanding}
+          initialAutoStartScout={autoStartScout}
+        />
       )}
     </AuthProvider>
   );

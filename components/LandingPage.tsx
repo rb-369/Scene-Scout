@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { ArrowRight, Film, MapPin, ShieldCheck } from 'lucide-react';
 
 interface LandingPageProps {
-  onLaunchStudio: () => void;
+  onLaunchStudio: (options?: { autoStartScout?: boolean }) => void;
 }
 
 const dossiers = [
@@ -82,20 +82,22 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
 
   return (
     <div className="scenescout-landing">
-      {/* Dynamic Animated Cinematic Background */}
+      {/* Dynamic Animated Cinematic Background & 32-Star Galaxy Field */}
       <div className="scene-ambient-bg" aria-hidden="true">
         <div className="ambient-orb ambient-orb-amber" />
         <div className="ambient-orb ambient-orb-cyan" />
         <div className="ambient-orb ambient-orb-warm" />
+
+        {/* Cinematic Shooting Star */}
+        <div className="shooting-star-track">
+          <span className="shooting-star" />
+        </div>
+
+        {/* 32 Layered Stars & Projector Dust Particles across Viewport */}
         <div className="ambient-dust-field">
-          <span className="dust-particle p1" />
-          <span className="dust-particle p2" />
-          <span className="dust-particle p3" />
-          <span className="dust-particle p4" />
-          <span className="dust-particle p5" />
-          <span className="dust-particle p6" />
-          <span className="dust-particle p7" />
-          <span className="dust-particle p8" />
+          {Array.from({ length: 32 }).map((_, i) => (
+            <span key={i} className={`star-particle s${i + 1}`} />
+          ))}
         </div>
       </div>
 
@@ -112,7 +114,7 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
             <a href="#method">Method</a>
             <a href="#dossiers">Dossiers</a>
             <a href="#departments">Departments</a>
-            <button onClick={onLaunchStudio} className="btn-cinema btn-primary">
+            <button onClick={() => onLaunchStudio({ autoStartScout: true })} className="btn-cinema btn-primary">
               Open studio <ArrowRight size={14} />
             </button>
           </div>
@@ -127,15 +129,15 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
               <h1 id="hero-title">Find the frame before <span>you move the crew.</span></h1>
               <p>SceneScout turns a scene brief into a practical, verified location dossier for the people who have to make the day work.</p>
               <div className="scene-hero-actions">
-                <button onClick={onLaunchStudio} className="btn-cinema btn-primary">
+                <button onClick={() => onLaunchStudio({ autoStartScout: true })} className="btn-cinema btn-primary">
                   <Film size={16} /> Start a scout
                 </button>
                 <a href="#dossiers" className="btn-cinema btn-secondary">View a dossier</a>
               </div>
               <div className="scene-hero-meta" aria-label="SceneScout coverage">
-                <div><span>Look</span><strong>Light, texture, scale</strong></div>
-                <div><span>Logistics</span><strong>Road, power, permits</strong></div>
-                <div><span>Proof</span><strong>Sources and contacts</strong></div>
+                <div className="scene-meta-card animate-card-drop" style={{ animationDelay: '0.1s' }}><span>Look</span><strong>Light, texture, scale</strong></div>
+                <div className="scene-meta-card animate-card-drop" style={{ animationDelay: '0.2s' }}><span>Logistics</span><strong>Road, power, permits</strong></div>
+                <div className="scene-meta-card animate-card-drop" style={{ animationDelay: '0.3s' }}><span>Proof</span><strong>Sources and contacts</strong></div>
               </div>
             </div>
             <div className="scene-hero-visual" aria-label="Industrial warehouse location preview">
@@ -168,7 +170,7 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
             </header>
             <div className="scene-workflow">
               {workflow.map(([title, description], index) => (
-                <article className="scene-workflow-item" key={title}>
+                <article className="scene-workflow-item animate-card-drop" style={{ animationDelay: `${0.1 + index * 0.12}s` }} key={title}>
                   <span className="scene-workflow-index">0{index + 1}</span>
                   <h3>{title}</h3>
                   <p>{description}</p>
@@ -221,7 +223,7 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
                   <div><span>Access</span><strong>{dossier.access}</strong></div>
                   <div><span>Tariff</span><strong>{dossier.tariff}</strong></div>
                 </div>
-                <button onClick={onLaunchStudio} className="btn-cinema btn-secondary">Scout this direction <ArrowRight size={14} /></button>
+                <button onClick={() => onLaunchStudio({ autoStartScout: true })} className="btn-cinema btn-secondary">Scout this direction <ArrowRight size={14} /></button>
               </div>
             </div>
           </section>
@@ -232,16 +234,19 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
               <p>Each department can work from the same source of truth without reducing the location to a generic score.</p>
             </header>
             <div className="scene-role-list">
-              {roles.map(([title, description]) => (
-                <article className="scene-role" key={title}><h3>{title}</h3><p>{description}</p></article>
+              {roles.map(([title, description], index) => (
+                <article className="scene-role animate-card-drop" style={{ animationDelay: `${0.12 + index * 0.1}s` }} key={title}>
+                  <h3>{title}</h3>
+                  <p>{description}</p>
+                </article>
               ))}
             </div>
           </section>
 
           <section className="scene-section" aria-labelledby="cta-title">
-            <div className="scene-cta">
+            <div className="scene-cta animate-card-drop">
               <div><p className="scene-kicker">Production starts with a place</p><h2 id="cta-title">Bring the next scene into focus.</h2></div>
-              <button onClick={onLaunchStudio} className="btn-cinema btn-primary">Open scout studio <ArrowRight size={15} /></button>
+              <button onClick={() => onLaunchStudio({ autoStartScout: true })} className="btn-cinema btn-primary">Open scout studio <ArrowRight size={15} /></button>
             </div>
           </section>
         </div>

@@ -39,15 +39,26 @@ import {
   Globe,
   CheckCircle2,
   CheckCircle,
-  ArrowDown
+  ArrowDown,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
-export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => void }) {
+export function DashboardContent({ 
+  onBackToLanding,
+  initialAutoStartScout = false
+}: { 
+  onBackToLanding?: () => void;
+  initialAutoStartScout?: boolean;
+}) {
   const router = useRouter();
   const { user } = useAuth();
 
   // Navigation
   const [currentTab, setCurrentTab] = useState<'scout' | 'saved' | 'compare' | 'history'>('scout');
+
+  // Sidebar toggle state (persisted)
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
   // Mode and System status
   const [isDemoMode, setIsDemoMode] = useState<boolean>(true);
@@ -64,6 +75,7 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
   // Section references for automatic scroll navigation
   const shortlistRef = useRef<HTMLDivElement>(null);
   const conversationalRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
 
   // Modals & Sub-views
   const [selectedCandidate, setSelectedCandidate] = useState<LocationCandidate | null>(null);
@@ -75,8 +87,26 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
   const [followUpMessages, setFollowUpMessages] = useState<FollowUpMessage[]>([]);
   const [isFollowUpLoading, setIsFollowUpLoading] = useState<boolean>(false);
 
+  // Toggle sidebar
+  const handleToggleSidebar = () => {
+    setIsSidebarOpen(prev => {
+      const next = !prev;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('scenescout_sidebar_open', String(next));
+      }
+      return next;
+    });
+  };
+
   // Initialize
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedSidebar = localStorage.getItem('scenescout_sidebar_open');
+      if (savedSidebar !== null) {
+        setIsSidebarOpen(savedSidebar === 'true');
+      }
+    }
+
     // Check backend provider status
     fetch('/api/status')
       .then(res => res.json())
@@ -94,12 +124,33 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
     const saved = storageService.getSavedLocations();
     setSavedLocations(saved);
 
-    // Automatically load the pre-curated primary demo session on first load
-    setCurrentSession(DEMO_SESSION);
-    setCandidates(DEMO_CANDIDATES);
-    storageService.cacheActiveCandidates(DEMO_CANDIDATES);
-    setCurrentStepIndex(DEMO_ACTIVITY_STEPS.length - 1);
-  }, []);
+    // If navigated via "Start a scout", auto-run the scout pipeline so user lands on pipeline first!
+    if (initialAutoStartScout) {
+      setCurrentSession(DEMO_SESSION);
+      setCandidates(DEMO_CANDIDATES);
+      storageService.cacheActiveCandidates(DEMO_CANDIDATES);
+      setTimeout(() => {
+        timelineRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        handleStartScout(
+          DEMO_BRIEF,
+          {
+            city: 'Mumbai',
+            sceneType: 'Industrial Thriller Warehouse',
+            budgetSensitivity: 'Moderate',
+            maxDistanceKm: 35,
+            priorities: { sceneMatch: 40, accessibility: 20, evidenceQuality: 20, productionRisk: 20 }
+          },
+          true
+        );
+      }, 200);
+    } else {
+      // Automatically load the pre-curated primary demo session statically
+      setCurrentSession(DEMO_SESSION);
+      setCandidates(DEMO_CANDIDATES);
+      storageService.cacheActiveCandidates(DEMO_CANDIDATES);
+      setCurrentStepIndex(DEMO_ACTIVITY_STEPS.length - 1);
+    }
+  }, [initialAutoStartScout]);
 
   // Keep active candidates cached for instant location detail page lookup
   useEffect(() => {
@@ -133,7 +184,7 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
         currentStep += 1;
         setCurrentStepIndex(currentStep);
       }
-    }, 600);
+    }, 550);
 
     try {
       const response = await fetch('/api/scout', {
@@ -148,14 +199,20 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
 
       const data = await response.json();
 
-      // Ensure user sees the agent progression even if server responds quickly
-      const remainingSteps = Math.max(0, totalSteps - 1 - currentStep);
-      if (remainingSteps > 0) {
-        await new Promise(resolve => setTimeout(resolve, Math.min(remainingSteps * 450, 2200)));
+      // Ensure user sees progression up through all intermediary steps
+      while (currentStep < totalSteps - 1) {
+        currentStep += 1;
+        setCurrentStepIndex(currentStep);
+        await new Promise(resolve => setTimeout(resolve, 450));
       }
 
       clearInterval(stepTimer);
+      // Explicitly set to final step 10: "Preparing Production Shortlist Report"
       setCurrentStepIndex(totalSteps - 1);
+
+      // STEP 10 LOADING ANIMATION FIX:
+      // Keep isLoading = true and pause for 1400ms so the active loading animation of report preparation is clearly visible and experienced!
+      await new Promise(resolve => setTimeout(resolve, 1400));
 
       if (data.success && data.session && Array.isArray(data.session.candidates) && data.session.candidates.length > 0) {
         setCurrentSession(data.session);
@@ -170,6 +227,7 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
       console.error('Scout request failed:', err);
       clearInterval(stepTimer);
       setCurrentStepIndex(totalSteps - 1);
+      await new Promise(resolve => setTimeout(resolve, 1200));
       // Fallback
       setCurrentSession(DEMO_SESSION);
       setCandidates(DEMO_CANDIDATES);
@@ -177,10 +235,10 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
       setIsLoading(false);
       setJustCompletedScout(true);
 
-      // Pause briefly so user can see completed pipeline before gentle scroll
+      // Pause briefly so user can see completed 100% pipeline before gentle smooth scroll to shortlist
       setTimeout(() => {
         shortlistRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 2200);
+      }, 1000);
     }
   };
 
@@ -309,13 +367,46 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
         setIsDemoMode={setIsDemoMode}
         isLiveConfigured={isLiveConfigured}
         onBackToLanding={onBackToLanding}
+        isOpen={isSidebarOpen}
+        onToggle={handleToggleSidebar}
       />
 
       {/* Main Working Area */}
-      <main className="main-content">
+      <main 
+        className="main-content"
+        style={{ 
+          marginLeft: isSidebarOpen ? '260px' : '0px', 
+          transition: 'margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1)' 
+        }}
+      >
         {/* Top Status Bar */}
         <header className="top-status-bar" aria-label="System status">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={handleToggleSidebar}
+              className="btn-cinema btn-ghost"
+              style={{
+                padding: '5px 9px',
+                borderRadius: '6px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: '#e2e8f0',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '0.74rem',
+                cursor: 'pointer'
+              }}
+              title={isSidebarOpen ? "Close sidebar menu" : "Open sidebar menu"}
+              aria-label={isSidebarOpen ? "Close sidebar menu" : "Open sidebar menu"}
+            >
+              {isSidebarOpen ? <PanelLeftClose size={15} /> : <PanelLeftOpen size={15} />}
+              <span>{isSidebarOpen ? 'Close Menu' : 'Open Menu'}</span>
+            </button>
+
+            <div style={{ height: '14px', width: '1px', background: 'rgba(255, 255, 255, 0.12)' }} />
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{
                 width: '8px',
@@ -563,18 +654,20 @@ export function DashboardContent({ onBackToLanding }: { onBackToLanding?: () => 
             />
 
             {/* Agent Activity Stepped Timeline */}
-            <AgentTimeline
-              steps={currentSession?.activity || DEMO_ACTIVITY_STEPS}
-              currentStepIndex={currentStepIndex}
-              sourcesCount={currentSession?.sourcesConsultedCount || 14}
-              candidatesFoundCount={currentSession?.candidatesFoundCount || 18}
-              shortlistedCount={candidates.length}
-              isLoading={isLoading}
-              mode={isDemoMode ? 'demo' : 'live'}
-              onExploreShortlist={() => {
-                shortlistRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-            />
+            <div ref={timelineRef} id="pipeline-section" style={{ scrollMarginTop: '20px' }}>
+              <AgentTimeline
+                steps={currentSession?.activity || DEMO_ACTIVITY_STEPS}
+                currentStepIndex={currentStepIndex}
+                sourcesCount={currentSession?.sourcesConsultedCount || 14}
+                candidatesFoundCount={currentSession?.candidatesFoundCount || 18}
+                shortlistedCount={candidates.length}
+                isLoading={isLoading}
+                mode={isDemoMode ? 'demo' : 'live'}
+                onExploreShortlist={() => {
+                  shortlistRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              />
+            </div>
 
             {/* Completion Banner */}
             {justCompletedScout && (

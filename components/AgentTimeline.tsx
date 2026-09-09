@@ -177,6 +177,49 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
         }} />
       </div>
 
+      {/* Active Shortlist Report Preparation Banner */}
+      {isLoading && currentStepIndex >= steps.length - 1 && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(217, 119, 6, 0.12) 100%)',
+          border: '1px solid rgba(245, 158, 11, 0.55)',
+          borderRadius: '10px',
+          padding: '14px 18px',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          boxShadow: '0 6px 26px rgba(245, 158, 11, 0.22)'
+        }} className="animate-pulse-subtle">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: 'rgba(245, 158, 11, 0.25)',
+              border: '1px solid #f59e0b',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Loader2 size={20} color="#fbbf24" className="animate-spin-slow" />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.01em' }}>
+                Compiling Production Shortlist Report...
+              </div>
+              <div style={{ fontSize: '0.76rem', color: '#cbd5e1', marginTop: '2px' }}>
+                Synthesizing multi-pillar scores, formatting authority contacts, and generating production defense rationales.
+              </div>
+            </div>
+          </div>
+          <span className="badge badge-warning" style={{ fontSize: '0.7rem', padding: '4px 10px', flexShrink: 0 }}>
+            Generating Report
+          </span>
+        </div>
+      )}
+
       {/* Stepped Timeline */}
       <div style={{
         display: 'grid',
@@ -184,21 +227,21 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
         gap: '12px'
       }}>
         {steps.map((step, idx) => {
-          const isCompleted = idx <= currentStepIndex;
           const isCurrent = idx === currentStepIndex && isLoading;
+          const isCompleted = idx < currentStepIndex || (idx === currentStepIndex && !isLoading);
 
           return (
             <div 
               key={step.id || idx}
               style={{
                 background: isCurrent 
-                  ? 'rgba(245, 158, 11, 0.12)' 
+                  ? 'rgba(245, 158, 11, 0.16)' 
                   : isCompleted 
                     ? 'rgba(255, 255, 255, 0.03)' 
                     : 'rgba(255, 255, 255, 0.01)',
                 border: `1px solid ${
                   isCurrent 
-                    ? 'rgba(245, 158, 11, 0.5)' 
+                    ? 'rgba(245, 158, 11, 0.7)' 
                     : isCompleted 
                       ? 'rgba(255, 255, 255, 0.08)' 
                       : 'rgba(255, 255, 255, 0.03)'
@@ -209,6 +252,7 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
                 alignItems: 'flex-start',
                 gap: '10px',
                 opacity: isCompleted || isCurrent ? 1 : 0.45,
+                boxShadow: isCurrent ? '0 0 16px rgba(245, 158, 11, 0.2)' : 'none',
                 transition: 'all 0.25s ease'
               }}
             >
@@ -227,7 +271,7 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
                   <span style={{ 
                     fontSize: '0.82rem', 
                     fontWeight: 600, 
-                    color: isCurrent ? '#38bdf8' : isCompleted ? '#ffffff' : '#94a3b8' 
+                    color: isCurrent ? '#fbbf24' : isCompleted ? '#ffffff' : '#94a3b8' 
                   }}>
                     {step.title}
                   </span>
