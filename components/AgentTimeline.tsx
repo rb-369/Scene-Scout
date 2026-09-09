@@ -192,16 +192,35 @@ export const AgentTimeline: React.FC<AgentTimelineProps> = ({
                 </p>
 
                 {step.toolUsed && (
-                  <div style={{ marginTop: '4px' }}>
+                  <div style={{ marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{
-                      fontSize: '0.64rem',
-                      fontFamily: 'monospace',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      padding: '1px 5px',
-                      borderRadius: '3px',
-                      color: '#38bdf8'
+                      fontSize: '0.66rem',
+                      fontFamily: 'var(--font-mono)',
+                      background: step.toolUsed.toLowerCase().includes('parallel')
+                        ? 'rgba(6, 182, 212, 0.15)'
+                        : step.toolUsed.toLowerCase().includes('gemini')
+                          ? 'rgba(245, 158, 11, 0.15)'
+                          : 'rgba(255, 255, 255, 0.06)',
+                      border: `1px solid ${
+                        step.toolUsed.toLowerCase().includes('parallel')
+                          ? 'rgba(6, 182, 212, 0.35)'
+                          : step.toolUsed.toLowerCase().includes('gemini')
+                            ? 'rgba(245, 158, 11, 0.35)'
+                            : 'rgba(255, 255, 255, 0.1)'
+                      }`,
+                      padding: '2px 7px',
+                      borderRadius: '4px',
+                      color: step.toolUsed.toLowerCase().includes('parallel')
+                        ? '#38bdf8'
+                        : step.toolUsed.toLowerCase().includes('gemini')
+                          ? '#fbbf24'
+                          : '#cbd5e1',
+                      fontWeight: 600,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
                     }}>
-                      tool: {step.toolUsed}
+                      ⚡ {step.toolUsed}
                     </span>
                   </div>
                 )}

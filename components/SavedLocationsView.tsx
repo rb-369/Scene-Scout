@@ -45,12 +45,12 @@ export const SavedLocationsView: React.FC<SavedLocationsViewProps> = ({
       md += `* **Accessibility**: ${loc.accessibilityScore}/100\n`;
       md += `* **Production Risk**: ${loc.productionRiskScore}%\n`;
       md += `* **Trust Status**: ${loc.trustStatus}\n`;
-      md += `* **Description**: ${loc.description}\n`;
-      md += `* **Key Restrictions**: ${loc.potentialRestrictions.join('; ')}\n`;
-      md += `* **Contact**: ${loc.contactInformation}\n`;
+      md += `* **Description**: ${loc.description || 'N/A'}\n`;
+      md += `* **Key Restrictions**: ${(loc.potentialRestrictions || []).join('; ') || 'None noted'}\n`;
+      md += `* **Contact**: ${loc.contactInformation || 'N/A'}\n`;
       md += `* **Sources**:\n`;
-      loc.sources.forEach(s => {
-        md += `  - [${s.title}](${s.url}) (${s.domain})\n`;
+      (loc.sources || []).forEach(s => {
+        md += `  - [${s.title || 'Source'}](${s.url || '#'}) (${s.domain || 'web'})\n`;
       });
       md += `\n---\n\n`;
     });
@@ -178,7 +178,7 @@ export const SavedLocationsView: React.FC<SavedLocationsViewProps> = ({
               </div>
 
               <p style={{ fontSize: '0.82rem', color: '#cbd5e1', lineHeight: 1.4, marginBottom: '14px' }}>
-                {loc.description.slice(0, 140)}...
+                {(loc.description || '').slice(0, 140)}...
               </p>
 
               <button

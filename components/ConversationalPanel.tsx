@@ -164,9 +164,16 @@ export const ConversationalPanel: React.FC<ConversationalPanelProps> = ({
 
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: msg.sender === 'user' ? '#e2e8f0' : '#38bdf8' }}>
-                    {msg.sender === 'user' ? 'Producer (You)' : 'SceneScout Intelligence'}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: msg.sender === 'user' ? '#e2e8f0' : '#38bdf8' }}>
+                      {msg.sender === 'user' ? 'Producer (You)' : 'SceneScout Agent'}
+                    </span>
+                    {msg.sender === 'agent' && (
+                      <span className="badge badge-warning" style={{ fontSize: '0.6rem', padding: '1px 5px' }}>
+                        Gemini Reasoning
+                      </span>
+                    )}
+                  </div>
                   <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{msg.timestamp}</span>
                 </div>
 

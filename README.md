@@ -188,17 +188,23 @@ npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## 🎬 Video Demonstration & Demo Script
+
+- **3-Minute Functional Demo Video**: [`docs/scenescout_demo.mp4`](file:///d:/agentic-cinema-hackathon/docs/scenescout_demo.mp4)
+- **Demo Script**: [`DEMO_SCRIPT.md`](file:///d:/agentic-cinema-hackathon/DEMO_SCRIPT.md) — Follows the exact 3-minute functional breakdown with runtime Gemini & Parallel API verification.
+
 ---
 
 ## 🎬 Primary Demo Scenario
 
 1. Click **"Run Demo Scout (1-Click)"** on the main dashboard.
 2. Watch the **10-step Agent Activity Timeline** update in real-time.
-3. Review the **5 shortlisted Mumbai industrial locations** (Mukesh Mills, Cotton Green Port Godowns, Reay Road Timber Sheds, Sewri Freight Apron, Shakti Mills).
+3. Review the **5 shortlisted Mumbai industrial locations** (Cotton Green Port Godowns, Mukesh Mills, Reay Road Timber Sheds, Sewri Freight Apron, Shakti Mills).
 4. Click **"View Research"** on any location to view the comprehensive dossier with evidence quotes and source links.
 5. In the **"Ask SceneScout"** box, click the chip: *"Remove locations with uncertain access"*.
 6. Observe the agent dynamically filter out Shakti Mills and re-order the cards with explicit reasoning.
 7. Select 2 or 3 cards and click **"Compare"** to launch the side-by-side decision matrix.
+
 
 ---
 

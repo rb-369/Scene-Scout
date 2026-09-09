@@ -71,3 +71,11 @@ SceneScout utilizes **Google Gemini** (`gemini-2.5-flash`) through the Google Cl
 - **Time Savings**: Reduces preliminary location scouting research from **3–5 days** of manual web searching to **under 30 seconds**.
 - **Risk Mitigation**: Prevents costly shoot disruptions by surfacing curfews, structural hazards, and judicial disputes before location scouts travel to the site.
 - **Production Transparency**: Gives production teams defensible research dossiers backed by clickable web evidence and transparent mathematical scoring.
+
+---
+
+## 8. Functional Demonstration Video & Script
+- **3-Minute Functional Demo Video**: Located at [`docs/scenescout_demo.mp4`](file:///d:/agentic-cinema-hackathon/docs/scenescout_demo.mp4)
+- **Interactive Browser Recording Session**: Located at [`docs/scenescout_live_session.webp`](file:///d:/agentic-cinema-hackathon/docs/scenescout_live_session.webp)
+- **Demo Script**: Documented in [`DEMO_SCRIPT.md`](file:///d:/agentic-cinema-hackathon/DEMO_SCRIPT.md) adhering strictly to hackathon organizer guidelines (functional project demonstration of runtime Google Cloud/Gemini and Parallel Search API execution).
+

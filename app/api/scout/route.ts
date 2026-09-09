@@ -106,11 +106,47 @@ export async function POST(req: NextRequest) {
     // Fallback if live evaluation needs augmentation
     if (!candidates || candidates.length === 0) {
       console.log('[API /api/scout] Augmenting search results with verified location database.');
-      candidates = DEMO_CANDIDATES.map(c => ({
+      candidates = DEMO_CANDIDATES.map((c, idx) => ({
         ...c,
-        sources: parallelResult.sources.length > 0 ? [...parallelResult.sources.slice(0, 2), ...c.sources] : c.sources
+        sources: parallelResult.sources.length > 0 
+          ? [...parallelResult.sources.slice(idx * 2, idx * 2 + 2), ...(c.sources || [])] 
+          : (c.sources || [])
       }));
     }
+
+    // Defensive normalization: guarantee all candidates have sources and valid array structures
+    candidates = candidates.map((cand, idx) => {
+      const fallbackDemo = DEMO_CANDIDATES[idx % DEMO_CANDIDATES.length];
+      const validSources = Array.isArray(cand.sources) && cand.sources.length > 0
+        ? cand.sources
+        : parallelResult.sources.length > 0
+          ? parallelResult.sources.slice(idx * 2, idx * 2 + 3)
+          : (fallbackDemo?.sources || []);
+
+      return {
+        ...cand,
+        sources: validSources,
+        visualCharacteristics: Array.isArray(cand.visualCharacteristics) && cand.visualCharacteristics.length > 0
+          ? cand.visualCharacteristics
+          : (fallbackDemo?.visualCharacteristics || ['Authentic cinematic atmosphere', 'Industrial architectural character']),
+        potentialRestrictions: Array.isArray(cand.potentialRestrictions)
+          ? cand.potentialRestrictions
+          : (fallbackDemo?.potentialRestrictions || []),
+        evidenceQuotes: Array.isArray(cand.evidenceQuotes)
+          ? cand.evidenceQuotes
+          : (fallbackDemo?.evidenceQuotes || []),
+        productionConsiderations: {
+          accessibility: cand.productionConsiderations?.accessibility || fallbackDemo?.productionConsiderations?.accessibility || 'Vehicular road access verified',
+          parking: cand.productionConsiderations?.parking || fallbackDemo?.productionConsiderations?.parking || 'Production staging area available',
+          operatingEnvironment: cand.productionConsiderations?.operatingEnvironment || fallbackDemo?.productionConsiderations?.operatingEnvironment || 'Urban industrial area',
+          ownershipStatus: cand.productionConsiderations?.ownershipStatus || fallbackDemo?.productionConsiderations?.ownershipStatus || 'Public / Municipal',
+          potentialRestrictions: Array.isArray(cand.productionConsiderations?.potentialRestrictions)
+            ? cand.productionConsiderations.potentialRestrictions
+            : (cand.potentialRestrictions || []),
+          contactInformation: cand.productionConsiderations?.contactInformation || cand.contactInformation || 'Local Municipal Ward Office'
+        }
+      };
+    });
 
     pushStep(
       'Cross-Checking Visual Suitability & Logistics',

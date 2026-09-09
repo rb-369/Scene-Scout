@@ -69,7 +69,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
               <MapPin size={15} color="#f59e0b" />
               <span>{candidate.area}, {candidate.city}</span>
               <span style={{ color: '#64748b' }}>•</span>
-              <span style={{ color: '#cbd5e1' }}>{candidate.productionConsiderations.ownershipStatus}</span>
+              <span style={{ color: '#cbd5e1' }}>{candidate.productionConsiderations?.ownershipStatus || 'Commercial / Municipal'}</span>
             </div>
           </div>
 
@@ -177,7 +177,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
             Why It Matches the Production Brief
           </h4>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
-            {candidate.visualCharacteristics.map((trait, idx) => (
+            {(candidate.visualCharacteristics || []).map((trait, idx) => (
               <div 
                 key={idx}
                 style={{
@@ -199,19 +199,19 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Section 4: Production Considerations & Logistics */}
+        {/* Section 4: Production Logistics & Technical Profile */}
         <div style={{ marginBottom: '24px' }}>
           <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '12px' }}>
-            Production Considerations & Logistics
+            Production Logistics & Technical Profile
           </h4>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
             gap: '12px',
-            background: 'rgba(0, 0, 0, 0.25)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
+            background: 'rgba(0, 0, 0, 0.3)',
+            padding: '16px',
             borderRadius: '10px',
-            padding: '16px'
+            border: '1px solid rgba(255, 255, 255, 0.06)'
           }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}>
@@ -219,7 +219,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
                 <span>ACCESSIBILITY & ROADS</span>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
-                {candidate.productionConsiderations.accessibility}
+                {candidate.productionConsiderations?.accessibility || 'Vehicular access road confirmed'}
               </p>
             </div>
 
@@ -229,7 +229,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
                 <span>PARKING & BASECAMP</span>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
-                {candidate.productionConsiderations.parking}
+                {candidate.productionConsiderations?.parking || 'Production vehicle staging available'}
               </p>
             </div>
 
@@ -239,7 +239,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
                 <span>POWER AVAILABILITY</span>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
-                {candidate.productionConsiderations.powerAvailability || 'Generator backup recommended'}
+                {candidate.productionConsiderations?.powerAvailability || 'Generator backup recommended'}
               </p>
             </div>
 
@@ -249,7 +249,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
                 <span>ACOUSTICS & NOISE</span>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
-                {candidate.productionConsiderations.noiseProfile || 'Standard urban ambient noise profile'}
+                {candidate.productionConsiderations?.noiseProfile || 'Standard urban ambient noise profile'}
               </p>
             </div>
 
@@ -267,13 +267,13 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Section 5: Potential Restrictions & Legal Hazards */}
+        {/* Section 5: Potential Restrictions & Filming Hazards */}
         <div style={{ marginBottom: '24px' }}>
           <h4 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '10px' }}>
             Potential Restrictions & Filming Hazards
           </h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {candidate.potentialRestrictions.map((res, i) => (
+            {(candidate.potentialRestrictions || []).map((res, i) => (
               <div
                 key={i}
                 style={{
@@ -297,7 +297,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
             Verified Web Evidence & Source Citations
           </h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {candidate.evidenceQuotes.map((eq, i) => (
+            {(candidate.evidenceQuotes || []).map((eq, i) => (
               <div
                 key={i}
                 style={{

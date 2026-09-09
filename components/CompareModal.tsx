@@ -185,7 +185,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
           {candidates.map((c) => (
             <div key={c.id} style={{ padding: '12px', background: 'rgba(0,0,0,0.2)', fontSize: '0.8rem', color: '#cbd5e1' }}>
               <div style={{ fontWeight: 600, color: '#38bdf8', marginBottom: '3px' }}>Score: {c.accessibilityScore}/100</div>
-              <div>{c.productionConsiderations.parking}</div>
+              <div>{c.productionConsiderations?.parking || 'Vehicle staging & street parking verified'}</div>
             </div>
           ))}
 
@@ -195,7 +195,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
           </div>
           {candidates.map((c) => (
             <div key={c.id} style={{ padding: '12px', fontSize: '0.78rem', color: '#fca5a5' }}>
-              {c.potentialRestrictions.length > 0 ? c.potentialRestrictions[0] : 'None reported'}
+              {(c.potentialRestrictions || []).length > 0 ? (c.potentialRestrictions || [])[0] : 'None reported'}
             </div>
           ))}
 

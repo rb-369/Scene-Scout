@@ -59,36 +59,71 @@ export const LocationCard: React.FC<LocationCardProps> = ({
     return <span className="badge badge-warning">Limited Public Data</span>;
   };
 
+  const getTrustBadge = (status: string) => {
+    switch (status) {
+      case 'VERIFIED BY SOURCES':
+        return <span className="badge badge-verified"><CheckCircle size={10} /> Verified by Sources</span>;
+      case 'PUBLIC INFORMATION FOUND':
+        return <span className="badge badge-cyan"><FileCheck size={10} /> Public Info Found</span>;
+      case 'REQUIRES CONFIRMATION':
+      default:
+        return <span className="badge badge-warning"><AlertTriangle size={10} /> Requires Confirmation</span>;
+    }
+  };
+
   return (
-    <div className="glass-panel" style={{
+    <div className={`glass-panel card-interactive`} style={{
       padding: '24px',
       position: 'relative',
-      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-      border: isCompared ? '1px solid #06b6d4' : undefined,
-      boxShadow: isCompared ? '0 0 16px rgba(6, 182, 212, 0.25)' : undefined
+      borderRadius: '16px',
+      border: isCompared ? '1px solid #06b6d4' : '1px solid rgba(255, 255, 255, 0.08)',
+      boxShadow: isCompared ? '0 0 20px rgba(6, 182, 212, 0.3)' : undefined
     }}>
-      {/* Top Bar: Rank Index + Title + Save/Compare buttons */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '14px' }}>
+      {/* Top Meta Bar: Trust Status & Overall Score */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+        <div>
+          {getTrustBadge(candidate.trustStatus || 'PUBLIC INFORMATION FOUND')}
+        </div>
+        
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          background: rankIndex === 0 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+          border: `1px solid ${rankIndex === 0 ? 'rgba(245, 158, 11, 0.35)' : 'rgba(255, 255, 255, 0.1)'}`,
+          padding: '3px 10px',
+          borderRadius: '20px'
+        }}>
+          <span style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>Overall</span>
+          <span className="font-display" style={{ fontSize: '0.95rem', fontWeight: 800, color: rankIndex === 0 ? '#fbbf24' : '#ffffff' }}>
+            {candidate.overallScore || Math.round(((candidate.sceneMatchScore || 0) * 0.4) + ((candidate.accessibilityScore || 0) * 0.2) + ((candidate.evidenceQualityScore || 0) * 0.2) + ((100 - (candidate.productionRiskScore || 0)) * 0.2))}
+          </span>
+        </div>
+      </div>
+
+      {/* Title Bar: Rank Index + Title + Save/Compare buttons */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '14px', marginBottom: '14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '8px',
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
             background: rankIndex === 0 
               ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' 
-              : 'rgba(255, 255, 255, 0.08)',
-            color: rankIndex === 0 ? '#07090e' : '#ffffff',
+              : 'rgba(255, 255, 255, 0.07)',
+            color: rankIndex === 0 ? '#06080d' : '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontWeight: 800,
-            fontSize: '0.95rem'
+            fontSize: '1rem',
+            boxShadow: rankIndex === 0 ? '0 4px 14px rgba(245, 158, 11, 0.35)' : undefined
           }} className="font-display">
             #{rankIndex + 1}
           </div>
 
           <div>
-            <h3 className="font-display" style={{ fontSize: '1.28rem', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
+            <h3 className="font-display" style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.25 }}>
               {candidate.name}
             </h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '0.82rem', marginTop: '2px' }}>
@@ -99,21 +134,22 @@ export const LocationCard: React.FC<LocationCardProps> = ({
         </div>
 
         {/* Action icons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <button
             onClick={() => onToggleCompare(candidate)}
             title={isCompared ? 'Remove from comparison' : 'Add to comparison'}
             style={{
-              background: isCompared ? 'rgba(6, 182, 212, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              background: isCompared ? 'rgba(6, 182, 212, 0.25)' : 'rgba(255, 255, 255, 0.05)',
               border: `1px solid ${isCompared ? '#06b6d4' : 'rgba(255, 255, 255, 0.1)'}`,
               color: isCompared ? '#38bdf8' : '#cbd5e1',
-              padding: '6px 10px',
+              padding: '6px 9px',
               borderRadius: '6px',
-              fontSize: '0.74rem',
+              fontSize: '0.72rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '5px',
-              cursor: 'pointer'
+              gap: '4px',
+              cursor: 'pointer',
+              fontWeight: 600
             }}
           >
             <Layers size={13} />
@@ -124,16 +160,17 @@ export const LocationCard: React.FC<LocationCardProps> = ({
             onClick={() => onToggleSave(candidate)}
             title={isSaved ? 'Remove from saved' : 'Save location to shortlist'}
             style={{
-              background: isSaved ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              background: isSaved ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255, 255, 255, 0.05)',
               border: `1px solid ${isSaved ? '#f59e0b' : 'rgba(255, 255, 255, 0.1)'}`,
               color: isSaved ? '#fbbf24' : '#cbd5e1',
-              padding: '6px 10px',
+              padding: '6px 9px',
               borderRadius: '6px',
-              fontSize: '0.74rem',
+              fontSize: '0.72rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '5px',
-              cursor: 'pointer'
+              gap: '4px',
+              cursor: 'pointer',
+              fontWeight: 600
             }}
           >
             <Bookmark size={13} fill={isSaved ? '#fbbf24' : 'none'} />
@@ -198,7 +235,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({
       {/* Visual Characteristics tags */}
       <div style={{ marginBottom: '14px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-          {candidate.visualCharacteristics.slice(0, 3).map((trait, i) => (
+          {(candidate.visualCharacteristics || []).slice(0, 3).map((trait, i) => (
             <span key={i} style={{
               fontSize: '0.74rem',
               background: 'rgba(255, 255, 255, 0.04)',
@@ -214,7 +251,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({
       </div>
 
       {/* Potential Concerns / Risk Notice */}
-      {candidate.potentialRestrictions.length > 0 && (
+      {(candidate.potentialRestrictions || []).length > 0 && (
         <div style={{
           marginBottom: '16px',
           padding: '10px 12px',
@@ -226,7 +263,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({
           lineHeight: 1.4
         }}>
           <strong>Production Notice: </strong>
-          {candidate.potentialRestrictions[0]}
+          {(candidate.potentialRestrictions || [])[0]}
         </div>
       )}
 
@@ -242,7 +279,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>SOURCES:</span>
-          {candidate.sources.slice(0, 3).map((src, i) => (
+          {(candidate.sources || []).slice(0, 3).map((src, i) => (
             <a
               key={i}
               href={src.url}
