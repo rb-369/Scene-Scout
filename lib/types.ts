@@ -57,6 +57,8 @@ export interface LocationCandidate {
   recommendation: string;
   confidence: number; // 0-100
   trustStatus: TrustStatus;
+  image?: string;
+  cameraPackage?: string;
   
   // Specific evidence quotes linked to sources
   evidenceQuotes: {

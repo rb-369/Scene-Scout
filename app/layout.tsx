@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   description: 'Your AI production scout. Turn a scene brief into a research-backed filming location shortlist with live Parallel Search and Gemini intelligence.',
   keywords: ['film production', 'location scouting', 'agentic cinema', 'AI agent', 'Parallel Search', 'Gemini'],
   authors: [{ name: 'SceneScout Hackathon Team' }],
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
 };
 
 export const viewport: Viewport = {
@@ -21,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>

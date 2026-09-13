@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { parallelClient } from '@/lib/services/parallel';
 import { geminiService } from '@/lib/services/gemini';
+import { isMongoDBConfigured } from '@/lib/mongodb';
 
 export async function GET() {
   const parallelConfigured = parallelClient.isConfigured();
   const geminiConfigured = geminiService.isConfigured();
+  const mongodbConfigured = isMongoDBConfigured();
   const mode = parallelConfigured && geminiConfigured ? 'live' : 'demo';
 
   return NextResponse.json({
@@ -25,7 +27,7 @@ export async function GET() {
         track: 'Google Cloud Agent Track'
       },
       mongodb: {
-        configured: Boolean(process.env.MONGODB_URI && process.env.MONGODB_URI.trim().length > 0),
+        configured: mongodbConfigured,
         name: 'MongoDB Atlas Cloud Database',
         track: 'Persistence Layer'
       }

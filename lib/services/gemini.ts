@@ -29,6 +29,68 @@ export class GeminiAgentService {
   }
 
   /**
+   * Helper to execute content generation with automatic model fallback
+   * Prevents 429 quota errors or experimental model deprecation issues
+   */
+  public async generateWithFallback(
+    prompt: string,
+    generationConfig?: { responseMimeType?: string }
+  ): Promise<string> {
+    const genAI = this.getGenAI();
+    if (!genAI) throw new Error('Google Generative AI client is not initialized');
+
+    const candidateModels = Array.from(new Set([
+      this.modelName,
+      'gemini-2.5-flash-lite',
+      'gemini-flash-lite-latest',
+      'gemini-2.5-flash',
+      'gemini-flash-latest'
+    ].filter(Boolean) as string[]));
+
+    let lastError: any = null;
+    for (const m of candidateModels) {
+      try {
+        const model = genAI.getGenerativeModel({ model: m, generationConfig });
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        if (text && text.trim().length > 0) {
+          return text;
+        }
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[Gemini Service] Model ${m} attempt failed (${err.message?.slice(0, 70)}...), trying next model.`);
+      }
+    }
+    throw lastError || new Error('All candidate Gemini models failed to generate content.');
+  }
+
+  /**
+   * Assign cinematic still image and recommended camera sensor package
+   */
+  private getAtmosphericImage(name: string, area: string, traits: string[]): { image: string; camera: string } {
+    const combined = `${name} ${area} ${traits.join(' ')}`.toLowerCase();
+    if (combined.includes('cotton') || combined.includes('godown') || combined.includes('rafter') || combined.includes('timber')) {
+      return { image: '/images/cinema_cotton_godown.jpg', camera: 'ARRI Alexa 35 · 35mm Master Prime' };
+    }
+    if (combined.includes('freight') || combined.includes('container') || combined.includes('yard') || combined.includes('depot')) {
+      return { image: '/images/cinema_freight_yard.jpg', camera: 'RED V-Raptor XL · 40mm Anamorphic' };
+    }
+    if (combined.includes('dock') || combined.includes('naval') || combined.includes('shipyard') || combined.includes('ship')) {
+      return { image: '/images/cinema_naval_drydock.jpg', camera: 'Sony Venice 2 · 28mm Primo 70' };
+    }
+    if (combined.includes('port') || combined.includes('pier') || combined.includes('berth') || combined.includes('marine')) {
+      return { image: '/images/cinema_maritime_berth.jpg', camera: 'RED V-Raptor · 50mm Anamorphic' };
+    }
+    if (combined.includes('sea') || combined.includes('beach') || combined.includes('promontory') || combined.includes('coastal') || combined.includes('basalt')) {
+      return { image: '/images/cinema_coastal_outpost.jpg', camera: 'Sony Venice 2 · 35mm Cooke S7' };
+    }
+    if (combined.includes('chemical') || combined.includes('boiler') || combined.includes('pipe') || combined.includes('silo')) {
+      return { image: '/images/cinema_chemical_plant.jpg', camera: 'ARRI Alexa Mini LF · 40mm Cooke Anamorphic' };
+    }
+    return { image: '/images/cinema_warehouse_still.jpg', camera: 'ARRI Alexa 35 · 35mm Master Prime' };
+  }
+
+  /**
    * Plan search queries based on the user's production brief
    */
   public async planSearchQueries(brief: string, criteria: ScoutCriteria): Promise<string[]> {
@@ -42,7 +104,6 @@ export class GeminiAgentService {
     }
 
     try {
-      const model = this.getGenAI()!.getGenerativeModel({ model: this.modelName });
       const prompt = `You are SceneScout, an elite autonomous AI film production scout.
 A producer provided this production brief:
 "${brief}"
@@ -53,8 +114,7 @@ Generate 4-5 highly specific, realistic search queries to find authentic filming
 Focus on industrial sites, heritage mills, logistics godowns, and official filming commission guides.
 Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
 
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
+      const text = await this.generateWithFallback(prompt);
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
@@ -83,11 +143,6 @@ Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
     }
 
     try {
-      const model = this.getGenAI()!.getGenerativeModel({ 
-        model: this.modelName,
-        generationConfig: { responseMimeType: "application/json" }
-      });
-
       const prompt = `You are SceneScout, an expert film production intelligence scout.
 Analyze these web search results from Parallel Search and evaluate 3-5 real candidate filming locations matching:
 Brief: "${brief}"
@@ -131,9 +186,10 @@ IMPORTANT:
 - Highlight uncertainties and needed permissions.
 - Make scores transparent and realistic.`;
 
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      const parsed = JSON.parse(text);
+      const text = await this.generateWithFallback(prompt, { responseMimeType: "application/json" });
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      const cleanJson = jsonMatch ? jsonMatch[0] : text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+      const parsed = JSON.parse(cleanJson);
       if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed.map((cand: any, idx: number): LocationCandidate => {
           const matchedSources = Array.isArray(cand.sources) && cand.sources.length > 0
@@ -160,6 +216,8 @@ IMPORTANT:
             notes: 'Standard filming NOC and local precinct notification required.'
           };
 
+          const media = this.getAtmosphericImage(cand.name || '', cand.area || '', visualTraits);
+
           return {
             id: cand.id || `loc-live-${Date.now()}-${idx + 1}`,
             name: cand.name || `Candidate Location ${idx + 1}`,
@@ -174,6 +232,8 @@ IMPORTANT:
               ? cand.overallScore
               : Math.round(((cand.sceneMatchScore || 88) * 0.4) + ((cand.accessibilityScore || 78) * 0.2) + ((cand.evidenceQualityScore || 84) * 0.2) + ((100 - (cand.productionRiskScore || 35)) * 0.2)),
             visualCharacteristics: visualTraits,
+            image: cand.image || media.image,
+            cameraPackage: cand.cameraPackage || media.camera,
             productionConsiderations: {
               accessibility: cand.productionConsiderations?.accessibility || 'Vehicular road access verified',
               parking: cand.productionConsiderations?.parking || 'Production staging and parking available',
@@ -243,7 +303,6 @@ IMPORTANT:
 
     if (this.isConfigured()) {
       try {
-        const model = this.getGenAI()!.getGenerativeModel({ model: this.modelName });
         const historyText = conversationHistory.slice(-6).map(m => 
           `${m.sender === 'user' ? 'Filmmaker' : 'SceneScout Agent'}: ${m.text}`
         ).join('\n');
@@ -274,8 +333,7 @@ Return strictly valid JSON:
   "orderedIds": ["${currentCandidates.map(c => c.id).join('", "')}"]
 }`;
 
-        const result = await model.generateContent(prompt);
-        const resText = result.response.text();
+        const resText = await this.generateWithFallback(prompt);
         const jsonMatch = resText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const parsed = JSON.parse(jsonMatch[0]);

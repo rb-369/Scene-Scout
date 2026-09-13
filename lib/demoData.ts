@@ -90,7 +90,9 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
         sourceTitle: "Maharashtra Film Stage and Cultural Development Corp",
         sourceUrl: "https://filmcitymumbai.gov.in/location-scouting-guidelines"
       }
-    ]
+    ],
+    image: "/images/cinema_warehouse_still.jpg",
+    cameraPackage: "ARRI Alexa 35 · 35mm Master Prime"
   },
   {
     id: "loc-mumbai-02",
@@ -178,7 +180,9 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
         sourceTitle: "Times of India: Port land transformations",
         sourceUrl: "https://timesofindia.indiatimes.com/city/mumbai/port-trust-opens-historic-warehouses-for-film-crews/articleshow/98421.cms"
       }
-    ]
+    ],
+    image: "/images/cinema_cotton_godown.jpg",
+    cameraPackage: "ARRI Alexa Mini LF · Cooke Anamorphic 40mm"
   },
   {
     id: "loc-mumbai-03",
@@ -254,7 +258,9 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
         sourceTitle: "Mumbai Film Location Guide",
         sourceUrl: "https://filminginindia.com/guide/reay-road-timber-depots"
       }
-    ]
+    ],
+    image: "/images/cinema_freight_yard.jpg",
+    cameraPackage: "RED V-Raptor XL 8K · Canon K-35 Vintage 24mm"
   },
   {
     id: "loc-mumbai-04",
@@ -330,7 +336,9 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
         sourceTitle: "Central Warehousing Corporation Commercial Filming Policy",
         sourceUrl: "https://cewacor.nic.in/filming-and-promotional-shoots-guidelines"
       }
-    ]
+    ],
+    image: "/images/cinema_freight_yard.jpg",
+    cameraPackage: "Sony FX9 · Fujinon Premista 28-100mm Zoom"
   },
   {
     id: "loc-mumbai-05",
@@ -407,7 +415,9 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
         sourceTitle: "The Indian Express: The silent ruins of Mahalaxmi",
         sourceUrl: "https://indianexpress.com/article/cities/mumbai/the-ghost-mills-of-central-mumbai-shakti-mills-ruins-8192301"
       }
-    ]
+    ],
+    image: "/images/cinema_warehouse_still.jpg",
+    cameraPackage: "ARRI Alexa 35 · Zeiss Supreme Prime 29mm"
   }
 ];
 
@@ -486,7 +496,9 @@ export const ADDITIONAL_SUGGESTED_CANDIDATES: LocationCandidate[] = [
         sourceTitle: "Mazagon Dock Shipbuilders Commercial Filming Protocol",
         sourceUrl: "https://mazagondock.in/filming-in-shipyard-workshops"
       }
-    ]
+    ],
+    image: "/images/cinema_naval_drydock.jpg",
+    cameraPackage: "RED Monstro 8K VV · Panavision C-Series 50mm Anamorphic"
   },
   {
     id: "loc-mumbai-07",
@@ -562,7 +574,9 @@ export const ADDITIONAL_SUGGESTED_CANDIDATES: LocationCandidate[] = [
         sourceTitle: "Western India Cinematographers Association Directory",
         sourceUrl: "https://wica.in/locations/thane-chemical-warehouses"
       }
-    ]
+    ],
+    image: "/images/cinema_chemical_plant.jpg",
+    cameraPackage: "Sony Venice 2 · Zeiss Master Anamorphic 35mm"
   },
   {
     id: "loc-mumbai-08",
@@ -638,7 +652,9 @@ export const ADDITIONAL_SUGGESTED_CANDIDATES: LocationCandidate[] = [
         sourceTitle: "Indian Railways Commercial Filming Policy & Tariffs",
         sourceUrl: "https://indianrailways.gov.in/railwayboard/view_section.jsp?id=filming-policy"
       }
-    ]
+    ],
+    image: "/images/cinema_freight_yard.jpg",
+    cameraPackage: "ARRI Amira · Angenieux Optimo Ultra 24-290mm"
   },
   {
     id: "loc-mumbai-09",
@@ -713,6 +729,154 @@ export const ADDITIONAL_SUGGESTED_CANDIDATES: LocationCandidate[] = [
         claim: "Standardized Union Government day rate through Salt Commissionerate.",
         sourceTitle: "Salt Commissionerate Commercial Use Guidelines",
         sourceUrl: "https://salt.gov.in/filming-permits-mumbai-salt-lands"
+      }
+    ],
+    image: "/images/cinema_coastal_outpost.jpg",
+    cameraPackage: "Sony Venice 2 · Hawk V-Lite 45mm Anamorphic"
+  },
+  {
+    id: "ballard-pier",
+    name: "Ballard Pier Marine Berth",
+    area: "Port Trust Area / Ballard Estate",
+    city: "Mumbai",
+    description: "Decommissioned deepwater maritime pier surrounded by historic British port architecture, towering quay floodlights, and expansive wet tarmac reflecting the open harbor. Unmatched for nocturnal crime, espionage exchanges, and atmospheric maritime climaxes.",
+    sceneMatchScore: 94,
+    accessibilityScore: 92,
+    productionRiskScore: 30,
+    evidenceQualityScore: 94,
+    overallScore: 92,
+    image: "/images/cinema_maritime_berth.jpg",
+    cameraPackage: "RED V-Raptor XL · 50mm Anamorphic",
+    visualCharacteristics: [
+      "Sodium-vapor floodlights casting amber halos on wet concrete quay",
+      "Expansive ocean harbor view with distant freighter silhouettes",
+      "Historic British-era Edwardian port administration stonework",
+      "Wide vehicle turnaround apron suitable for high-speed tracking vehicles"
+    ],
+    productionConsiderations: {
+      accessibility: "Wide approach road via Shoorji Vallabhdas Marg; direct heavy truck access to water edge.",
+      parking: "MbPA private parking tarmac for 25+ production vehicles and technical trailers.",
+      operatingEnvironment: "Gated maritime port zone with 24/7 security gate.",
+      ownershipStatus: "Mumbai Port Authority (MbPA)",
+      potentialRestrictions: [
+        "MbPA filming NOC required 5 working days in advance.",
+        "Security manifest required for all cast and crew entering the port gates.",
+        "No night pyrotechnics without harbor master clearance."
+      ],
+      contactInformation: "MbPA Port House Filming Cell, Shoorji Vallabhdas Marg, Ballard Estate",
+      powerAvailability: "Direct shore-power tie-in points and generator parking bay.",
+      noiseProfile: "Low at night; distant fog horns and ocean swell."
+    },
+    potentialRestrictions: [
+      "MbPA commercial permit required 5 days prior",
+      "Harbor master NOC for high-wattage water-facing lighting arrays",
+      "Security identification check for technical crew"
+    ],
+    contactInformation: "MbPA Estate Division Filming Cell, Port House, Ballard Estate",
+    estimatedTariff: "₹85,000 / day (MbPA Official Gazette rate)",
+    contactDetails: {
+      phone: "+91 22 6656 4051",
+      email: "commercialfilming@mumbaiport.gov.in",
+      officeDesk: "MbPA Port House Filming Liaison Desk, Ballard Estate",
+      notes: "Official MbPA single-window shoot clearance; shore power available on request."
+    },
+    sources: [
+      {
+        title: "Mumbai Port Authority - Ballard Pier Commercial Filming Regulations",
+        url: "https://mumbaiport.gov.in/ballard-pier-filming",
+        domain: "mumbaiport.gov.in",
+        snippet: "Guidelines and standardized fees for filming at historic deepwater berths in South Mumbai.",
+        relevance: "Official legal and tariff authority"
+      },
+      {
+        title: "Indian Cinematography Guild - Coastal & Maritime Directory",
+        url: "https://cinematographyindia.org/locations/ballard-pier-marine",
+        domain: "cinematographyindia.org",
+        snippet: "Celebrated for clean western dusk horizon and dramatic sodium-vapor tarmac reflections.",
+        relevance: "Visual suitability and cinematography precedent"
+      }
+    ],
+    recommendation: "Outstanding visual depth and high production value for high-stakes maritime and thriller sequences.",
+    confidence: 95,
+    trustStatus: "VERIFIED BY SOURCES",
+    evidenceQuotes: [
+      {
+        claim: "Standardized commercial shoot tariff and direct shore-power tie-in through Mumbai Port Authority.",
+        sourceTitle: "Mumbai Port Authority - Ballard Pier Commercial Filming Regulations",
+        sourceUrl: "https://mumbaiport.gov.in/ballard-pier-filming"
+      }
+    ]
+  },
+  {
+    id: "worli-coastal",
+    name: "Worli Sea Promontory & Coastal Basalt Outpost",
+    area: "Worli Headland / Sea Face",
+    city: "Mumbai",
+    description: "Spectacular ocean-facing headland with rugged basalt outcrops, 17th-century coastal fortifications, and an unobstructed 270-degree horizon over the Arabian Sea. Exceptional for golden hour showdowns, dramatic storm sequences, and sweeping anamorphic wide shots.",
+    sceneMatchScore: 95,
+    accessibilityScore: 82,
+    productionRiskScore: 36,
+    evidenceQualityScore: 92,
+    overallScore: 90,
+    image: "/images/cinema_coastal_outpost.jpg",
+    cameraPackage: "Sony Venice 2 · 28mm Primo",
+    visualCharacteristics: [
+      "Rugged volcanic basalt boulders pounded by Arabian Sea breakers",
+      "Historic 1675 British sea fort bastion silhouetted against western dusk",
+      "Sweeping unobstructed horizon without modern visual intrusion",
+      "Dynamic tidal water pools creating natural specular reflections"
+    ],
+    productionConsiderations: {
+      accessibility: "Direct vehicular approach via Worli Sea Face and Fort access lane; 200m walking access to rock promontory.",
+      parking: "Dedicated municipal parking bay for up to 8 production support vans.",
+      operatingEnvironment: "Open coastal headland; sensitive to tidal timing and monsoon swells.",
+      ownershipStatus: "Archaeological Survey of India (ASI) / Municipal Corporation of Greater Mumbai (MCGM)",
+      potentialRestrictions: [
+        "ASI heritage preservation clearance required for equipment rigging on fort walls.",
+        "Local police NOC from Worli Police Station.",
+        "Tide chart safety briefing mandatory for crew working on wet basalt rocks."
+      ],
+      contactInformation: "ASI Mumbai Circle Office & MCGM G-South Ward Office",
+      powerAvailability: "Generator trucks required; mobile sound-baffled units can park 150m from promontory.",
+      noiseProfile: "High ocean surf noise; best suited for boom sync sound with wind muffs or ADR."
+    },
+    potentialRestrictions: [
+      "ASI heritage NOC for rigging on historic ramparts",
+      "Tide monitoring mandatory for basalt ledge shooting",
+      "Night lighting arrays require police environmental consent"
+    ],
+    contactInformation: "MCGM G-South Ward Filming Desk, Elphinstone Road",
+    estimatedTariff: "₹35,000 / day (MCGM Municipal Heritage Tariff)",
+    contactDetails: {
+      phone: "+91 22 2430 5035",
+      email: "filming.gsouth@mcgm.gov.in",
+      officeDesk: "MCGM G-South Ward Office, N.M. Joshi Marg, Mumbai",
+      notes: "Municipal heritage shoot permit; tide tables must be submitted with production schedule."
+    },
+    sources: [
+      {
+        title: "Maharashtra Film City - Coastal Heritage Scouting Guidelines",
+        url: "https://filmcitymumbai.gov.in/heritage-locations/worli-fort-sea-promontory",
+        domain: "filmcitymumbai.gov.in",
+        snippet: "Single-window clearance protocols for filming at Worli Fort and surrounding coastal rock ledges.",
+        relevance: "Official legal and permit authority"
+      },
+      {
+        title: "Cinematography India - Golden Hour Coastal Perspectives",
+        url: "https://cinematographyindia.org/locations/worli-coastal-promontory",
+        domain: "cinematographyindia.org",
+        snippet: "Renowned for clean western sunset line and dramatic sea foam textures against dark basalt.",
+        relevance: "Visual and lighting evaluation"
+      }
+    ],
+    recommendation: "Unsurpassed natural spectacle and dramatic tension. Ideal for climax confrontations, but ensure rigorous tide safety planning.",
+    confidence: 93,
+    trustStatus: "VERIFIED BY SOURCES",
+    evidenceQuotes: [
+      {
+        claim: "270-degree clean horizon over the Arabian Sea ideal for sunset and storm cinematography.",
+        sourceTitle: "Cinematography India - Golden Hour Coastal Perspectives",
+        sourceUrl: "https://cinematographyindia.org/locations/worli-coastal-promontory"
       }
     ]
   }

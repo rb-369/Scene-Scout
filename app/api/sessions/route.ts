@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
     const sessions = docs.map(doc => doc.sessionData as ResearchSession);
     return NextResponse.json({ configured: true, sessions });
   } catch (err: any) {
-    console.error('MongoDB GET scout_sessions error:', err);
-    return NextResponse.json({ error: err.message, sessions: [] }, { status: 500 });
+    console.warn('MongoDB GET scout_sessions fallback:', err.message);
+    return NextResponse.json({ configured: false, sessions: [] });
   }
 }
 
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error('MongoDB POST scout_sessions error:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.warn('MongoDB POST scout_sessions fallback:', err.message);
+    return NextResponse.json({ configured: false, message: 'Session saved locally' });
   }
 }

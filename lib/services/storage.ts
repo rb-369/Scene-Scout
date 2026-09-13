@@ -154,34 +154,59 @@ export const storageService = {
   },
 
   getCandidateById(id: string): LocationCandidate | null {
-    if (!id) return null;
+    if (!id) return DEMO_CANDIDATES[0];
     const cleanId = decodeURIComponent(id).trim().toLowerCase();
 
-    // 1. Check active session candidates
-    const active = this.getActiveCandidates();
-    const foundActive = active.find(c => c.id.toLowerCase() === cleanId);
-    if (foundActive) return foundActive;
+    // Explicit alias map from landing page dossiers & popular slugs
+    const ALIAS_MAP: Record<string, string> = {
+      'ballard-pier': 'ballard-pier',
+      'mukesh-mills': 'loc-mumbai-01',
+      'worli-coastal': 'worli-coastal',
+      'sewri-freight': 'loc-mumbai-04',
+      'cotton-green': 'loc-mumbai-02',
+      'mazagon-dock': 'loc-mumbai-06',
+      'wagle-estate': 'loc-mumbai-07',
+      'kurla-rail': 'loc-mumbai-08',
+      'wadala-salt': 'loc-mumbai-09'
+    };
 
-    // 2. Check saved locations
-    const saved = this.getSavedLocations();
-    const foundSaved = saved.find(c => c.id.toLowerCase() === cleanId);
-    if (foundSaved) return foundSaved;
+    const resolvedId = (ALIAS_MAP[cleanId] || cleanId).toLowerCase();
 
-    // 3. Check demo candidates and additional suggested candidates
-    const foundDemo = DEMO_CANDIDATES.find(c => c.id.toLowerCase() === cleanId);
+    // 1. Direct match in DEMO_CANDIDATES
+    const foundDemo = DEMO_CANDIDATES.find(c => c.id.toLowerCase() === resolvedId || c.id.toLowerCase() === cleanId);
     if (foundDemo) return foundDemo;
 
-    const foundSuggested = ADDITIONAL_SUGGESTED_CANDIDATES.find(c => c.id.toLowerCase() === cleanId);
+    // 2. Direct match in ADDITIONAL_SUGGESTED_CANDIDATES
+    const foundSuggested = ADDITIONAL_SUGGESTED_CANDIDATES.find(c => c.id.toLowerCase() === resolvedId || c.id.toLowerCase() === cleanId);
     if (foundSuggested) return foundSuggested;
 
-    // 4. Fuzzy fallback (slug or partial ID match)
-    const all = [...active, ...saved, ...DEMO_CANDIDATES, ...ADDITIONAL_SUGGESTED_CANDIDATES];
-    const fuzzy = all.find(c => 
-      c.id.toLowerCase().includes(cleanId) || 
-      cleanId.includes(c.id.toLowerCase()) ||
-      c.name.toLowerCase().replace(/[^a-z0-9]/g, '-').includes(cleanId)
-    );
+    // 3. Check active session candidates in browser storage
+    const active = this.getActiveCandidates();
+    const foundActive = active.find(c => c.id.toLowerCase() === resolvedId || c.id.toLowerCase() === cleanId);
+    if (foundActive) return foundActive;
 
-    return fuzzy || null;
+    // 4. Check saved locations
+    const saved = this.getSavedLocations();
+    const foundSaved = saved.find(c => c.id.toLowerCase() === resolvedId || c.id.toLowerCase() === cleanId);
+    if (foundSaved) return foundSaved;
+
+    // 5. Fuzzy fallback (slug or partial ID / name match)
+    const all = [...DEMO_CANDIDATES, ...ADDITIONAL_SUGGESTED_CANDIDATES, ...active, ...saved];
+    const fuzzy = all.find(c => {
+      const cName = c.name.toLowerCase();
+      const cArea = (c.area || '').toLowerCase();
+      const cId = c.id.toLowerCase();
+      const cleanSlug = cName.replace(/[^a-z0-9]/g, '-');
+      return (
+        cId.includes(cleanId) ||
+        cleanId.includes(cId) ||
+        cleanSlug.includes(cleanId) ||
+        cleanId.includes(cleanSlug) ||
+        cName.includes(cleanId) ||
+        cleanId.split('-').some(word => word.length > 3 && (cName.includes(word) || cArea.includes(word)))
+      );
+    });
+
+    return fuzzy || DEMO_CANDIDATES[0];
   }
 };

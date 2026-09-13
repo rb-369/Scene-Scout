@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
     const locations = docs.map(doc => doc.candidateData as LocationCandidate);
     return NextResponse.json({ configured: true, locations });
   } catch (err: any) {
-    console.error('MongoDB GET saved locations error:', err);
-    return NextResponse.json({ error: err.message, locations: [] }, { status: 500 });
+    console.warn('MongoDB GET saved locations fallback:', err.message);
+    return NextResponse.json({ configured: false, locations: [] });
   }
 }
 
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (err: any) {
-    console.error('MongoDB POST saved locations error:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.warn('MongoDB POST saved locations fallback:', err.message);
+    return NextResponse.json({ configured: false, message: 'Saved locally' });
   }
 }

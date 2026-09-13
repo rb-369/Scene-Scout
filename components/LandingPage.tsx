@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { ArrowRight, Film, MapPin, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Film, MapPin, ShieldCheck, Eye } from 'lucide-react';
 
 interface LandingPageProps {
   onLaunchStudio: (options?: { autoStartScout?: boolean }) => void;
@@ -142,6 +142,35 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
                 </button>
                 <a href="#dossiers" className="btn-cinema btn-secondary">View a dossier</a>
               </div>
+              <div className="scene-hero-presets" style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  Quick Presets:
+                </span>
+                <button 
+                  type="button" 
+                  className="preset-chip" 
+                  onClick={() => onLaunchStudio({ autoStartScout: true })}
+                  title="Run scout for Mumbai industrial thriller warehouse"
+                >
+                  <span>🎬 Industrial Thriller</span>
+                </button>
+                <button 
+                  type="button" 
+                  className="preset-chip" 
+                  onClick={() => onLaunchStudio({ autoStartScout: true })}
+                  title="Run scout for nocturnal dockside maritime noir"
+                >
+                  <span>⚓ Maritime Berth Noir</span>
+                </button>
+                <button 
+                  type="button" 
+                  className="preset-chip" 
+                  onClick={() => onLaunchStudio({ autoStartScout: true })}
+                  title="Run scout for sunset coastal standoff on basalt outcrops"
+                >
+                  <span>🌊 Basalt Coastal Standoff</span>
+                </button>
+              </div>
               <div className="scene-hero-meta" aria-label="SceneScout coverage">
                 <div className="scene-meta-card animate-card-drop" style={{ animationDelay: '0.1s' }}><span>Look</span><strong>Light, texture, scale</strong></div>
                 <div className="scene-meta-card animate-card-drop" style={{ animationDelay: '0.2s' }}><span>Logistics</span><strong>Road, power, permits</strong></div>
@@ -231,7 +260,14 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
                   <div><span>Access</span><strong>{dossier.access}</strong></div>
                   <div><span>Tariff</span><strong>{dossier.tariff}</strong></div>
                 </div>
-                <button onClick={() => onLaunchStudio({ autoStartScout: true })} className="btn-cinema btn-secondary">Scout this direction <ArrowRight size={14} /></button>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '18px' }}>
+                  <a href={`/location/${dossier.id}`} className="btn-cinema btn-primary" title={`Open full production dossier for ${dossier.name}`}>
+                    <Eye size={14} /> View full dossier
+                  </a>
+                  <button onClick={() => onLaunchStudio({ autoStartScout: true })} className="btn-cinema btn-secondary">
+                    Scout this direction <ArrowRight size={14} />
+                  </button>
+                </div>
               </div>
             </div>
           </section>

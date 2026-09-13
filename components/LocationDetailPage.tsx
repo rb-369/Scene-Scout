@@ -22,8 +22,10 @@ import {
   Sparkles,
   MessageSquare,
   Send,
-  Loader2
+  Loader2,
+  Printer
 } from 'lucide-react';
+import Image from 'next/image';
 import { LocationCandidate, TrustStatus } from '@/lib/types';
 import { storageService } from '@/lib/services/storage';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,7 +38,9 @@ export function LocationDetailPage({ locationId }: LocationDetailPageProps) {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [candidate, setCandidate] = useState<LocationCandidate | null>(null);
+  const [candidate, setCandidate] = useState<LocationCandidate | null>(() => {
+    return storageService.getCandidateById(locationId);
+  });
   const [isSaved, setIsSaved] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedContact, setCopiedContact] = useState(false);
@@ -199,6 +203,16 @@ export function LocationDetailPage({ locationId }: LocationDetailPageProps) {
               {copiedLink ? <Check size={14} color="#10b981" /> : <Share2 size={14} />}
               <span>{copiedLink ? 'Link Copied' : 'Share'}</span>
             </button>
+
+            <button
+              onClick={() => { if (typeof window !== 'undefined') window.print(); }}
+              className="btn-cinema btn-secondary"
+              style={{ padding: '8px 12px', fontSize: '0.8rem' }}
+              title="Print physical production call sheet for location scout"
+            >
+              <Printer size={14} />
+              <span>Print Dossier</span>
+            </button>
           </div>
         </div>
       </header>
@@ -225,6 +239,87 @@ export function LocationDetailPage({ locationId }: LocationDetailPageProps) {
             </span>
             <span style={{ color: '#52525b' }}>•</span>
             <span style={{ color: '#cbd5e1' }}>{candidate.productionConsiderations?.ownershipStatus || 'Commercial / Municipal Authority'}</span>
+          </div>
+        </section>
+
+        {/* 16:9 Cinematic Viewfinder Monitor Header */}
+        <section style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '16 / 9',
+          maxHeight: '440px',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          marginBottom: '28px',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          background: '#090c0c',
+          boxShadow: '0 20px 48px rgba(0, 0, 0, 0.6)'
+        }}>
+          <Image
+            src={candidate.image || '/images/cinema_warehouse_still.jpg'}
+            alt={candidate.name}
+            fill
+            priority
+            sizes="(max-width: 1240px) 100vw, 1240px"
+            style={{ objectFit: 'cover' }}
+          />
+          {/* Viewfinder HUD Overlay */}
+          <div className="location-card-reticle" aria-hidden="true" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.75) 100%)' }}>
+            <span className="reticle-tl" style={{ top: '16px', left: '16px', fontSize: '14px' }}>+</span>
+            <span className="reticle-tr" style={{ top: '16px', right: '16px', fontSize: '14px' }}>+</span>
+            <span className="reticle-bl" style={{ bottom: '16px', left: '16px', fontSize: '14px' }}>+</span>
+            <span className="reticle-br" style={{ bottom: '16px', right: '16px', fontSize: '14px' }}>+</span>
+            <span className="reticle-center" style={{ fontSize: '16px' }}>✛</span>
+
+            <div style={{
+              position: 'absolute',
+              top: '16px',
+              left: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <span style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.74rem',
+                letterSpacing: '0.05em',
+                color: '#ffffff',
+                background: 'rgba(9, 12, 12, 0.85)',
+                backdropFilter: 'blur(8px)',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <span className="rec-dot animate-pulse-subtle" />
+                {candidate.cameraPackage || 'ARRI Alexa 35 · 35mm Master Prime'}
+              </span>
+            </div>
+
+            <div style={{
+              position: 'absolute',
+              bottom: '16px',
+              right: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.7rem',
+                letterSpacing: '0.06em',
+                color: '#f4a259',
+                background: 'rgba(9, 12, 12, 0.85)',
+                backdropFilter: 'blur(8px)',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                border: '1px solid rgba(244, 162, 89, 0.35)'
+              }}>
+                2.39:1 ANAMORPHIC · LIVE STILL
+              </span>
+            </div>
           </div>
         </section>
 
