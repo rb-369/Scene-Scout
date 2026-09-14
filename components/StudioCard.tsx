@@ -23,6 +23,9 @@ interface StudioCardProps {
 export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
   const [showContact, setShowContact] = useState<boolean>(false);
 
+  const lat = studio.coordinates.lat;
+  const lng = studio.coordinates.lng;
+  const satelliteEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
   const mapsUrl = studio.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${studio.name}, ${studio.city}`)}`;
   const earthUrl = studio.googleEarthUrl || `https://earth.google.com/web/search/${encodeURIComponent(`${studio.name} ${studio.city}`)}`;
 
@@ -35,53 +38,44 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)'
       }}
     >
-      {/* 16:9 Viewfinder - Google Maps Building Photo Thumbnail */}
+      {/* 16:9 Viewfinder - Real Google Maps Satellite Embed */}
       <div 
         className="location-card-viewport"
-        style={{ position: 'relative', overflow: 'hidden' }}
+        style={{ position: 'relative', overflow: 'hidden', height: '220px', background: '#000' }}
       >
-        <Image
-          src={studio.image || '/images/cinema_warehouse_still.jpg'}
-          alt={studio.name}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="location-card-still"
+        <iframe
+          src={satelliteEmbedUrl}
+          title={`Google Maps Satellite View of ${studio.name}`}
+          width="100%"
+          height="100%"
+          style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.08) brightness(0.95)' }}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
         />
-        <div className="location-card-reticle" aria-hidden="true">
-          <span className="reticle-tl">+</span>
-          <span className="reticle-tr">+</span>
-          <span className="reticle-bl">+</span>
-          <span className="reticle-br">+</span>
-          <span className="reticle-center">✛</span>
-          <span className="reticle-sensor">
-            <span className="rec-dot animate-pulse-subtle" />
-            VIRTUAL PRODUCTION / SOUNDSTAGE
-          </span>
-          <span className="reticle-format">ICVFX · STAGECRAFT</span>
-        </div>
 
-        {/* Google Maps Building View Badge */}
+        {/* Satellite Recon Overlay HUD */}
         <div 
           style={{
             position: 'absolute',
-            bottom: '10px',
+            top: '10px',
             left: '10px',
-            zIndex: 3,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
             background: 'rgba(9, 12, 12, 0.88)',
             backdropFilter: 'blur(8px)',
             border: '1px solid rgba(245, 158, 11, 0.4)',
             borderRadius: '6px',
             padding: '3px 8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
             fontSize: '0.68rem',
             fontFamily: 'var(--font-mono)',
-            color: '#fbbf24'
+            color: '#fbbf24',
+            zIndex: 3,
+            pointerEvents: 'none'
           }}
         >
-          <MapPin size={11} color="#fbbf24" />
-          <span>Google Maps Building Photo</span>
+          <Globe size={11} />
+          <span>{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
         </div>
 
         {/* Direct Open in Google Maps Link */}
@@ -111,7 +105,7 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
           }}
           title="Open exact studio complex in Google Maps"
         >
-          <span>Google Maps</span>
+          <span>Live Maps</span>
           <ExternalLink size={11} color="#fbbf24" />
         </a>
       </div>
