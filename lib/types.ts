@@ -60,12 +60,45 @@ export interface LocationCandidate {
   image?: string;
   cameraPackage?: string;
   
+  // Real coordinates & Google Maps integration
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  googleMapsUrl?: string;
+  googleEarthUrl?: string;
+  
   // Specific evidence quotes linked to sources
   evidenceQuotes: {
     claim: string;
     sourceTitle: string;
     sourceUrl: string;
   }[];
+}
+
+export interface StudioCandidate {
+  id: string;
+  name: string;
+  city: string;
+  country: string;
+  stageType: string; // e.g. 'Virtual Production LED Volume', 'Mythological Battlefield Backlot', 'Underwater Stage'
+  bestForGenres: string[]; // e.g. ['Futuristic Sci-Fi', 'Alien Planet', 'Mythological Warfare']
+  description: string;
+  whyStudioRecommended: string;
+  dimensions: string; // e.g. '35,000 sq ft · 45ft clear height'
+  capabilities: string[];
+  notableProductions: string[];
+  estimatedTariff: string;
+  contactDetails: ContactDetails;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+  googleMapsUrl: string;
+  googleEarthUrl?: string;
+  image?: string;
+  soundRating?: string;
+  powerCapacity?: string;
 }
 
 export interface ScoutCriteria {
@@ -104,6 +137,9 @@ export interface ResearchSession {
   mode: 'live' | 'demo';
   summary: string;
   createdAt: string;
+  isStudioRecommended?: boolean;
+  studioSuitabilityReason?: string;
+  studioRecommendations?: StudioCandidate[];
 }
 
 export interface FollowUpMessage {
@@ -124,3 +160,4 @@ export interface CompareAnalysis {
     notes: Record<string, string>; // locationId -> evaluation note
   }[];
 }
+

@@ -23,7 +23,8 @@ import {
   MessageSquare,
   Send,
   Loader2,
-  Printer
+  Printer,
+  Globe
 } from 'lucide-react';
 import Image from 'next/image';
 import { LocationCandidate, TrustStatus } from '@/lib/types';
@@ -49,6 +50,13 @@ export function LocationDetailPage({ locationId }: LocationDetailPageProps) {
   const [queryInput, setQueryInput] = useState('');
   const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'agent'; text: string }>>([]);
   const [isQueryLoading, setIsQueryLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<'cinematic' | 'satellite'>('cinematic');
+
+  const lat = candidate?.coordinates?.lat || 18.9138;
+  const lng = candidate?.coordinates?.lng || 72.8242;
+  const mapsUrl = candidate?.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${candidate?.name || ''}, ${candidate?.area || ''}, ${candidate?.city || ''}`)}`;
+  const earthUrl = candidate?.googleEarthUrl || `https://earth.google.com/web/search/${encodeURIComponent(`${candidate?.name || ''} ${candidate?.area || ''} ${candidate?.city || ''}`)}`;
+  const satelliteEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
 
   useEffect(() => {
     const cand = storageService.getCandidateById(locationId);
@@ -185,6 +193,19 @@ export function LocationDetailPage({ locationId }: LocationDetailPageProps) {
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-cinema btn-secondary"
+              style={{ padding: '8px 12px', fontSize: '0.8rem', textDecoration: 'none', color: '#38bdf8' }}
+              title="Open exact location in Google Maps"
+            >
+              <MapPin size={14} />
+              <span>Google Maps</span>
+              <ExternalLink size={12} />
+            </a>
+
             <button
               onClick={handleToggleSave}
               className="btn-cinema btn-secondary"
@@ -232,17 +253,24 @@ export function LocationDetailPage({ locationId }: LocationDetailPageProps) {
             {candidate.name}
           </h1>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#a1a1aa', fontSize: '0.92rem', flexWrap: 'wrap' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#d38a45' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#a1a1aa', fontSize: '0.92rem', flexWrap: 'wrap' }}>
+            <a 
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#38bdf8', textDecoration: 'none' }}
+              title="Open pin in Google Maps"
+            >
               <MapPin size={15} />
-              {candidate.area}, {candidate.city}
-            </span>
+              <span>{candidate.area}, {candidate.city}</span>
+              <ExternalLink size={12} />
+            </a>
             <span style={{ color: '#52525b' }}>•</span>
             <span style={{ color: '#cbd5e1' }}>{candidate.productionConsiderations?.ownershipStatus || 'Commercial / Municipal Authority'}</span>
           </div>
         </section>
 
-        {/* 16:9 Cinematic Viewfinder Monitor Header */}
+        {/* 16:9 Cinematic Viewfinder Monitor or Real Google Satellite Embed */}
         <section style={{
           position: 'relative',
           width: '100%',
@@ -255,71 +283,199 @@ export function LocationDetailPage({ locationId }: LocationDetailPageProps) {
           background: '#090c0c',
           boxShadow: '0 20px 48px rgba(0, 0, 0, 0.6)'
         }}>
-          <Image
-            src={candidate.image || '/images/cinema_warehouse_still.jpg'}
-            alt={candidate.name}
-            fill
-            priority
-            sizes="(max-width: 1240px) 100vw, 1240px"
-            style={{ objectFit: 'cover' }}
-          />
-          {/* Viewfinder HUD Overlay */}
-          <div className="location-card-reticle" aria-hidden="true" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.75) 100%)' }}>
-            <span className="reticle-tl" style={{ top: '16px', left: '16px', fontSize: '14px' }}>+</span>
-            <span className="reticle-tr" style={{ top: '16px', right: '16px', fontSize: '14px' }}>+</span>
-            <span className="reticle-bl" style={{ bottom: '16px', left: '16px', fontSize: '14px' }}>+</span>
-            <span className="reticle-br" style={{ bottom: '16px', right: '16px', fontSize: '14px' }}>+</span>
-            <span className="reticle-center" style={{ fontSize: '16px' }}>✛</span>
+          {viewMode === 'cinematic' ? (
+            <>
+              <Image
+                src={candidate.image || '/images/cinema_warehouse_still.jpg'}
+                alt={candidate.name}
+                fill
+                priority
+                sizes="(max-width: 1240px) 100vw, 1240px"
+                style={{ objectFit: 'cover' }}
+              />
+              {/* Viewfinder HUD Overlay */}
+              <div className="location-card-reticle" aria-hidden="true" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.75) 100%)' }}>
+                <span className="reticle-tl" style={{ top: '16px', left: '16px', fontSize: '14px' }}>+</span>
+                <span className="reticle-tr" style={{ top: '16px', right: '16px', fontSize: '14px' }}>+</span>
+                <span className="reticle-bl" style={{ bottom: '16px', left: '16px', fontSize: '14px' }}>+</span>
+                <span className="reticle-br" style={{ bottom: '16px', right: '16px', fontSize: '14px' }}>+</span>
+                <span className="reticle-center" style={{ fontSize: '16px' }}>✛</span>
 
-            <div style={{
-              position: 'absolute',
-              top: '16px',
-              left: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
-            }}>
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.74rem',
-                letterSpacing: '0.05em',
-                color: '#ffffff',
-                background: 'rgba(9, 12, 12, 0.85)',
-                backdropFilter: 'blur(8px)',
-                padding: '4px 10px',
-                borderRadius: '6px',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}>
-                <span className="rec-dot animate-pulse-subtle" />
-                {candidate.cameraPackage || 'ARRI Alexa 35 · 35mm Master Prime'}
-              </span>
+                <div style={{
+                  position: 'absolute',
+                  top: '16px',
+                  left: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.74rem',
+                    letterSpacing: '0.05em',
+                    color: '#ffffff',
+                    background: 'rgba(9, 12, 12, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <span className="rec-dot animate-pulse-subtle" />
+                    {candidate.cameraPackage || 'ARRI Alexa 35 · 35mm Master Prime'}
+                  </span>
+                </div>
+
+                <div style={{
+                  position: 'absolute',
+                  bottom: '16px',
+                  right: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.7rem',
+                    letterSpacing: '0.06em',
+                    color: '#f4a259',
+                    background: 'rgba(9, 12, 12, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(244, 162, 89, 0.35)'
+                  }}>
+                    2.39:1 ANAMORPHIC · LIVE STILL
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div style={{ position: 'relative', width: '100%', height: '100%', background: '#000' }}>
+              <iframe
+                src={satelliteEmbedUrl}
+                title={`Google Maps Satellite View of ${candidate.name}`}
+                width="100%"
+                height="100%"
+                style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.08) brightness(0.95)' }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+              {/* Satellite Recon Overlay HUD */}
+              <div 
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  left: '20px',
+                  background: 'rgba(9, 12, 12, 0.88)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  borderRadius: '6px',
+                  padding: '5px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '0.74rem',
+                  fontFamily: 'var(--font-mono)',
+                  color: '#38bdf8',
+                  zIndex: 3,
+                  pointerEvents: 'none'
+                }}
+              >
+                <Globe size={13} />
+                <span>GOOGLE EARTH SATELLITE · {lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
+              </div>
+
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  position: 'absolute',
+                  bottom: '16px',
+                  right: '20px',
+                  background: 'rgba(9, 12, 12, 0.92)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  borderRadius: '6px',
+                  padding: '6px 14px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  textDecoration: 'none',
+                  zIndex: 3,
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.6)'
+                }}
+                title="Open full interactive map on Google Maps"
+              >
+                <span>Open Live on Google Maps</span>
+                <ExternalLink size={12} color="#38bdf8" />
+              </a>
             </div>
+          )}
 
-            <div style={{
+          {/* View Toggle Pill */}
+          <div 
+            style={{
               position: 'absolute',
               bottom: '16px',
-              right: '20px',
+              left: '20px',
+              zIndex: 10,
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
-            }}>
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.7rem',
-                letterSpacing: '0.06em',
-                color: '#f4a259',
-                background: 'rgba(9, 12, 12, 0.85)',
-                backdropFilter: 'blur(8px)',
-                padding: '4px 10px',
-                borderRadius: '6px',
-                border: '1px solid rgba(244, 162, 89, 0.35)'
-              }}>
-                2.39:1 ANAMORPHIC · LIVE STILL
-              </span>
-            </div>
+              background: 'rgba(9, 12, 12, 0.88)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.18)',
+              borderRadius: '20px',
+              padding: '3px',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.7)'
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setViewMode('cinematic')}
+              style={{
+                background: viewMode === 'cinematic' ? '#d38a45' : 'transparent',
+                color: viewMode === 'cinematic' ? '#ffffff' : '#94a3b8',
+                border: 'none',
+                borderRadius: '16px',
+                padding: '4px 12px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span>🎬 Cinematic Still</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('satellite')}
+              style={{
+                background: viewMode === 'satellite' ? '#0284c7' : 'transparent',
+                color: viewMode === 'satellite' ? '#ffffff' : '#94a3b8',
+                border: 'none',
+                borderRadius: '16px',
+                padding: '4px 12px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span>🛰️ Real Google Earth</span>
+            </button>
           </div>
         </section>
 

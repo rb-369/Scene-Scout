@@ -39,6 +39,12 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
   const [copiedContact, setCopiedContact] = useState(false);
   if (!candidate) return null;
 
+  const lat = candidate.coordinates?.lat || 18.9138;
+  const lng = candidate.coordinates?.lng || 72.8242;
+  const mapsUrl = candidate.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${candidate.name}, ${candidate.area}, ${candidate.city}`)}`;
+  const earthUrl = candidate.googleEarthUrl || `https://earth.google.com/web/search/${encodeURIComponent(`${candidate.name} ${candidate.area} ${candidate.city}`)}`;
+  const satelliteEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
+
   const getTrustBadge = (status: string) => {
     switch (status) {
       case 'VERIFIED BY SOURCES':
@@ -69,15 +75,37 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
             <h2 className="font-display" style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
               {candidate.name}
             </h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '0.9rem', marginTop: '4px' }}>
-              <MapPin size={15} color="#38bdf8" />
-              <span>{candidate.area}, {candidate.city}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', marginTop: '4px', flexWrap: 'wrap' }}>
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#38bdf8', textDecoration: 'none' }}
+                title="Open location on Google Maps (opens in new tab)"
+              >
+                <MapPin size={15} color="#38bdf8" />
+                <span>{candidate.area}, {candidate.city}</span>
+                <ExternalLink size={12} />
+              </a>
               <span style={{ color: '#64748b' }}>•</span>
               <span style={{ color: '#cbd5e1' }}>{candidate.productionConsiderations?.ownershipStatus || 'Commercial / Municipal'}</span>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-cinema btn-secondary"
+              style={{ padding: '8px 12px', fontSize: '0.82rem', textDecoration: 'none', color: '#38bdf8' }}
+              title="Open pin directly in Google Maps"
+            >
+              <MapPin size={14} />
+              <span>Google Maps</span>
+              <ExternalLink size={11} />
+            </a>
+
             <button
               onClick={() => onToggleSave(candidate)}
               className="btn-cinema btn-secondary"
@@ -174,6 +202,102 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
             <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>
               Standard shift tariffs include basic staging access; auxiliary generator tie-in and clean-up fees may apply.
             </div>
+          </div>
+        </div>
+
+        {/* Google Maps & Real Google Earth Satellite Reconnaissance */}
+        <div style={{
+          marginBottom: '24px',
+          borderRadius: '10px',
+          overflow: 'hidden',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+          background: '#0a0d12'
+        }}>
+          <div style={{
+            padding: '12px 16px',
+            background: 'rgba(56, 189, 248, 0.08)',
+            borderBottom: '1px solid rgba(56, 189, 248, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '10px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <MapPin size={15} color="#38bdf8" />
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Real Google Maps & Earth Satellite Recon
+              </span>
+              <span style={{
+                fontSize: '0.7rem',
+                fontFamily: 'var(--font-mono)',
+                color: '#94a3b8',
+                background: 'rgba(0,0,0,0.4)',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                {lat.toFixed(4)}° N, {lng.toFixed(4)}° E
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '4px 10px',
+                  borderRadius: '5px',
+                  background: 'rgba(56, 189, 248, 0.15)',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  color: '#38bdf8',
+                  fontSize: '0.74rem',
+                  fontWeight: 600,
+                  textDecoration: 'none'
+                }}
+              >
+                <span>Open in Google Maps</span>
+                <ExternalLink size={11} />
+              </a>
+              <a
+                href={earthUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '4px 10px',
+                  borderRadius: '5px',
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  color: '#ffffff',
+                  fontSize: '0.74rem',
+                  fontWeight: 600,
+                  textDecoration: 'none'
+                }}
+              >
+                <span>Google Earth 3D</span>
+                <ExternalLink size={11} />
+              </a>
+            </div>
+          </div>
+
+          {/* Interactive Satellite Embed */}
+          <div style={{ width: '100%', height: '220px', position: 'relative' }}>
+            <iframe
+              src={satelliteEmbedUrl}
+              title={`Google Satellite View of ${candidate.name}`}
+              width="100%"
+              height="100%"
+              style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.06)' }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
           </div>
         </div>
 

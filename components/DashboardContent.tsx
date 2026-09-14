@@ -6,6 +6,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { BriefInput } from '@/components/BriefInput';
 import { AgentTimeline } from '@/components/AgentTimeline';
 import { LocationCard } from '@/components/LocationCard';
+import { StudioCard } from '@/components/StudioCard';
 import { LocationDetailModal } from '@/components/LocationDetailModal';
 import { ConversationalPanel } from '@/components/ConversationalPanel';
 import { CompareModal } from '@/components/CompareModal';
@@ -15,6 +16,7 @@ import { FilmmakerOnboardingModal } from '@/components/FilmmakerOnboardingModal'
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   LocationCandidate, 
+  StudioCandidate,
   ResearchSession, 
   ScoutCriteria, 
   FollowUpMessage 
@@ -24,7 +26,10 @@ import {
   DEMO_CANDIDATES, 
   DEMO_ACTIVITY_STEPS, 
   DEMO_SESSION,
-  ADDITIONAL_SUGGESTED_CANDIDATES 
+  DEMO_STUDIO_CANDIDATES,
+  ADDITIONAL_SUGGESTED_CANDIDATES,
+  isStudioScenario,
+  getStudioRecommendations
 } from '@/lib/demoData';
 import { storageService } from '@/lib/services/storage';
 import { 
@@ -43,7 +48,10 @@ import {
   ArrowDown,
   PanelLeftClose,
   PanelLeftOpen,
-  PlusCircle
+  PlusCircle,
+  Building2,
+  ExternalLink,
+  MapPin
 } from 'lucide-react';
 
 export function DashboardContent({ 
@@ -70,6 +78,8 @@ export function DashboardContent({
   // Active Research State
   const [currentSession, setCurrentSession] = useState<ResearchSession | null>(null);
   const [candidates, setCandidates] = useState<LocationCandidate[]>([]);
+  const [studios, setStudios] = useState<StudioCandidate[]>(DEMO_STUDIO_CANDIDATES);
+  const [activeCategory, setActiveCategory] = useState<'all' | 'practical' | 'studios'>('all');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(10);
   const [justCompletedScout, setJustCompletedScout] = useState<boolean>(false);
@@ -186,75 +196,124 @@ export function DashboardContent({
 
   // Handler: Start Scout (or Demo Scout)
   const handleStartScout = async (brief: string, criteria: ScoutCriteria, forceDemo: boolean) => {
+    if (isLoading) return;
+
     setIsLoading(true);
     setJustCompletedScout(false);
     setCurrentStepIndex(0);
     setFollowUpMessages([]);
 
-    const totalSteps = DEMO_ACTIVITY_STEPS.length;
-    let currentStep = 0;
-
-    // Advance through agent steps sequentially so the multi-agent pipeline is visibly experienced
-    const stepTimer = setInterval(() => {
-      if (currentStep < totalSteps - 1) {
-        currentStep += 1;
-        setCurrentStepIndex(currentStep);
+    // 1. Immediately scroll user down to the agent pipeline process so they see multi-agent execution live!
+    setTimeout(() => {
+      const pipelineEl = timelineRef.current || document.getElementById('pipeline-section');
+      if (pipelineEl) {
+        pipelineEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 550);
+    }, 60);
+
+    const totalSteps = DEMO_ACTIVITY_STEPS.length; // 10 steps (indices 0 to 9)
+
+    // 2. Dispatch background API fetch with safety abort controller (14s limit so it never hangs indefinitely)
+    const fetchScoutPromise = (async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 14000);
+
+        const response = await fetch('/api/scout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            brief,
+            criteria,
+            forceDemo: forceDemo || isDemoMode
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`Scout API responded with HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+      } catch (err) {
+        console.warn('[Scout Pipeline] API fetch completed or timed out; activating high-fidelity fallback:', err);
+        return null;
+      }
+    })();
 
     try {
-      const response = await fetch('/api/scout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brief,
-          criteria,
-          forceDemo: forceDemo || isDemoMode
-        })
-      });
-
-      const data = await response.json();
-
-      // Ensure user sees progression up through all intermediary steps
-      while (currentStep < totalSteps - 1) {
-        currentStep += 1;
-        setCurrentStepIndex(currentStep);
-        await new Promise(resolve => setTimeout(resolve, 450));
+      // 3. Smoothly advance through pipeline steps 0 to 8 (~380ms each) so user sees each agent active
+      for (let s = 0; s < totalSteps - 1; s++) {
+        setCurrentStepIndex(s);
+        await new Promise(resolve => setTimeout(resolve, 380));
       }
 
-      clearInterval(stepTimer);
-      // Explicitly set to final step 10: "Preparing Production Shortlist Report"
+      // 4. Arrive at final Step 10 (index 9): "Preparing Production Shortlist Report"
       setCurrentStepIndex(totalSteps - 1);
 
-      // STEP 10 LOADING ANIMATION FIX:
-      // Keep isLoading = true and pause for 1400ms so the active loading animation of report preparation is clearly visible and experienced!
-      await new Promise(resolve => setTimeout(resolve, 1400));
+      // Await the backend scout results (or fallback if timed out/failed)
+      const data = await fetchScoutPromise;
 
-      if (data.success && data.session && Array.isArray(data.session.candidates) && data.session.candidates.length > 0) {
+      // Keep Step 10 actively compiling with its rotating spinner for 1200ms so the user sees the report synthesis complete
+      await new Promise(resolve => setTimeout(resolve, 1200));
+
+      if (data && data.success && data.session && Array.isArray(data.session.candidates) && data.session.candidates.length > 0) {
         setCurrentSession(data.session);
         setCandidates(data.session.candidates);
+        if (data.session.studioRecommendations && data.session.studioRecommendations.length > 0) {
+          setStudios(data.session.studioRecommendations);
+        } else {
+          setStudios(getStudioRecommendations(brief));
+        }
+        if (data.session.isStudioRecommended || isStudioScenario(brief)) {
+          setActiveCategory('studios');
+        } else {
+          setActiveCategory('all');
+        }
         storageService.saveSession(data.session, user?.id);
       } else {
-        console.warn('Scout returned incomplete session or error, falling back to curated candidates:', data?.error);
-        setCurrentSession(DEMO_SESSION);
+        // Guaranteed fallback with studio scenario detection
+        const fallbackStudioNeeded = isStudioScenario(brief);
+        const fallbackStudios = getStudioRecommendations(brief);
+        const fallbackSession: ResearchSession = {
+          ...DEMO_SESSION,
+          id: `session-${Date.now()}`,
+          userBrief: brief,
+          criteria,
+          candidates: DEMO_CANDIDATES,
+          isStudioRecommended: fallbackStudioNeeded,
+          studioRecommendations: fallbackStudioNeeded ? fallbackStudios : undefined
+        };
+        setCurrentSession(fallbackSession);
         setCandidates(DEMO_CANDIDATES);
+        setStudios(fallbackStudios);
+        if (fallbackStudioNeeded) {
+          setActiveCategory('studios');
+        } else {
+          setActiveCategory('all');
+        }
+        storageService.saveSession(fallbackSession, user?.id);
       }
     } catch (err) {
-      console.error('Scout request failed:', err);
-      clearInterval(stepTimer);
-      setCurrentStepIndex(totalSteps - 1);
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      // Fallback
+      console.error('[Scout Pipeline] Pipeline execution error:', err);
       setCurrentSession(DEMO_SESSION);
       setCandidates(DEMO_CANDIDATES);
+      setStudios(getStudioRecommendations(brief));
     } finally {
+      // 5. Complete Step 10: isLoading = false marks all 10 steps green checkmarked, 100% complete!
       setIsLoading(false);
       setJustCompletedScout(true);
 
-      // Pause briefly so user can see completed 100% pipeline before gentle smooth scroll to shortlist
+      // 6. Automatically and smoothly navigate user down to the shortlist results!
       setTimeout(() => {
-        shortlistRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 1000);
+        const shortlistEl = shortlistRef.current || document.getElementById('shortlist-section');
+        if (shortlistEl) {
+          shortlistEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 750);
     }
   };
 
@@ -267,6 +326,15 @@ export function DashboardContent({
 
     // 2. Dispatch prompt to agent
     handleSendMessage(`Tell me more about filming permissions, logistical access, and production risks for ${cand.name}.`);
+  };
+
+  // Handler: Ask Agent about a studio stage
+  const handleAskAboutStudio = (studio: StudioCandidate) => {
+    setTimeout(() => {
+      conversationalRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
+
+    handleSendMessage(`Tell me more about stage booking protocols, Unreal Engine LED volume setup, and day rates for ${studio.name}.`);
   };
 
   // Handler: Follow-up query / re-ranking
@@ -726,7 +794,7 @@ export function DashboardContent({
             />
 
             {/* Agent Activity Stepped Timeline */}
-            <div ref={timelineRef} id="pipeline-section" style={{ scrollMarginTop: '20px' }}>
+            <div ref={timelineRef} id="pipeline-section" style={{ scrollMarginTop: '80px' }}>
               <AgentTimeline
                 steps={currentSession?.activity || DEMO_ACTIVITY_STEPS}
                 currentStepIndex={currentStepIndex}
@@ -792,23 +860,138 @@ export function DashboardContent({
             )}
 
             {/* Candidate Shortlist Section */}
-            <div ref={shortlistRef} id="shortlist-section" className="studio-shortlist" style={{ scrollMarginTop: '24px', marginBottom: '40px' }}>
+            <div ref={shortlistRef} id="shortlist-section" className="studio-shortlist" style={{ scrollMarginTop: '80px', marginBottom: '40px' }}>
+              {/* Studio & Virtual Production Intelligence Banner if applicable */}
+              {(currentSession?.isStudioRecommended || isStudioScenario(currentSession?.userBrief || '')) && (
+                <div style={{
+                  marginBottom: '22px',
+                  padding: '16px 20px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(56, 189, 248, 0.12) 100%)',
+                  border: '1px solid rgba(245, 158, 11, 0.35)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '14px',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.3)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '10px',
+                      background: 'rgba(245, 158, 11, 0.2)',
+                      border: '1px solid rgba(245, 158, 11, 0.45)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <Building2 size={22} color="#fbbf24" />
+                    </div>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <strong style={{ fontSize: '1.02rem', color: '#ffffff' }}>Studio & Virtual Production Intelligence Activated</strong>
+                        <span className="badge badge-gold" style={{ fontSize: '0.66rem' }}>StageCraft / LED Volume / Backlots</span>
+                      </div>
+                      <p style={{ color: '#cbd5e1', fontSize: '0.84rem', marginTop: '3px', maxWidth: '850px', lineHeight: 1.45 }}>
+                        {currentSession?.studioSuitabilityReason || "This scene requires complex VFX, futuristic cityscapes, alien worlds, or large-scale mythological warfare best staged in specialized LED volumes or secure backlots rather than practical public land."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCategory('studios')}
+                      className="btn-cinema btn-primary"
+                      style={{ fontSize: '0.82rem', padding: '7px 16px' }}
+                    >
+                      <Building2 size={14} />
+                      <span>View Recommended Studios ({studios.length})</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="studio-shortlist-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                     <h3 className="font-display" style={{ fontSize: '1.65rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
-                      Synthesized Candidate Shortlist
+                      Production Scouting Shortlist
                     </h3>
                     <span className="badge badge-gold" style={{ fontSize: '0.72rem' }}>
-                      {candidates.length} Verified
+                      {activeCategory === 'studios' ? `${studios.length} Studios` : activeCategory === 'practical' ? `${candidates.length} Locations` : `${candidates.length + studios.length} Options`}
                     </span>
                   </div>
                   <p style={{ color: '#94a3b8', fontSize: '0.88rem', marginTop: '4px' }}>
-                    Multi-criteria scored across aesthetic match, road & power accessibility, evidence grounding, and permit risk.
+                    Multi-criteria scored across aesthetic match, road & power accessibility, real Google Satellite recon, and permit feasibility.
                   </p>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  {/* Category Switcher Tabs */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '8px',
+                    padding: '3px'
+                  }}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCategory('all')}
+                      style={{
+                        background: activeCategory === 'all' ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                        color: activeCategory === 'all' ? '#ffffff' : '#94a3b8',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '5px 12px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      All ({candidates.length + studios.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCategory('practical')}
+                      style={{
+                        background: activeCategory === 'practical' ? '#0284c7' : 'transparent',
+                        color: activeCategory === 'practical' ? '#ffffff' : '#94a3b8',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '5px 12px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      📍 Locations ({candidates.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCategory('studios')}
+                      style={{
+                        background: activeCategory === 'studios' ? '#d38a45' : 'transparent',
+                        color: activeCategory === 'studios' ? '#ffffff' : '#94a3b8',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '5px 12px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      🎬 Studios & Stages ({studios.length})
+                    </button>
+                  </div>
+
                   {/* Suggest More Action Button */}
                   <button
                     type="button"
@@ -852,22 +1035,62 @@ export function DashboardContent({
                 </div>
               </div>
 
-              {/* Candidate Cards Grid */}
-              <div className="studio-card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
-                {candidates.map((candidate, idx) => (
-                  <LocationCard
-                    key={candidate.id}
-                    candidate={candidate}
-                    rankIndex={idx}
-                    onViewDetails={handleViewDetails}
-                    onToggleSave={handleToggleSave}
-                    isSaved={storageService.isSaved(candidate.id)}
-                    onToggleCompare={handleToggleCompare}
-                    isCompared={compareIds.includes(candidate.id)}
-                    onAskAbout={(cand) => handleAskAbout(cand)}
-                  />
-                ))}
-              </div>
+              {/* Section 1: Studio Candidates (if activeCategory is 'studios' or 'all') */}
+              {(activeCategory === 'studios' || (activeCategory === 'all' && (currentSession?.isStudioRecommended || isStudioScenario(currentSession?.userBrief || '')))) && (
+                <div style={{ marginBottom: '32px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                    <Building2 size={18} color="#fbbf24" />
+                    <h4 className="font-display" style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff' }}>
+                      Recommended Film Studios & Virtual Production Stages
+                    </h4>
+                    <span className="badge badge-gold" style={{ fontSize: '0.7rem' }}>
+                      {studios.length} Stages
+                    </span>
+                  </div>
+                  <div className="studio-card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+                    {studios.map((studio) => (
+                      <StudioCard
+                        key={studio.id}
+                        studio={studio}
+                        onAskAboutStudio={handleAskAboutStudio}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Section 2: Practical Locations (if activeCategory is 'practical' or 'all') */}
+              {(activeCategory === 'practical' || activeCategory === 'all') && (
+                <div>
+                  {activeCategory === 'all' && (currentSession?.isStudioRecommended || isStudioScenario(currentSession?.userBrief || '')) && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', marginTop: '20px' }}>
+                      <MapPin size={18} color="#38bdf8" />
+                      <h4 className="font-display" style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff' }}>
+                        Practical Real-World Location Candidates
+                      </h4>
+                      <span className="badge badge-ice" style={{ fontSize: '0.7rem' }}>
+                        {candidates.length} Locations
+                      </span>
+                    </div>
+                  )}
+                  {/* Candidate Cards Grid */}
+                  <div className="studio-card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+                    {candidates.map((candidate, idx) => (
+                      <LocationCard
+                        key={candidate.id}
+                        candidate={candidate}
+                        rankIndex={idx}
+                        onViewDetails={handleViewDetails}
+                        onToggleSave={handleToggleSave}
+                        isSaved={storageService.isSaved(candidate.id)}
+                        onToggleCompare={handleToggleCompare}
+                        isCompared={compareIds.includes(candidate.id)}
+                        onAskAbout={(cand) => handleAskAbout(cand)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Reference Anchor for Newly Added Candidates */}
               <div ref={newlyAddedRef} style={{ scrollMarginTop: '60px' }} />

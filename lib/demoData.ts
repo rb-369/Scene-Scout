@@ -1,4 +1,4 @@
-import { LocationCandidate, AgentActivityStep, ResearchSession } from './types';
+import { LocationCandidate, AgentActivityStep, ResearchSession, StudioCandidate } from './types';
 
 export const DEMO_BRIEF = 
   "Find 5 warehouse or industrial-style filming locations in Mumbai suitable for a thriller scene. Prioritize strong visual match, realistic accessibility, useful public information, and low production risk. Include location details, why it matches the scene, potential filming restrictions or uncertainties, contact information if publicly available, and sources.";
@@ -92,7 +92,10 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       }
     ],
     image: "/images/cinema_warehouse_still.jpg",
-    cameraPackage: "ARRI Alexa 35 · 35mm Master Prime"
+    cameraPackage: "ARRI Alexa 35 · 35mm Master Prime",
+    coordinates: { lat: 18.9138, lng: 72.8242 },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Mukesh+Mills+Colaba+Mumbai",
+    googleEarthUrl: "https://earth.google.com/web/search/Mukesh+Mills+Colaba+Mumbai"
   },
   {
     id: "loc-mumbai-02",
@@ -182,7 +185,10 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       }
     ],
     image: "/images/cinema_cotton_godown.jpg",
-    cameraPackage: "ARRI Alexa Mini LF · Cooke Anamorphic 40mm"
+    cameraPackage: "ARRI Alexa Mini LF · Cooke Anamorphic 40mm",
+    coordinates: { lat: 18.9866, lng: 72.8538 },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Cotton+Green+Port+Trust+Godowns+Mumbai",
+    googleEarthUrl: "https://earth.google.com/web/search/Cotton+Green+Port+Trust+Godowns+Mumbai"
   },
   {
     id: "loc-mumbai-03",
@@ -260,7 +266,10 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       }
     ],
     image: "/images/cinema_freight_yard.jpg",
-    cameraPackage: "RED V-Raptor XL 8K · Canon K-35 Vintage 24mm"
+    cameraPackage: "RED V-Raptor XL 8K · Canon K-35 Vintage 24mm",
+    coordinates: { lat: 18.9734, lng: 72.8465 },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Darukhana+Reay+Road+Timber+Yards+Mumbai",
+    googleEarthUrl: "https://earth.google.com/web/search/Darukhana+Reay+Road+Timber+Yards+Mumbai"
   },
   {
     id: "loc-mumbai-04",
@@ -338,7 +347,10 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       }
     ],
     image: "/images/cinema_freight_yard.jpg",
-    cameraPackage: "Sony FX9 · Fujinon Premista 28-100mm Zoom"
+    cameraPackage: "Sony FX9 · Fujinon Premista 28-100mm Zoom",
+    coordinates: { lat: 18.9984, lng: 72.8622 },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Sewri+Container+Freight+Station+Mumbai",
+    googleEarthUrl: "https://earth.google.com/web/search/Sewri+Container+Freight+Station+Mumbai"
   },
   {
     id: "loc-mumbai-05",
@@ -417,7 +429,10 @@ export const DEMO_CANDIDATES: LocationCandidate[] = [
       }
     ],
     image: "/images/cinema_warehouse_still.jpg",
-    cameraPackage: "ARRI Alexa 35 · Zeiss Supreme Prime 29mm"
+    cameraPackage: "ARRI Alexa 35 · Zeiss Supreme Prime 29mm",
+    coordinates: { lat: 18.9862, lng: 72.8228 },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Shakti+Mills+Mahalaxmi+Mumbai",
+    googleEarthUrl: "https://earth.google.com/web/search/Shakti+Mills+Mahalaxmi+Mumbai"
   }
 ];
 
@@ -498,7 +513,10 @@ export const ADDITIONAL_SUGGESTED_CANDIDATES: LocationCandidate[] = [
       }
     ],
     image: "/images/cinema_naval_drydock.jpg",
-    cameraPackage: "RED Monstro 8K VV · Panavision C-Series 50mm Anamorphic"
+    cameraPackage: "RED Monstro 8K VV · Panavision C-Series 50mm Anamorphic",
+    coordinates: { lat: 18.9667, lng: 72.8500 },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Mazagon+Dock+Shipbuilders+Mumbai",
+    googleEarthUrl: "https://earth.google.com/web/search/Mazagon+Dock+Shipbuilders+Mumbai"
   },
   {
     id: "loc-mumbai-07",
@@ -576,7 +594,10 @@ export const ADDITIONAL_SUGGESTED_CANDIDATES: LocationCandidate[] = [
       }
     ],
     image: "/images/cinema_chemical_plant.jpg",
-    cameraPackage: "Sony Venice 2 · Zeiss Master Anamorphic 35mm"
+    cameraPackage: "Sony Venice 2 · Zeiss Master Anamorphic 35mm",
+    coordinates: { lat: 19.1982, lng: 72.9467 },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Wagle+Industrial+Estate+Thane+Mumbai",
+    googleEarthUrl: "https://earth.google.com/web/search/Wagle+Industrial+Estate+Thane+Mumbai"
   },
   {
     id: "loc-mumbai-08",
@@ -654,7 +675,10 @@ export const ADDITIONAL_SUGGESTED_CANDIDATES: LocationCandidate[] = [
       }
     ],
     image: "/images/cinema_freight_yard.jpg",
-    cameraPackage: "ARRI Amira · Angenieux Optimo Ultra 24-290mm"
+    cameraPackage: "ARRI Amira · Angenieux Optimo Ultra 24-290mm",
+    coordinates: { lat: 19.0657, lng: 72.8793 },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Kurla+Railway+Yard+Mumbai",
+    googleEarthUrl: "https://earth.google.com/web/search/Kurla+Railway+Yard+Mumbai"
   },
   {
     id: "loc-mumbai-09",
@@ -732,7 +756,10 @@ export const ADDITIONAL_SUGGESTED_CANDIDATES: LocationCandidate[] = [
       }
     ],
     image: "/images/cinema_coastal_outpost.jpg",
-    cameraPackage: "Sony Venice 2 · Hawk V-Lite 45mm Anamorphic"
+    cameraPackage: "Sony Venice 2 · Cooke S7/i 40mm",
+    coordinates: { lat: 19.0200, lng: 72.8730 },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Wadala+Salt+Pans+Mumbai",
+    googleEarthUrl: "https://earth.google.com/web/search/Wadala+Salt+Pans+Mumbai"
   },
   {
     id: "ballard-pier",
@@ -1000,3 +1027,318 @@ export const DEMO_SESSION: ResearchSession = {
   summary: "18 candidate industrial sites in Mumbai were researched across municipal port records, film commission archives, and location guilds. 5 high-potential locations have been shortlisted and ranked based on visual match, crew logistics, and legal clarity.",
   createdAt: new Date().toISOString()
 };
+
+/* ==========================================================================
+   WORLD-CLASS STUDIO STAGES & VIRTUAL PRODUCTION BACKLOT DATASET
+   Specifically curated for scenes that CANNOT or SHOULD NOT be shot on practical
+   locations (e.g. Futuristic Cyberpunk Cities, Alien Planets, Mythological War)
+   ========================================================================== */
+
+export const DEMO_STUDIO_CANDIDATES: StudioCandidate[] = [
+  {
+    id: "studio-ramoji-01",
+    name: "Ramoji Film City - Epic Battlefield Backlot & Soundstage 18",
+    city: "Hyderabad",
+    country: "India",
+    stageType: "Mythological Battlefield Backlot & Soundstage Complex (2,000 Acres)",
+    bestForGenres: [
+      "Mythological Warfare",
+      "Ancient War Chariot Battles",
+      "Historical Period Epics",
+      "Fantasy Fortress Sieges"
+    ],
+    description: "The world's largest integrated film city (Guinness World Record, 2,000+ acres). Features expansive natural rugged terrain, permanent stone battlements, ancient fortress replicas, full chariot armory, and 47 acoustic soundstages.",
+    whyStudioRecommended: "Shooting high-scale mythological warfare (hundreds of armored warriors, stunt cavalry, practical pyrotechnic blasts, and massive siege engines) on public lands is legally and logistically prohibitive. Ramoji provides 2,000 acres of fully controlled, private battle ground with permanent staging infrastructure and stunt safety cordons.",
+    dimensions: "2,000-acre exterior backlot + 40,000 sq ft soundstage (50ft clear height)",
+    capabilities: [
+      "Massive open-air dirt battle plains suitable for 100+ war horses & 5,000 extras",
+      "Permanent stone fortress, palace courtyard, and temple facades",
+      "Full armory with authentic period weapons, shields, and war chariots",
+      "47 Soundstages with NC-25 acoustic isolation and heavy stunt wire grids",
+      "In-house pyrotechnic blast permits & dedicated emergency fire/medical tenders"
+    ],
+    notableProductions: [
+      "Baahubali: The Beginning & The Conclusion",
+      "Kalki 2898 AD (Ancient Kasi Sequences)",
+      "RRR (Climactic Compound Battle)",
+      "Ponniyin Selvan I & II",
+      "Razia Sultan"
+    ],
+    estimatedTariff: "₹1,80,000 - ₹3,50,000 / day (Battlefield Backlot + Mega Stage)",
+    soundRating: "NC-25 (Indoor Stages) / Controlled Aerial Buffer",
+    powerCapacity: "5,000 kVA dedicated substation with redundant diesel gensets",
+    coordinates: {
+      lat: 17.2543,
+      lng: 78.6808
+    },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Ramoji+Film+City+Hyderabad",
+    googleEarthUrl: "https://earth.google.com/web/search/Ramoji+Film+City+Hyderabad",
+    image: "/images/cinema_coastal_outpost.jpg",
+    contactDetails: {
+      phone: "+91 8415 246555",
+      email: "filmshoots@ramojifilmcity.com",
+      officeDesk: "Ramoji Film City Production & Backlot Bookings, Abdullahpurmet, Hyderabad",
+      notes: "Dedicated line producer liaison provided; 72-hour notice for special pyrotechnic approvals."
+    }
+  },
+  {
+    id: "studio-trilith-02",
+    name: "Trilith Studios & Prysm Stages - Virtual Production LED Volume",
+    city: "Atlanta (Fayetteville, GA)",
+    country: "United States",
+    stageType: "Virtual Production In-Camera VFX (ICVFX) LED Volume",
+    bestForGenres: [
+      "Futuristic Cyberpunk Metropolis",
+      "Alien Planetary Surfaces",
+      "Deep Space Odyssey & Spaceships",
+      "High-Concept Sci-Fi Thrillers"
+    ],
+    description: "Premier production home of the Marvel Cinematic Universe, featuring an industry-leading 80-foot curved Unreal Engine 5.4 LED Volume with real-time in-camera parallax, dynamic ceiling lighting, and optical camera tracking.",
+    whyStudioRecommended: "Futuristic neon metropolises and surreal alien planetary surfaces (with purple atmospheric haze, multiple moons, and floating monolithic geometry) cannot physically exist on Earth. Shooting inside Trilith's LED Volume captures real-time photorealistic reflections on actors' costumes and skin without green-screen spill or expensive post-production rotoscoping.",
+    dimensions: "18,000 sq ft Stage footprint · 80ft diameter curved LED wall · 40ft clear ceiling",
+    capabilities: [
+      "Unreal Engine 5.4 live virtual environment rendering with sub-millimeter parallax",
+      "1.5mm pixel pitch curved LED wall with 10-bit HDR cinema color fidelity",
+      "Dynamic motorized LED ceiling panels for authentic interactive environment lighting",
+      "Sub-millimeter Vicon & OptiTrack optical camera tracking synchronized with cinema cameras",
+      "Direct ARRI Alexa 35 & RED V-Raptor genlock synchronization"
+    ],
+    notableProductions: [
+      "Avengers: Infinity War & Endgame",
+      "Spider-Man: No Way Home",
+      "Guardians of the Galaxy Vol. 3",
+      "Loki (Time Variance Authority & Alien Citadel Sets)",
+      "Black Panther: Wakanda Forever"
+    ],
+    estimatedTariff: "$28,000 - $48,000 / day (LED Volume + Unreal Engine Technical Crew)",
+    soundRating: "NC-20 (Whisper-Quiet Sync Sound Certification)",
+    powerCapacity: "3,000A 3-Phase Camlock Drops per quadrant",
+    coordinates: {
+      lat: 33.4735,
+      lng: -84.5072
+    },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Trilith+Studios+Fayetteville+Georgia",
+    googleEarthUrl: "https://earth.google.com/web/search/Trilith+Studios+Fayetteville+Georgia",
+    image: "/images/cinema_warehouse_still.jpg",
+    contactDetails: {
+      phone: "+1 678 369 5900",
+      email: "stages@trilithstudios.com",
+      officeDesk: "Trilith Studios Operations Desk, 461 Sandy Creek Rd, Fayetteville, GA 30214",
+      notes: "Unreal Engine environment assets must be pre-calibrated with Prysm Virtual Production engineers 5 days prior."
+    }
+  },
+  {
+    id: "studio-leavesden-03",
+    name: "Warner Bros. Studios Leavesden - Stage D & Deep Water Tank",
+    city: "Watford, Hertfordshire",
+    country: "United Kingdom",
+    stageType: "Giant Acoustic Soundstage with 250,000-Gallon Underwater Tank",
+    bestForGenres: [
+      "Alien Ocean Planets",
+      "Underwater Sci-Fi & Submarine Ruins",
+      "Epic High-Ceiling Stunt Wire Sequences",
+      "Grand Period & Fantasy Architecture"
+    ],
+    description: "Iconic UK production epicenter featuring 19 soundstages, Europe's largest heated underwater filming tank (250,000 gallons), and a 100-foot-tall exterior VFX backlot.",
+    whyStudioRecommended: "Alien ocean surfaces or deep-water sci-fi environments require crystal-clear, temperature-controlled water filtration, specialized scuba camera operators, and heavy overhead stunt winches that are dangerous and unpredictable in open oceanic conditions.",
+    dimensions: "33,600 sq ft column-free stage · 45ft clear height · 250,000-gallon heated tank (60ft x 75ft x 20ft deep)",
+    capabilities: [
+      "250,000-gallon crystal-clear heated water tank with submerged camera portals",
+      "Heavy-duty motorized stunt flying truss system rated for high-velocity wire-work",
+      "NC-20 acoustic rating suitable for whisper-quiet sync sound dialogues",
+      "Full 360-degree blue/green screen cyclorama integration",
+      "Massive basecamp capacity accommodating up to 60 production trailers"
+    ],
+    notableProductions: [
+      "The Batman (Flooded Gotham Sequences)",
+      "Harry Potter Series (Triwizard Lake Sequences)",
+      "Barbie",
+      "House of the Dragon",
+      "Edge of Tomorrow (Futuristic Combat Drops)"
+    ],
+    estimatedTariff: "£18,000 - £32,000 / day (Soundstage + Water Operations)",
+    soundRating: "NC-20 Certified",
+    powerCapacity: "4,000A 415V 3-Phase Industrial Supply",
+    coordinates: {
+      lat: 51.6914,
+      lng: -0.4181
+    },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Warner+Bros+Studios+Leavesden+UK",
+    googleEarthUrl: "https://earth.google.com/web/search/Warner+Bros+Studios+Leavesden+UK",
+    image: "/images/cinema_maritime_berth.jpg",
+    contactDetails: {
+      phone: "+44 20 3427 7777",
+      email: "commercialfilming@wbsl.com",
+      officeDesk: "Warner Bros. Studios Leavesden, Warner Dr, Leavesden, Watford WD25 7LP",
+      notes: "Commercial filming bookings coordinated via Warner Bros. Stage Operations; safety diver team included."
+    }
+  },
+  {
+    id: "studio-filmcity-04",
+    name: "Dadasaheb Phalke Chitranagari (Film City) - Studio Stage 1 & Temple Backlot",
+    city: "Mumbai (Goregaon East)",
+    country: "India",
+    stageType: "520-Acre Multi-Stage Complex with Temple & Fort Facades",
+    bestForGenres: [
+      "Indian Mythological Battles",
+      "Ancient Temple & Royal Court Sequences",
+      "High-Concept Supernatural Thrillers",
+      "Controlled Action & Wire Stunts"
+    ],
+    description: "Mumbai's central film production hub sprawling over 520 acres at the edge of Sanjay Gandhi National Park. Contains 16 fully equipped soundstages, outdoor helipads, temple complexes, and historic fort ramparts.",
+    whyStudioRecommended: "Enables filmmakers needing mythological or period battle sets to work within Mumbai city limits with immediate access to Bollywood stunt masters, horse handlers, specialized armories, and union crew guilds under single-window government clearances.",
+    dimensions: "520-acre studio campus · Soundstages up to 25,000 sq ft · 36ft grid height",
+    capabilities: [
+      "16 Soundstages with direct drive-in access for lighting cranes and grip trucks",
+      "Permanent ancient temple steps, historic court facades, and natural lakeside backdrops",
+      "Specialized stunt harness anchor points tested for aerial wire combat",
+      "Single-window clearance through Maharashtra Film Development Corporation (MFDC)",
+      "Secure private perimeter with 24/7 armed security and staging space for 40+ vanity vans"
+    ],
+    notableProductions: [
+      "Brahmāstra: Part One – Shiva",
+      "Tanhaji: The Unsung Warrior",
+      "Bajirao Mastani",
+      "Mahabharat (Epic Television Series)",
+      "Devdas"
+    ],
+    estimatedTariff: "₹90,000 - ₹1,80,000 / 12-hr shift (Soundstage + Outdoor Compound)",
+    soundRating: "Acoustically insulated indoor stages / Natural ambient buffer outdoors",
+    powerCapacity: "2,000 kVA dedicated grid tie-in + twin 125 kVA generator backups",
+    coordinates: {
+      lat: 19.1625,
+      lng: 72.8856
+    },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Dadasaheb+Phalke+Chitranagari+Film+City+Mumbai",
+    googleEarthUrl: "https://earth.google.com/web/search/Dadasaheb+Phalke+Chitranagari+Film+City+Mumbai",
+    image: "/images/cinema_cotton_godown.jpg",
+    contactDetails: {
+      phone: "+91 22 2840 1533",
+      email: "booking@filmcitymumbai.gov.in",
+      officeDesk: "Maharashtra Film Stage & Cultural Development Corp, Film City, Goregaon (East), Mumbai 400065",
+      notes: "Single-window online clearance through Film City portal; discounts available for student productions."
+    }
+  },
+  {
+    id: "studio-annapurna-05",
+    name: "Annapurna Studios - ANR In-Camera VFX (ICVFX) Virtual Stage",
+    city: "Hyderabad (Banjara Hills)",
+    country: "India",
+    stageType: "Cutting-Edge Curved LED Volume for Virtual Production",
+    bestForGenres: [
+      "Futuristic Cyberpunk Neo-Cities",
+      "Surreal Alien Planetary Landscapes",
+      "Sci-Fi Spacecraft Interiors",
+      "High-Tech Pan-Indian Cinema"
+    ],
+    description: "South Asia's leading virtual production soundstage featuring a 60-foot curved 2.3mm pixel pitch LED wall powered by Unreal Engine 5.4, Brompton processing, and Mo-Sys optical camera tracking.",
+    whyStudioRecommended: "Provides Indian and international cinema productions with Hollywood-caliber LED Volume capabilities at highly competitive day rates, allowing instant scene transitions from a neon futuristic skyline to a barren alien surface in the same shooting shift.",
+    dimensions: "12,000 sq ft soundstage · 60ft curved LED wall · 28ft ceiling height",
+    capabilities: [
+      "Unreal Engine 5.4 virtual production environment rendering pipeline",
+      "Brompton SX40 processors delivering true cinema color gamut and HDR",
+      "Mo-Sys StarTracker optical tracking system with zero sensor drift",
+      "Fully integrated DMX lighting automation that syncs stage lights with virtual sky",
+      "Acoustically treated NC-22 soundstage for clean synchronized audio"
+    ],
+    notableProductions: [
+      "Kalki 2898 AD (Virtual Production Units)",
+      "Major",
+      "High-concept pan-Indian sci-fi sequences"
+    ],
+    estimatedTariff: "₹2,20,000 - ₹3,60,000 / day (LED Volume + Technicians)",
+    soundRating: "NC-22 Certified",
+    powerCapacity: "1,500 kVA dedicated clean power with uninterruptible battery backup",
+    coordinates: {
+      lat: 17.4300,
+      lng: 78.4350
+    },
+    googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Annapurna+Studios+Banjara+Hills+Hyderabad",
+    googleEarthUrl: "https://earth.google.com/web/search/Annapurna+Studios+Banjara+Hills+Hyderabad",
+    image: "/images/cinema_warehouse_still.jpg",
+    contactDetails: {
+      phone: "+91 40 2355 5555",
+      email: "vp@annapurnastudios.com",
+      officeDesk: "Annapurna Studios Virtual Production Division, Road No. 2, Banjara Hills, Hyderabad 500034",
+      notes: "Virtual environment pre-visualization and asset ingestion support provided by in-house technicians."
+    }
+  }
+];
+
+/**
+ * Intelligent helper: Detect if a user brief requires a studio or virtual production stage
+ */
+export function isStudioScenario(brief: string): boolean {
+  const lower = (brief || '').toLowerCase();
+  const studioKeywords = [
+    'studio',
+    'soundstage',
+    'sound stage',
+    'futuristic',
+    'cyberpunk',
+    'sci-fi',
+    'scifi',
+    'alien planet',
+    'alien world',
+    'alien',
+    'spaceship',
+    'space craft',
+    'deep space',
+    'zero gravity',
+    'mythological',
+    'mythology',
+    'mythic',
+    'kurukshetra',
+    'mahabharat',
+    'war scene',
+    'battlefield',
+    'epic war',
+    'epic battle',
+    'chariot',
+    'fantasy kingdom',
+    'virtual production',
+    'led volume',
+    'stagecraft',
+    'green screen',
+    'blue screen',
+    'underwater tank',
+    'vfx heavy'
+  ];
+
+  return studioKeywords.some(keyword => lower.includes(keyword));
+}
+
+/**
+ * Filter and rank studio candidates matching a specific scene brief
+ */
+export function getStudioRecommendations(brief: string): StudioCandidate[] {
+  const lower = (brief || '').toLowerCase();
+
+  // If mythological or ancient war
+  if (lower.includes('mytholog') || lower.includes('war') || lower.includes('battle') || lower.includes('chariot') || lower.includes('kurukshetra')) {
+    return [
+      DEMO_STUDIO_CANDIDATES[0], // Ramoji Film City
+      DEMO_STUDIO_CANDIDATES[3], // Film City Mumbai
+      DEMO_STUDIO_CANDIDATES[2], // Leavesden
+      DEMO_STUDIO_CANDIDATES[4]  // Annapurna
+    ];
+  }
+
+  // If underwater or ocean
+  if (lower.includes('water') || lower.includes('ocean') || lower.includes('submerged') || lower.includes('submarine')) {
+    return [
+      DEMO_STUDIO_CANDIDATES[2], // Leavesden (Deep water tank)
+      DEMO_STUDIO_CANDIDATES[1], // Trilith
+      DEMO_STUDIO_CANDIDATES[0], // Ramoji
+      DEMO_STUDIO_CANDIDATES[4]  // Annapurna
+    ];
+  }
+
+  // Default / Futuristic Sci-Fi / Alien Planet / Cyberpunk
+  return [
+    DEMO_STUDIO_CANDIDATES[1], // Trilith Studios (LED Volume)
+    DEMO_STUDIO_CANDIDATES[4], // Annapurna (ICVFX)
+    DEMO_STUDIO_CANDIDATES[0], // Ramoji (Massive Scale)
+    DEMO_STUDIO_CANDIDATES[2]  // Leavesden
+  ];
+}

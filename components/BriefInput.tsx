@@ -527,6 +527,32 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
             >
               <span>🏚️ Heritage Mill Ruins</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => handleQuickPrompt(
+                "We need to shoot a massive mythological war scene with 5,000 armored soldiers, chariot cavalry charges, practical explosions, and towering ancient stone battlements. Recommend suitable backlot studios and locations.",
+                "Hyderabad / Mumbai",
+                "Mythological War & Ancient Fortress Siege"
+              )}
+              className="preset-chip"
+              style={{ borderColor: 'rgba(245, 158, 11, 0.4)', background: 'rgba(245, 158, 11, 0.08)' }}
+            >
+              <span>⚔️ Mythological War Epic (Studio Backlots)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleQuickPrompt(
+                "High-concept sci-fi scene set in a futuristic neon cyberpunk metropolis and an alien planet surface with purple atmospheric haze. Need top virtual production soundstages or Unreal Engine LED Volumes with StageCraft.",
+                "Virtual Production / Global",
+                "Futuristic Cyberpunk & Alien Planet (LED Volume)"
+              )}
+              className="preset-chip"
+              style={{ borderColor: 'rgba(56, 189, 248, 0.4)', background: 'rgba(56, 189, 248, 0.08)' }}
+            >
+              <span>🚀 Futuristic Sci-Fi / Alien Planet (Virtual LED Volume)</span>
+            </button>
           </div>
         </div>
       </div>

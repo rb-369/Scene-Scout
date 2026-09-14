@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parallelClient } from '@/lib/services/parallel';
 import { geminiService } from '@/lib/services/gemini';
-import { DEMO_BRIEF, DEMO_CANDIDATES, DEMO_ACTIVITY_STEPS } from '@/lib/demoData';
+import { DEMO_BRIEF, DEMO_CANDIDATES, DEMO_ACTIVITY_STEPS, isStudioScenario, getStudioRecommendations } from '@/lib/demoData';
 import { ScoutCriteria, LocationCandidate, AgentActivityStep, ResearchSession } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
@@ -34,6 +34,14 @@ export async function POST(req: NextRequest) {
         timestamp: `00:${(idx * 2 + 1).toString().padStart(2, '0')}`
       }));
 
+      const studioNeeded = isStudioScenario(brief);
+      const studioRecs = studioNeeded ? getStudioRecommendations(brief) : undefined;
+      const studioReason = studioNeeded 
+        ? (brief.toLowerCase().includes('mytholog') || brief.toLowerCase().includes('war') || brief.toLowerCase().includes('battle'))
+          ? "Large-scale mythological warfare (hundreds of armored warriors, stunt cavalry charges, and practical explosions) requires dedicated studio backlots with safety cordons rather than public municipal land."
+          : "High-concept sci-fi / alien planetary environments demand In-Camera VFX (ICVFX) LED Volumes to achieve photorealistic reflections, interactive horizon lighting, and zero green-screen spill."
+        : undefined;
+
       const session: ResearchSession = {
         id: `session-${Date.now()}`,
         userBrief: brief,
@@ -45,7 +53,10 @@ export async function POST(req: NextRequest) {
         shortlistedCount: DEMO_CANDIDATES.length,
         mode: 'demo',
         summary: `18 candidate industrial sites in ${criteria.city} were researched across municipal port records, film commission archives, and location guilds. 5 high-potential locations have been shortlisted and ranked based on visual match, crew logistics, and legal clarity.`,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        isStudioRecommended: studioNeeded,
+        studioSuitabilityReason: studioReason,
+        studioRecommendations: studioRecs
       };
 
       return NextResponse.json({
@@ -123,37 +134,48 @@ export async function POST(req: NextRequest) {
           ? parallelResult.sources.slice(idx * 2, idx * 2 + 3)
           : (fallbackDemo?.sources || []);
 
-      return {
-        ...cand,
-        sources: validSources,
-        estimatedTariff: cand.estimatedTariff || fallbackDemo?.estimatedTariff || criteria.budgetRange || '₹60,000 / shift',
-        contactDetails: cand.contactDetails || fallbackDemo?.contactDetails || {
-          phone: '+91 22 6656 4051',
-          email: 'commercialfilming@mumbaiport.gov.in',
-          officeDesk: cand.contactInformation || 'Municipal Ward / Port Filming Cell',
-          notes: 'Standard filming NOC and local precinct notification required.'
-        },
-        visualCharacteristics: Array.isArray(cand.visualCharacteristics) && cand.visualCharacteristics.length > 0
-          ? cand.visualCharacteristics
-          : (fallbackDemo?.visualCharacteristics || ['Authentic cinematic atmosphere', 'Industrial architectural character']),
-        potentialRestrictions: Array.isArray(cand.potentialRestrictions)
-          ? cand.potentialRestrictions
-          : (fallbackDemo?.potentialRestrictions || []),
-        evidenceQuotes: Array.isArray(cand.evidenceQuotes)
-          ? cand.evidenceQuotes
-          : (fallbackDemo?.evidenceQuotes || []),
-        productionConsiderations: {
-          accessibility: cand.productionConsiderations?.accessibility || fallbackDemo?.productionConsiderations?.accessibility || 'Vehicular road access verified',
-          parking: cand.productionConsiderations?.parking || fallbackDemo?.productionConsiderations?.parking || 'Production staging area available',
-          operatingEnvironment: cand.productionConsiderations?.operatingEnvironment || fallbackDemo?.productionConsiderations?.operatingEnvironment || 'Urban industrial area',
-          ownershipStatus: cand.productionConsiderations?.ownershipStatus || fallbackDemo?.productionConsiderations?.ownershipStatus || 'Public / Municipal',
-          potentialRestrictions: Array.isArray(cand.productionConsiderations?.potentialRestrictions)
-            ? cand.productionConsiderations.potentialRestrictions
-            : (cand.potentialRestrictions || []),
-          contactInformation: cand.productionConsiderations?.contactInformation || cand.contactInformation || 'Local Municipal Ward Office'
-        }
-      };
-    });
+        const defaultCoords = [
+          { lat: 18.9138, lng: 72.8242 },
+          { lat: 18.9866, lng: 72.8538 },
+          { lat: 18.9734, lng: 72.8465 },
+          { lat: 18.9984, lng: 72.8622 },
+          { lat: 18.9862, lng: 72.8228 }
+        ];
+
+        return {
+          ...cand,
+          coordinates: cand.coordinates || fallbackDemo?.coordinates || defaultCoords[idx % defaultCoords.length],
+          googleMapsUrl: cand.googleMapsUrl || fallbackDemo?.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${cand.name}, ${cand.area}, ${cand.city}`)}`,
+          googleEarthUrl: cand.googleEarthUrl || fallbackDemo?.googleEarthUrl || `https://earth.google.com/web/search/${encodeURIComponent(`${cand.name} ${cand.area} ${cand.city}`)}`,
+          sources: validSources,
+          estimatedTariff: cand.estimatedTariff || fallbackDemo?.estimatedTariff || criteria.budgetRange || '₹60,000 / shift',
+          contactDetails: cand.contactDetails || fallbackDemo?.contactDetails || {
+            phone: '+91 22 6656 4051',
+            email: 'commercialfilming@mumbaiport.gov.in',
+            officeDesk: cand.contactInformation || 'Municipal Ward / Port Filming Cell',
+            notes: 'Standard filming NOC and local precinct notification required.'
+          },
+          visualCharacteristics: Array.isArray(cand.visualCharacteristics) && cand.visualCharacteristics.length > 0
+            ? cand.visualCharacteristics
+            : (fallbackDemo?.visualCharacteristics || ['Authentic cinematic atmosphere', 'Industrial architectural character']),
+          potentialRestrictions: Array.isArray(cand.potentialRestrictions)
+            ? cand.potentialRestrictions
+            : (fallbackDemo?.potentialRestrictions || []),
+          evidenceQuotes: Array.isArray(cand.evidenceQuotes)
+            ? cand.evidenceQuotes
+            : (fallbackDemo?.evidenceQuotes || []),
+          productionConsiderations: {
+            accessibility: cand.productionConsiderations?.accessibility || fallbackDemo?.productionConsiderations?.accessibility || 'Vehicular road access verified',
+            parking: cand.productionConsiderations?.parking || fallbackDemo?.productionConsiderations?.parking || 'Production staging area available',
+            operatingEnvironment: cand.productionConsiderations?.operatingEnvironment || fallbackDemo?.productionConsiderations?.operatingEnvironment || 'Urban industrial area',
+            ownershipStatus: cand.productionConsiderations?.ownershipStatus || fallbackDemo?.productionConsiderations?.ownershipStatus || 'Public / Municipal',
+            potentialRestrictions: Array.isArray(cand.productionConsiderations?.potentialRestrictions)
+              ? cand.productionConsiderations.potentialRestrictions
+              : (cand.potentialRestrictions || []),
+            contactInformation: cand.productionConsiderations?.contactInformation || cand.contactInformation || 'Local Municipal Ward Office'
+          }
+        };
+      });
 
     pushStep(
       'Cross-Checking Visual Suitability & Logistics',
@@ -173,6 +195,14 @@ export async function POST(req: NextRequest) {
       'scenescout_synthesizer'
     );
 
+    const liveStudioNeeded = isStudioScenario(brief);
+    const liveStudioRecs = liveStudioNeeded ? getStudioRecommendations(brief) : undefined;
+    const liveStudioReason = liveStudioNeeded 
+      ? (brief.toLowerCase().includes('mytholog') || brief.toLowerCase().includes('war') || brief.toLowerCase().includes('battle'))
+        ? "Large-scale mythological warfare (hundreds of armored warriors, stunt cavalry charges, and practical explosions) requires dedicated studio backlots with safety cordons rather than public municipal land."
+        : "High-concept sci-fi / alien planetary environments demand In-Camera VFX (ICVFX) LED Volumes to achieve photorealistic reflections, interactive horizon lighting, and zero green-screen spill."
+      : undefined;
+
     const session: ResearchSession = {
       id: `session-${Date.now()}`,
       userBrief: brief,
@@ -184,7 +214,10 @@ export async function POST(req: NextRequest) {
       shortlistedCount: candidates.length,
       mode: 'live',
       summary: `Autonomous live research completed using Parallel Search API + Gemini. Analyzed ${parallelResult.sources.length || 14} web sources across municipal gazettes and location databases to deliver your ${candidates.length}-candidate shortlist.`,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      isStudioRecommended: liveStudioNeeded,
+      studioSuitabilityReason: liveStudioReason,
+      studioRecommendations: liveStudioRecs
     };
 
     return NextResponse.json({
