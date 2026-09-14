@@ -1,8 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parallelClient } from '@/lib/services/parallel';
 import { geminiService } from '@/lib/services/gemini';
+import { serpApiClient } from '@/lib/services/serpapi';
 import { DEMO_BRIEF, DEMO_CANDIDATES, DEMO_ACTIVITY_STEPS, isStudioScenario, getStudioRecommendations } from '@/lib/demoData';
-import { ScoutCriteria, LocationCandidate, AgentActivityStep, ResearchSession } from '@/lib/types';
+import { ScoutCriteria, LocationCandidate, AgentActivityStep, ResearchSession, StudioCandidate } from '@/lib/types';
+
+
+async function enrichVisuals(
+  candidates: LocationCandidate[],
+  studios: StudioCandidate[] | undefined,
+  defaultCity: string
+): Promise<{ candidates: LocationCandidate[]; studios?: StudioCandidate[] }> {
+  const enrichedCandidates = await Promise.all(
+    candidates.map(async (cand) => {
+      try {
+        const photo = await serpApiClient.getPlacePhoto(cand.name, cand.city || defaultCity);
+        if (photo?.photoUrl) {
+          return {
+            ...cand,
+            image: photo.photoUrl,
+            coordinates: cand.coordinates || photo.coordinates,
+            googleMapsUrl: cand.googleMapsUrl || photo.googleMapsUrl
+          };
+        }
+      } catch (err) {
+        console.warn(`[Visual Enricher] Failed for "${cand.name}":`, err);
+      }
+      return cand;
+    })
+  );
+
+  let enrichedStudios = studios;
+  if (studios && studios.length > 0) {
+    enrichedStudios = await Promise.all(
+      studios.map(async (st) => {
+        try {
+          const photo = await serpApiClient.getPlacePhoto(st.name, st.city);
+          if (photo?.photoUrl) {
+            const updated: StudioCandidate = {
+              ...st,
+              image: photo.photoUrl,
+              coordinates: photo.coordinates || st.coordinates,
+              googleMapsUrl: photo.googleMapsUrl || st.googleMapsUrl
+            };
+            return updated;
+          }
+        } catch (err) {
+          console.warn(`[Visual Enricher] Failed for studio "${st.name}":`, err);
+        }
+        return st;
+      })
+    );
+  }
+
+  return { candidates: enrichedCandidates, studios: enrichedStudios };
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     if (!useLive) {
       // Demo Mode Pipeline
-      console.log('[API /api/scout] Serving high-fidelity Demo Mode pipeline');
+      console.log('[API /api/scout] Serving high-fidelity Demo Mode pipeline with visual enrichment');
       
       const activity: AgentActivityStep[] = DEMO_ACTIVITY_STEPS.map((step, idx) => ({
         ...step,
@@ -35,28 +87,34 @@ export async function POST(req: NextRequest) {
       }));
 
       const studioNeeded = isStudioScenario(brief);
-      const studioRecs = studioNeeded ? getStudioRecommendations(brief) : undefined;
+      const rawStudioRecs = studioNeeded ? getStudioRecommendations(brief) : undefined;
       const studioReason = studioNeeded 
         ? (brief.toLowerCase().includes('mytholog') || brief.toLowerCase().includes('war') || brief.toLowerCase().includes('battle'))
           ? "Large-scale mythological warfare (hundreds of armored warriors, stunt cavalry charges, and practical explosions) requires dedicated studio backlots with safety cordons rather than public municipal land."
           : "High-concept sci-fi / alien planetary environments demand In-Camera VFX (ICVFX) LED Volumes to achieve photorealistic reflections, interactive horizon lighting, and zero green-screen spill."
         : undefined;
 
+      const { candidates: enrichedCandidates, studios: enrichedStudios } = await enrichVisuals(
+        DEMO_CANDIDATES,
+        rawStudioRecs,
+        criteria.city
+      );
+
       const session: ResearchSession = {
         id: `session-${Date.now()}`,
         userBrief: brief,
         criteria,
-        candidates: DEMO_CANDIDATES,
+        candidates: enrichedCandidates,
         activity,
         sourcesConsultedCount: 14,
         candidatesFoundCount: 18,
-        shortlistedCount: DEMO_CANDIDATES.length,
+        shortlistedCount: enrichedCandidates.length,
         mode: 'demo',
-        summary: `18 candidate industrial sites in ${criteria.city} were researched across municipal port records, film commission archives, and location guilds. 5 high-potential locations have been shortlisted and ranked based on visual match, crew logistics, and legal clarity.`,
+        summary: `18 candidate industrial sites in ${criteria.city} were researched across municipal port records, film commission archives, and location guilds. 5 high-potential locations have been shortlisted with official Google Maps visual dossiers.`,
         createdAt: new Date().toISOString(),
         isStudioRecommended: studioNeeded,
         studioSuitabilityReason: studioReason,
-        studioRecommendations: studioRecs
+        studioRecommendations: enrichedStudios
       };
 
       return NextResponse.json({
@@ -196,28 +254,41 @@ export async function POST(req: NextRequest) {
     );
 
     const liveStudioNeeded = isStudioScenario(brief);
-    const liveStudioRecs = liveStudioNeeded ? getStudioRecommendations(brief) : undefined;
+    const rawLiveStudioRecs = liveStudioNeeded ? getStudioRecommendations(brief) : undefined;
     const liveStudioReason = liveStudioNeeded 
       ? (brief.toLowerCase().includes('mytholog') || brief.toLowerCase().includes('war') || brief.toLowerCase().includes('battle'))
         ? "Large-scale mythological warfare (hundreds of armored warriors, stunt cavalry charges, and practical explosions) requires dedicated studio backlots with safety cordons rather than public municipal land."
         : "High-concept sci-fi / alien planetary environments demand In-Camera VFX (ICVFX) LED Volumes to achieve photorealistic reflections, interactive horizon lighting, and zero green-screen spill."
       : undefined;
 
+    // Enrich with official Google Maps visual dossiers via SerpApi
+    const { candidates: enrichedLiveCandidates, studios: enrichedLiveStudios } = await enrichVisuals(
+      candidates,
+      rawLiveStudioRecs,
+      criteria.city
+    );
+
+    pushStep(
+      'Retrieving Official Google Maps Visuals',
+      `Queried official Google Maps imagery via SerpApi for authentic facade photography and verified satellite coordinates.`,
+      'serpapi_visual_enricher'
+    );
+
     const session: ResearchSession = {
       id: `session-${Date.now()}`,
       userBrief: brief,
       criteria,
-      candidates,
+      candidates: enrichedLiveCandidates,
       activity: liveActivity,
       sourcesConsultedCount: parallelResult.sources.length > 0 ? parallelResult.sources.length : 14,
       candidatesFoundCount: candidates.length * 3 + 2,
-      shortlistedCount: candidates.length,
+      shortlistedCount: enrichedLiveCandidates.length,
       mode: 'live',
-      summary: `Autonomous live research completed using Parallel Search API + Gemini. Analyzed ${parallelResult.sources.length || 14} web sources across municipal gazettes and location databases to deliver your ${candidates.length}-candidate shortlist.`,
+      summary: `Autonomous live research completed using Parallel Search API + Gemini. Analyzed ${parallelResult.sources.length || 14} web sources across municipal gazettes and location databases with official Google Maps visual dossiers.`,
       createdAt: new Date().toISOString(),
       isStudioRecommended: liveStudioNeeded,
       studioSuitabilityReason: liveStudioReason,
-      studioRecommendations: liveStudioRecs
+      studioRecommendations: enrichedLiveStudios
     };
 
     return NextResponse.json({

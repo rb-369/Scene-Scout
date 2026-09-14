@@ -14,12 +14,14 @@ import {
   Zap, 
   Volume2, 
   Phone, 
-  Mail,
-  Copy,
-  Check,
-  FileText,
-  Sparkles,
-  Bookmark
+  Mail, 
+  Copy, 
+  Check, 
+  FileText, 
+  Sparkles, 
+  Bookmark,
+  Camera,
+  Globe
 } from 'lucide-react';
 import { LocationCandidate } from '@/lib/types';
 
@@ -37,7 +39,9 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
   isSaved
 }) => {
   const [copiedContact, setCopiedContact] = useState(false);
+  const [reconTab, setReconTab] = useState<'photo' | 'satellite'>('photo');
   if (!candidate) return null;
+
 
   const lat = candidate.coordinates?.lat || 18.9138;
   const lng = candidate.coordinates?.lng || 72.8242;
@@ -226,7 +230,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <MapPin size={15} color="#38bdf8" />
               <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Real Google Maps & Earth Satellite Recon
+                Official Google Maps Visual Dossier
               </span>
               <span style={{
                 fontSize: '0.7rem',
@@ -241,7 +245,59 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
               </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              {/* Photo vs Satellite Toggle */}
+              {candidate.image && (
+                <div style={{
+                  display: 'inline-flex',
+                  background: 'rgba(0,0,0,0.4)',
+                  borderRadius: '6px',
+                  padding: '2px',
+                  border: '1px solid rgba(255,255,255,0.12)'
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => setReconTab('photo')}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      border: 'none',
+                      background: reconTab === 'photo' ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
+                      color: reconTab === 'photo' ? '#38bdf8' : '#94a3b8',
+                      fontSize: '0.72rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <Camera size={11} />
+                    <span>Building Photo</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setReconTab('satellite')}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      border: 'none',
+                      background: reconTab === 'satellite' ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
+                      color: reconTab === 'satellite' ? '#38bdf8' : '#94a3b8',
+                      fontSize: '0.72rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <Globe size={11} />
+                    <span>Satellite Recon</span>
+                  </button>
+                </div>
+              )}
+
               <a
                 href={mapsUrl}
                 target="_blank"
@@ -260,7 +316,7 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
                   textDecoration: 'none'
                 }}
               >
-                <span>Open in Google Maps</span>
+                <span>Google Maps</span>
                 <ExternalLink size={11} />
               </a>
               <a
@@ -281,23 +337,58 @@ export const LocationDetailModal: React.FC<LocationDetailModalProps> = ({
                   textDecoration: 'none'
                 }}
               >
-                <span>Google Earth 3D</span>
+                <span>Earth 3D</span>
                 <ExternalLink size={11} />
               </a>
             </div>
           </div>
 
-          {/* Interactive Satellite Embed */}
-          <div style={{ width: '100%', height: '220px', position: 'relative' }}>
-            <iframe
-              src={satelliteEmbedUrl}
-              title={`Google Satellite View of ${candidate.name}`}
-              width="100%"
-              height="100%"
-              style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.06)' }}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+          {/* Viewer: Photo or Interactive Satellite Embed */}
+          <div style={{ width: '100%', height: '280px', position: 'relative', background: '#07090d' }}>
+            {reconTab === 'photo' && candidate.image ? (
+              <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                <img
+                  src={candidate.image}
+                  alt={`Official photo of ${candidate.name}`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    filter: 'contrast(1.05) brightness(0.96)',
+                    display: 'block'
+                  }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  bottom: '12px',
+                  left: '12px',
+                  background: 'rgba(9, 12, 12, 0.88)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  borderRadius: '6px',
+                  padding: '4px 10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '0.72rem',
+                  color: '#38bdf8',
+                  fontWeight: 600
+                }}>
+                  <Camera size={12} />
+                  <span>Official Google Maps Place Photo</span>
+                </div>
+              </div>
+            ) : (
+              <iframe
+                src={satelliteEmbedUrl}
+                title={`Google Satellite View of ${candidate.name}`}
+                width="100%"
+                height="100%"
+                style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.06)' }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            )}
           </div>
         </div>
 

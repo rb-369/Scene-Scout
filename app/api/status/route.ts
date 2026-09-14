@@ -2,11 +2,13 @@ import { NextResponse } from 'next/server';
 import { parallelClient } from '@/lib/services/parallel';
 import { geminiService } from '@/lib/services/gemini';
 import { isMongoDBConfigured } from '@/lib/mongodb';
+import { serpApiClient } from '@/lib/services/serpapi';
 
 export async function GET() {
   const parallelConfigured = parallelClient.isConfigured();
   const geminiConfigured = geminiService.isConfigured();
   const mongodbConfigured = isMongoDBConfigured();
+  const serpapiConfigured = serpApiClient.isConfigured();
   const mode = parallelConfigured && geminiConfigured ? 'live' : 'demo';
 
   return NextResponse.json({
@@ -30,6 +32,11 @@ export async function GET() {
         configured: mongodbConfigured,
         name: 'MongoDB Atlas Cloud Database',
         track: 'Persistence Layer'
+      },
+      serpapi: {
+        configured: serpapiConfigured,
+        name: 'SerpApi (Dynamic Google Maps Photos)',
+        track: 'Visual Intelligence'
       }
     },
     version: '1.0.0'

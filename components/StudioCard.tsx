@@ -11,7 +11,8 @@ import {
   Phone, 
   Mail, 
   Globe,
-  Volume2
+  Volume2,
+  Camera
 } from 'lucide-react';
 import { StudioCandidate } from '@/lib/types';
 
@@ -22,12 +23,19 @@ interface StudioCardProps {
 
 export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
   const [showContact, setShowContact] = useState<boolean>(false);
+  const [imgFailed, setImgFailed] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<'photo' | 'satellite'>(
+    studio.image && !imgFailed ? 'photo' : 'satellite'
+  );
 
   const lat = studio.coordinates.lat;
   const lng = studio.coordinates.lng;
   const satelliteEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
   const mapsUrl = studio.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${studio.name}, ${studio.city}`)}`;
   const earthUrl = studio.googleEarthUrl || `https://earth.google.com/web/search/${encodeURIComponent(`${studio.name} ${studio.city}`)}`;
+
+  const hasPhoto = Boolean(studio.image && !imgFailed);
+  const activeMode = hasPhoto ? viewMode : 'satellite';
 
   return (
     <article 
@@ -38,22 +46,43 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)'
       }}
     >
-      {/* 16:9 Viewfinder - Real Google Maps Satellite Embed */}
+      {/* 16:9 Viewfinder - Official Google Maps Photo or Satellite Recon */}
       <div 
         className="location-card-viewport"
-        style={{ position: 'relative', overflow: 'hidden', height: '220px', background: '#000' }}
+        style={{ position: 'relative', overflow: 'hidden', height: '220px', background: '#0a0d12' }}
       >
-        <iframe
-          src={satelliteEmbedUrl}
-          title={`Google Maps Satellite View of ${studio.name}`}
-          width="100%"
-          height="100%"
-          style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.08) brightness(0.95)' }}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
+        {activeMode === 'photo' && studio.image ? (
+          /* Official Google Maps Building / Complex Photo */
+          <img
+            src={studio.image}
+            alt={`Official photo of ${studio.name}`}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              filter: 'contrast(1.04) brightness(0.96)',
+              display: 'block'
+            }}
+            loading="lazy"
+            onError={() => {
+              setImgFailed(true);
+              setViewMode('satellite');
+            }}
+          />
+        ) : (
+          /* Google Maps Satellite Recon Embed */
+          <iframe
+            src={satelliteEmbedUrl}
+            title={`Google Maps Satellite View of ${studio.name}`}
+            width="100%"
+            height="100%"
+            style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.08) brightness(0.95)' }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        )}
 
-        {/* Satellite Recon Overlay HUD */}
+        {/* Visual Mode Overlay HUD */}
         <div 
           style={{
             position: 'absolute',
@@ -74,9 +103,60 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
             pointerEvents: 'none'
           }}
         >
-          <Globe size={11} />
-          <span>{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
+          {activeMode === 'photo' ? (
+            <>
+              <Camera size={11} />
+              <span>Official Google Maps Photo</span>
+            </>
+          ) : (
+            <>
+              <Globe size={11} />
+              <span>{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
+            </>
+          )}
         </div>
+
+        {/* View Switcher Toggle: Photo <-> Satellite */}
+        {hasPhoto && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setViewMode(activeMode === 'photo' ? 'satellite' : 'photo');
+            }}
+            style={{
+              position: 'absolute',
+              bottom: '10px',
+              left: '10px',
+              zIndex: 3,
+              background: 'rgba(9, 12, 12, 0.88)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(245, 158, 11, 0.35)',
+              borderRadius: '6px',
+              padding: '4px 8px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontSize: '0.68rem',
+              fontWeight: 600,
+              color: '#cbd5e1',
+              cursor: 'pointer'
+            }}
+            title={activeMode === 'photo' ? 'Switch to Satellite Recon' : 'Switch to Official Complex Photo'}
+          >
+            {activeMode === 'photo' ? (
+              <>
+                <Globe size={11} color="#fbbf24" />
+                <span>Satellite</span>
+              </>
+            ) : (
+              <>
+                <Camera size={11} color="#fbbf24" />
+                <span>Complex</span>
+              </>
+            )}
+          </button>
+        )}
 
         {/* Direct Open in Google Maps Link */}
         <a

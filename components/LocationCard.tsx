@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { 
   Bookmark, 
@@ -12,7 +12,8 @@ import {
   MessageSquare, 
   AlertTriangle,
   ExternalLink,
-  Globe
+  Globe,
+  Camera
 } from 'lucide-react';
 import { LocationCandidate } from '@/lib/types';
 
@@ -56,6 +57,11 @@ export function LocationCard({
   onAskAbout,
   rankIndex,
 }: LocationCardProps) {
+  const [imgFailed, setImgFailed] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<'photo' | 'satellite'>(
+    candidate.image && !imgFailed ? 'photo' : 'satellite'
+  );
+
   const trust = trustMeta(candidate.trustStatus);
   const risk = riskMeta(candidate.productionRiskScore);
   const TrustIcon = trust.Icon;
@@ -65,13 +71,16 @@ export function LocationCard({
   const mapsUrl = candidate.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${candidate.name}, ${candidate.area}, ${candidate.city}`)}`;
   const satelliteEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
 
+  const hasPhoto = Boolean(candidate.image && !imgFailed);
+  const activeMode = hasPhoto ? viewMode : 'satellite';
+
   return (
     <article 
       className={`location-card location-card-compact ${isCompared ? 'is-compared' : ''}`}
       onDoubleClick={() => onViewDetails(candidate)}
       title="Double click to view full location dossier"
     >
-      {/* 16:9 Viewfinder - Real Google Maps Satellite Embed */}
+      {/* 16:9 Viewfinder - Official Google Maps Photo or Satellite Recon */}
       <div 
         className="location-card-viewport"
         onClick={() => onViewDetails(candidate)}
@@ -79,19 +88,40 @@ export function LocationCard({
         tabIndex={0}
         onKeyDown={(e) => { if (e.key === 'Enter') onViewDetails(candidate); }}
         title="Click to view full dossier"
-        style={{ position: 'relative', overflow: 'hidden', height: '220px', background: '#000' }}
+        style={{ position: 'relative', overflow: 'hidden', height: '220px', background: '#0a0d12' }}
       >
-        <iframe
-          src={satelliteEmbedUrl}
-          title={`Google Maps Satellite View of ${candidate.name}`}
-          width="100%"
-          height="100%"
-          style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.08) brightness(0.95)' }}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
+        {activeMode === 'photo' && candidate.image ? (
+          /* Official Google Maps Building / Place Photo */
+          <img
+            src={candidate.image}
+            alt={`Official Google Maps photo of ${candidate.name}`}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              filter: 'contrast(1.04) brightness(0.96)',
+              display: 'block'
+            }}
+            loading="lazy"
+            onError={() => {
+              setImgFailed(true);
+              setViewMode('satellite');
+            }}
+          />
+        ) : (
+          /* Google Maps Satellite Recon Embed */
+          <iframe
+            src={satelliteEmbedUrl}
+            title={`Google Maps Satellite View of ${candidate.name}`}
+            width="100%"
+            height="100%"
+            style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.08) brightness(0.95)' }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        )}
 
-        {/* Satellite Recon Overlay HUD */}
+        {/* Visual Mode Overlay HUD */}
         <div 
           style={{
             position: 'absolute',
@@ -112,9 +142,60 @@ export function LocationCard({
             pointerEvents: 'none'
           }}
         >
-          <Globe size={11} />
-          <span>{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
+          {activeMode === 'photo' ? (
+            <>
+              <Camera size={11} />
+              <span>Google Maps Place Photo</span>
+            </>
+          ) : (
+            <>
+              <Globe size={11} />
+              <span>{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
+            </>
+          )}
         </div>
+
+        {/* View Switcher Toggle: Photo <-> Satellite */}
+        {hasPhoto && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setViewMode(activeMode === 'photo' ? 'satellite' : 'photo');
+            }}
+            style={{
+              position: 'absolute',
+              bottom: '10px',
+              left: '10px',
+              zIndex: 3,
+              background: 'rgba(9, 12, 12, 0.88)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              borderRadius: '6px',
+              padding: '4px 8px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontSize: '0.68rem',
+              fontWeight: 600,
+              color: '#cbd5e1',
+              cursor: 'pointer'
+            }}
+            title={activeMode === 'photo' ? 'Switch to Satellite Recon' : 'Switch to Official Place Photo'}
+          >
+            {activeMode === 'photo' ? (
+              <>
+                <Globe size={11} color="#38bdf8" />
+                <span>Satellite</span>
+              </>
+            ) : (
+              <>
+                <Camera size={11} color="#38bdf8" />
+                <span>Building</span>
+              </>
+            )}
+          </button>
+        )}
 
         {/* Direct Open in Google Maps Link */}
         <a
