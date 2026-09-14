@@ -1,18 +1,20 @@
 /**
- * SerpApi Integration Service
+ * Multi-Provider Visual Intelligence Service
  * 
- * Provides dynamic, real Google Maps place photos and verified street/exterior photography
- * for candidate filming locations and studio backlots.
+ * Dynamically retrieves official Google Maps place photos, verified building facades,
+ * and GPS coordinates across multiple visual search providers with higher free limits:
  * 
- * Engines supported:
- * 1. engine=google_maps -> Fetches verified Google Maps thumbnail, place_id, GPS coordinates, rating
- * 2. engine=google_images -> Fallback for filming location building exterior photography
+ * Supported Providers (Cascade Priority):
+ * 1. Serper.dev (SERPER_API_KEY) -> 2,500 Free Queries, dedicated Google Maps & Image endpoints
+ * 2. OpenSERP (OPENSERP_URL / OPENSERP_API_KEY) -> Unlimited Self-Hosted Docker or OpenSERP Cloud
+ * 3. SerpApi (SERPAPI_API_KEY) -> 100 Queries/mo, Google Maps engine + Google Images fallback
+ * 4. Curated Verified Fallbacks -> Instant offline stills for foundational landmarks
  */
 
 export interface PlacePhotoResult {
   photoUrl: string;
   thumbnailUrl: string;
-  source: 'google_maps' | 'google_images' | 'curated_maps';
+  source: 'google_maps' | 'google_images' | 'serper_maps' | 'openserp_images' | 'curated_maps';
   title?: string;
   coordinates?: {
     lat: number;
@@ -25,7 +27,7 @@ export interface PlacePhotoResult {
   address?: string;
 }
 
-// In-memory cache to save SerpApi credits and optimize response time
+// In-memory cache to save API credits and optimize response time
 const photoCache = new Map<string, PlacePhotoResult>();
 
 // Curated verified authentic photos for foundational demo & historical landmarks
@@ -112,17 +114,53 @@ const VERIFIED_MAPS_PHOTOS: Record<string, Partial<PlacePhotoResult>> = {
   }
 };
 
-class SerpApiClient {
+class VisualIntelligenceService {
   /**
-   * Check if the SerpApi key is provided in environment variables
+   * Check if any visual intelligence provider is configured
    */
   isConfigured(): boolean {
-    const key = process.env.SERPAPI_API_KEY;
-    return Boolean(key && key.trim().length > 0);
+    return Boolean(
+      process.env.SERPER_API_KEY ||
+      process.env.OPENSERP_URL ||
+      process.env.OPENSERP_API_KEY ||
+      process.env.SERPAPI_API_KEY
+    );
   }
 
   /**
-   * Get an official Google Maps place photo for a given place name and city
+   * Get metadata describing the currently active visual provider
+   */
+  getActiveProvider(): { id: string; name: string; configured: boolean } {
+    if (process.env.SERPER_API_KEY) {
+      return {
+        id: 'serper',
+        name: 'Serper.dev (2,500 Queries - Google Maps & Images)',
+        configured: true
+      };
+    }
+    if (process.env.OPENSERP_URL || process.env.OPENSERP_API_KEY) {
+      return {
+        id: 'openserp',
+        name: `OpenSERP (${process.env.OPENSERP_URL || 'Self-Hosted / Cloud'})`,
+        configured: true
+      };
+    }
+    if (process.env.SERPAPI_API_KEY) {
+      return {
+        id: 'serpapi',
+        name: 'SerpApi (Google Maps & Images)',
+        configured: true
+      };
+    }
+    return {
+      id: 'curated',
+      name: 'Curated Location Stills (Demo Mode)',
+      configured: false
+    };
+  }
+
+  /**
+   * Main entry point: Get verified Google Maps place photo / building photo
    */
   async getPlacePhoto(placeName: string, city: string = 'Mumbai'): Promise<PlacePhotoResult | null> {
     if (!placeName || placeName.trim().length === 0) return null;
@@ -132,19 +170,185 @@ class SerpApiClient {
       return photoCache.get(cacheKey)!;
     }
 
-    const apiKey = process.env.SERPAPI_API_KEY?.trim();
-
-    // If no API key configured, use curated authentic Google Maps stills
-    if (!apiKey) {
-      const fallback = this.matchCurated(placeName);
-      if (fallback) {
-        photoCache.set(cacheKey, fallback);
-        return fallback;
+    // 1. Serper.dev (Priority 1: generous 2,500 free query tier)
+    if (process.env.SERPER_API_KEY?.trim()) {
+      const serperResult = await this.fetchSerper(placeName, city);
+      if (serperResult) {
+        photoCache.set(cacheKey, serperResult);
+        return serperResult;
       }
-      return null;
     }
 
-    // Step 1: Query SerpApi with engine=google_maps
+    // 2. OpenSERP (Priority 2: unlimited self-hosted or OpenSERP Cloud)
+    if (process.env.OPENSERP_URL?.trim() || process.env.OPENSERP_API_KEY?.trim()) {
+      const openSerpResult = await this.fetchOpenSerp(placeName, city);
+      if (openSerpResult) {
+        photoCache.set(cacheKey, openSerpResult);
+        return openSerpResult;
+      }
+    }
+
+    // 3. SerpApi (Priority 3: Google Maps engine)
+    if (process.env.SERPAPI_API_KEY?.trim()) {
+      const serpApiResult = await this.fetchSerpApi(placeName, city);
+      if (serpApiResult) {
+        photoCache.set(cacheKey, serpApiResult);
+        return serpApiResult;
+      }
+    }
+
+    // 4. Curated verified backup still
+    const fallback = this.matchCurated(placeName);
+    if (fallback) {
+      photoCache.set(cacheKey, fallback);
+      return fallback;
+    }
+
+    return null;
+  }
+
+  /**
+   * Provider 1: Serper.dev (Google Maps & Google Images)
+   */
+  private async fetchSerper(placeName: string, city: string): Promise<PlacePhotoResult | null> {
+    const key = process.env.SERPER_API_KEY?.trim();
+    if (!key) return null;
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 7500);
+
+      // A. Query Serper /maps endpoint for exact Google Maps place details
+      const mapsRes = await fetch('https://google.serper.dev/maps', {
+        method: 'POST',
+        headers: {
+          'X-API-KEY': key,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          q: `${placeName}, ${city}`,
+          num: 1
+        }),
+        signal: controller.signal
+      });
+
+      let placeData: any = null;
+      if (mapsRes.ok) {
+        const json = await mapsRes.json();
+        if (Array.isArray(json.places) && json.places.length > 0) {
+          placeData = json.places[0];
+        }
+      }
+
+      // B. Query Serper /images endpoint for real building exterior photo
+      const imgRes = await fetch('https://google.serper.dev/images', {
+        method: 'POST',
+        headers: {
+          'X-API-KEY': key,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          q: `${placeName} ${city} building exterior filming location`,
+          num: 3
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      let photoUrl: string | undefined = placeData?.thumbnailUrl;
+      if (imgRes.ok) {
+        const imgJson = await imgRes.json();
+        if (Array.isArray(imgJson.images) && imgJson.images.length > 0) {
+          photoUrl = imgJson.images[0].imageUrl || imgJson.images[0].thumbnailUrl || photoUrl;
+        }
+      }
+
+      if (photoUrl || placeData) {
+        return {
+          photoUrl: photoUrl || '/images/cinema_warehouse_still.jpg',
+          thumbnailUrl: photoUrl || '/images/cinema_warehouse_still.jpg',
+          source: 'serper_maps',
+          title: placeData?.title || placeName,
+          coordinates: (placeData?.latitude && placeData?.longitude) ? {
+            lat: placeData.latitude,
+            lng: placeData.longitude
+          } : undefined,
+          rating: placeData?.rating,
+          reviews: placeData?.ratingCount,
+          address: placeData?.address,
+          googleMapsUrl: placeData?.link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${placeName}, ${city}`)}`
+        };
+      }
+    } catch (err: any) {
+      console.warn(`[VisualIntelligence] Serper error for "${placeName}":`, err?.message || err);
+    }
+    return null;
+  }
+
+  /**
+   * Provider 2: OpenSERP (Self-Hosted / Cloud)
+   */
+  private async fetchOpenSerp(placeName: string, city: string): Promise<PlacePhotoResult | null> {
+    const rawUrl = process.env.OPENSERP_URL?.trim() || 'http://localhost:7000';
+    const baseUrl = rawUrl.replace(/\/$/, '');
+    const apiKey = process.env.OPENSERP_API_KEY?.trim();
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 7500);
+
+      const query = encodeURIComponent(`${placeName} ${city} building exterior filming location`);
+      const headers: Record<string, string> = { 'Accept': 'application/json' };
+      if (apiKey) {
+        headers['Authorization'] = `Bearer ${apiKey}`;
+      }
+
+      let res = await fetch(`${baseUrl}/images?text=${query}`, {
+        headers,
+        signal: controller.signal
+      });
+
+      if (!res.ok) {
+        res = await fetch(`${baseUrl}/google/images?text=${query}`, {
+          headers,
+          signal: controller.signal
+        });
+      }
+
+      clearTimeout(timeout);
+
+      if (res.ok) {
+        const data = await res.json();
+        const results = Array.isArray(data.results) ? data.results : (Array.isArray(data) ? data : []);
+        if (results.length > 0) {
+          const item = results[0];
+          const photo = item.image_url || item.url || item.thumbnail;
+          if (photo) {
+            return {
+              photoUrl: photo,
+              thumbnailUrl: item.thumbnail || photo,
+              source: 'openserp_images',
+              title: item.title || placeName,
+              googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${placeName}, ${city}`)}`
+            };
+          }
+        }
+      }
+    } catch (err: any) {
+      console.warn(`[VisualIntelligence] OpenSERP error for "${placeName}":`, err?.message || err);
+    }
+    return null;
+  }
+
+  /**
+   * Provider 3: SerpApi (Google Maps Engine & Google Images Fallback)
+   */
+  private async fetchSerpApi(placeName: string, city: string): Promise<PlacePhotoResult | null> {
+    const apiKey = process.env.SERPAPI_API_KEY?.trim();
+    if (!apiKey) return null;
+
+    // Step A: engine=google_maps
     try {
       const query = `${placeName}, ${city}`.trim();
       const mapsUrl = `https://serpapi.com/search.json?engine=google_maps&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
@@ -158,12 +362,12 @@ class SerpApiClient {
       if (res.ok) {
         const data = await res.json();
 
-        // Check if single place returned (place_results)
+        // Check place_results
         if (data.place_results) {
           const pr = data.place_results;
           const photoUrl = pr.thumbnail || (Array.isArray(pr.photos) && pr.photos[0]?.image);
           if (photoUrl) {
-            const result: PlacePhotoResult = {
+            return {
               photoUrl,
               thumbnailUrl: photoUrl,
               source: 'google_maps',
@@ -178,16 +382,14 @@ class SerpApiClient {
               googleMapsUrl: pr.link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`,
               address: pr.address
             };
-            photoCache.set(cacheKey, result);
-            return result;
           }
         }
 
-        // Check local results list
+        // Check local_results
         if (Array.isArray(data.local_results) && data.local_results.length > 0) {
           for (const item of data.local_results) {
             if (item.thumbnail) {
-              const result: PlacePhotoResult = {
+              return {
                 photoUrl: item.thumbnail,
                 thumbnailUrl: item.thumbnail,
                 source: 'google_maps',
@@ -202,17 +404,15 @@ class SerpApiClient {
                 googleMapsUrl: item.links?.directions || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`,
                 address: item.address
               };
-              photoCache.set(cacheKey, result);
-              return result;
             }
           }
         }
       }
     } catch (err: any) {
-      console.warn(`[SerpApiClient] Google Maps engine warning for "${placeName}":`, err?.message || err);
+      console.warn(`[VisualIntelligence] SerpApi Google Maps error for "${placeName}":`, err?.message || err);
     }
 
-    // Step 2: Fallback to SerpApi engine=google_images for building exterior
+    // Step B: engine=google_images
     try {
       const searchTerms = `${placeName} ${city} building exterior filming location`;
       const imagesUrl = `https://serpapi.com/search.json?engine=google_images&q=${encodeURIComponent(searchTerms)}&api_key=${apiKey}&ijn=0`;
@@ -229,27 +429,18 @@ class SerpApiClient {
           const firstImg = data.images_results[0];
           const imgUrl = firstImg.original || firstImg.thumbnail;
           if (imgUrl) {
-            const result: PlacePhotoResult = {
+            return {
               photoUrl: imgUrl,
               thumbnailUrl: firstImg.thumbnail || imgUrl,
               source: 'google_images',
               title: firstImg.title || placeName,
               googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${placeName}, ${city}`)}`
             };
-            photoCache.set(cacheKey, result);
-            return result;
           }
         }
       }
     } catch (err: any) {
-      console.warn(`[SerpApiClient] Google Images fallback warning for "${placeName}":`, err?.message || err);
-    }
-
-    // Final fallback to curated authentic still
-    const fallback = this.matchCurated(placeName);
-    if (fallback) {
-      photoCache.set(cacheKey, fallback);
-      return fallback;
+      console.warn(`[VisualIntelligence] SerpApi Google Images error for "${placeName}":`, err?.message || err);
     }
 
     return null;
@@ -273,4 +464,6 @@ class SerpApiClient {
   }
 }
 
-export const serpApiClient = new SerpApiClient();
+export const visualIntelligenceService = new VisualIntelligenceService();
+// Alias for backward compatibility across existing imports
+export const serpApiClient = visualIntelligenceService;

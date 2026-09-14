@@ -8,7 +8,7 @@ export async function GET() {
   const parallelConfigured = parallelClient.isConfigured();
   const geminiConfigured = geminiService.isConfigured();
   const mongodbConfigured = isMongoDBConfigured();
-  const serpapiConfigured = serpApiClient.isConfigured();
+  const visualProvider = serpApiClient.getActiveProvider();
   const mode = parallelConfigured && geminiConfigured ? 'live' : 'demo';
 
   return NextResponse.json({
@@ -33,9 +33,16 @@ export async function GET() {
         name: 'MongoDB Atlas Cloud Database',
         track: 'Persistence Layer'
       },
+      visualIntelligence: {
+        configured: visualProvider.configured,
+        provider: visualProvider.id,
+        name: visualProvider.name,
+        track: 'Visual Intelligence'
+      },
+      // Backward compatibility key
       serpapi: {
-        configured: serpapiConfigured,
-        name: 'SerpApi (Dynamic Google Maps Photos)',
+        configured: visualProvider.configured,
+        name: visualProvider.name,
         track: 'Visual Intelligence'
       }
     },
