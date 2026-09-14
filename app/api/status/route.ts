@@ -9,13 +9,13 @@ export async function GET() {
   const geminiConfigured = geminiService.isConfigured();
   const mongodbConfigured = isMongoDBConfigured();
   const visualProvider = serpApiClient.getActiveProvider();
-  const mode = parallelConfigured && geminiConfigured ? 'live' : 'demo';
+  const mode = geminiConfigured ? 'live' : 'demo';
 
   return NextResponse.json({
     status: 'ok',
     mode,
     modeLabel: mode === 'live' 
-      ? 'Live Research - Gemini + Parallel Search' 
+      ? `Live Agentic Research - Gemini${parallelConfigured ? ' + Parallel Search' : ''}` 
       : 'Demo Mode - simulated research data',
     providers: {
       parallel: {

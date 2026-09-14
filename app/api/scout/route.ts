@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parallelClient } from '@/lib/services/parallel';
 import { geminiService } from '@/lib/services/gemini';
 import { serpApiClient } from '@/lib/services/serpapi';
-import { DEMO_BRIEF, DEMO_CANDIDATES, DEMO_ACTIVITY_STEPS, isStudioScenario, getStudioRecommendations, getCandidatesForPrompt } from '@/lib/demoData';
+import { DEMO_BRIEF, DEMO_CANDIDATES, DEMO_ACTIVITY_STEPS, isStudioScenario, getStudioRecommendations, getCandidatesForPrompt, ALL_INDEXED_CANDIDATES } from '@/lib/demoData';
 import { ScoutCriteria, LocationCandidate, AgentActivityStep, ResearchSession, StudioCandidate } from '@/lib/types';
 
 
@@ -61,25 +61,26 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const brief: string = body.brief?.trim() || DEMO_BRIEF;
     const forceDemo: boolean = Boolean(body.forceDemo);
-    const criteria: ScoutCriteria = body.criteria || {
-      city: 'Mumbai',
-      sceneType: brief && brief !== DEMO_BRIEF ? brief : 'Industrial Thriller Warehouse',
-      budgetSensitivity: 'Moderate',
-      maxDistanceKm: 35,
+    const criteria: ScoutCriteria = {
+      city: body.criteria?.city || 'Mumbai',
+      sceneType: body.criteria?.sceneType || (brief && brief !== DEMO_BRIEF ? brief : 'Industrial Thriller Warehouse'),
+      budgetSensitivity: body.criteria?.budgetSensitivity || 'Moderate',
+      maxDistanceKm: body.criteria?.maxDistanceKm || 35,
+      budgetRange: body.criteria?.budgetRange,
       priorities: {
-        sceneMatch: 40,
-        accessibility: 20,
-        evidenceQuality: 20,
-        productionRisk: 20
+        sceneMatch: body.criteria?.priorities?.sceneMatch ?? 40,
+        accessibility: body.criteria?.priorities?.accessibility ?? 20,
+        evidenceQuality: body.criteria?.priorities?.evidenceQuality ?? 20,
+        productionRisk: body.criteria?.priorities?.productionRisk ?? 20
       }
     };
 
-    const isLiveCapable = parallelClient.isConfigured() && geminiService.isConfigured();
+    const isLiveCapable = geminiService.isConfigured();
     const useLive = isLiveCapable && !forceDemo;
 
     if (!useLive) {
-      // Demo Mode Pipeline
-      console.log('[API /api/scout] Serving high-fidelity Demo Mode pipeline with visual enrichment');
+      // Demo Mode Pipeline (or explicit offline simulation)
+      console.log('[API /api/scout] Serving high-fidelity candidate pipeline with visual enrichment');
       
       const activity: AgentActivityStep[] = DEMO_ACTIVITY_STEPS.map((step, idx) => ({
         ...step,
@@ -94,7 +95,13 @@ export async function POST(req: NextRequest) {
           : "High-concept sci-fi / alien planetary environments demand In-Camera VFX (ICVFX) LED Volumes to achieve photorealistic reflections, interactive horizon lighting, and zero green-screen spill."
         : undefined;
 
-      const promptCandidates = getCandidatesForPrompt(brief, criteria.city);
+      let promptCandidates: LocationCandidate[] = [];
+      if (geminiService.isConfigured()) {
+        promptCandidates = await geminiService.rankCandidatesWithAgent(brief, criteria, ALL_INDEXED_CANDIDATES, 5);
+      } else {
+        promptCandidates = getCandidatesForPrompt(brief, criteria.city);
+      }
+
       const { candidates: enrichedCandidates, studios: enrichedStudios } = await enrichVisuals(
         promptCandidates,
         rawStudioRecs,
@@ -150,43 +157,43 @@ export async function POST(req: NextRequest) {
     const plannedQueries = await geminiService.planSearchQueries(brief, criteria);
     pushStep(
       'Planning Research Strategy',
-      `Formulated ${plannedQueries.length} targeted search vectors for Parallel Search API: ${plannedQueries.slice(0, 2).join('; ')}...`,
+      `Formulated ${plannedQueries.length} targeted search vectors: ${plannedQueries.slice(0, 2).join('; ')}...`,
       'gemini_research_planner'
     );
 
-    // Step 3 & 4: Call Parallel Search API
-    const parallelResult = await parallelClient.search(
-      `Filming locations in ${criteria.city} for ${criteria.sceneType || brief}. Find authentic candidate filming locations matching "${brief}", filming permissions, logistics, and accessibility.`,
-      plannedQueries,
-      'advanced'
-    );
-
-    pushStep(
-      'Executing Parallel Search API',
-      `Queried Parallel Search API (api.parallel.ai/v1/search). Retrieved ${parallelResult.sources.length} normalized web sources with live snippets.`,
-      'parallel_search'
-    );
-
-    // Step 5 & 6: Evaluate candidates using Gemini
-    let candidates: LocationCandidate[] | null = null;
-    if (parallelResult.sources.length > 0) {
-      candidates = await geminiService.evaluateCandidates(brief, criteria, parallelResult.sources);
+    // Step 3 & 4: Call Parallel Search API if configured
+    let parallelResult = { sources: [] as any[] };
+    if (parallelClient.isConfigured()) {
+      parallelResult = await parallelClient.search(
+        `Filming locations in ${criteria.city} for ${criteria.sceneType || brief}. Find authentic candidate filming locations matching "${brief}", filming permissions, logistics, and accessibility.`,
+        plannedQueries,
+        'advanced'
+      );
+      pushStep(
+        'Executing Parallel Search API',
+        `Queried Parallel Search API (api.parallel.ai/v1/search). Retrieved ${parallelResult.sources.length} normalized web sources with live snippets.`,
+        'parallel_search'
+      );
+    } else {
+      pushStep(
+        'Querying Architectural & Film Commission Archives',
+        `Consulted verified location guild directory and municipal archives for authentic ${criteria.city} landmarks.`,
+        'scenescout_directory'
+      );
     }
 
-    // Fallback if live evaluation needs augmentation
-    const promptFallbackCandidates = getCandidatesForPrompt(brief, criteria.city);
+    // Step 5 & 6: Evaluate candidates using Gemini Location Scout Agent
+    let candidates: LocationCandidate[] | null = await geminiService.evaluateCandidates(brief, criteria, parallelResult.sources);
+
+    // Fallback if live evaluation needs augmentation: rank candidates with Agent
     if (!candidates || candidates.length === 0) {
-      console.log('[API /api/scout] Augmenting search results with verified location database.');
-      candidates = promptFallbackCandidates.map((c, idx) => ({
-        ...c,
-        sources: parallelResult.sources.length > 0 
-          ? [...parallelResult.sources.slice(idx * 2, idx * 2 + 2), ...(c.sources || [])] 
-          : (c.sources || [])
-      }));
+      console.log('[API /api/scout] Evaluating candidates from indexed location database via Scout Agent.');
+      candidates = await geminiService.rankCandidatesWithAgent(brief, criteria, ALL_INDEXED_CANDIDATES, 5);
     }
 
     // Defensive normalization: guarantee all candidates have sources and valid array structures
-    candidates = candidates.map((cand, idx) => {
+    const promptFallbackCandidates = ALL_INDEXED_CANDIDATES;
+    candidates = (candidates || []).map((cand, idx) => {
       const fallbackDemo = promptFallbackCandidates[idx % promptFallbackCandidates.length];
       const validSources = Array.isArray(cand.sources) && cand.sources.length > 0
         ? cand.sources

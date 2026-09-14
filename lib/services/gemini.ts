@@ -85,23 +85,11 @@ export class GeminiAgentService {
    * Plan search queries based on the user's production brief
    */
   public async planSearchQueries(brief: string, criteria: ScoutCriteria): Promise<string[]> {
-    const keywords = (brief || '').toLowerCase();
-    
-    // Default fallback queries tailored to scene context
-    let defaultQueries = [
-      `${criteria.city} ${brief} filming locations`,
+    const defaultQueries = [
+      `${criteria.city} ${brief} authentic filming locations`,
       `${criteria.city} film commission location directory`,
       `${criteria.city} commercial filming permissions shooting NOC`
     ];
-
-    if (keywords.includes('cemetery') || keywords.includes('graveyard') || keywords.includes('horror') || keywords.includes('burial')) {
-      defaultQueries = [
-        `${criteria.city} historic cemetery graveyard filming locations`,
-        `${criteria.city} gothic burial grounds Sewri Christian cemetery film shoots`,
-        `${criteria.city} Vasai Fort church ruins cemetery shooting permissions`,
-        `${criteria.city} abandoned church ruins horror movie filming guidelines`
-      ];
-    }
 
     if (!this.isConfigured()) {
       return defaultQueries;
@@ -136,30 +124,30 @@ Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
   public async evaluateCandidates(
     brief: string,
     criteria: ScoutCriteria,
-    rawSources: any[]
+    rawSources: any[] = []
   ): Promise<LocationCandidate[] | null> {
-    if (!this.isConfigured() || rawSources.length === 0) {
-      return null; // Signals caller to use curated candidates
+    if (!this.isConfigured()) {
+      return null;
     }
 
     try {
-      const prompt = `You are SceneScout, an expert film production intelligence scout.
-Analyze these web search results from Parallel Search and evaluate 3-5 real, named candidate filming locations in "${criteria.city}" strictly matching:
+      const hasSources = Array.isArray(rawSources) && rawSources.length > 0;
+      const prompt = `You are SceneScout, an elite AI Location Scout and Supervising Production Designer Agent.
+${hasSources 
+  ? `Analyze these web search results from Parallel Search and scout 3-5 real, named candidate filming locations in "${criteria.city}" strictly matching:`
+  : `Scout 3-5 authentic, real-world candidate filming locations in "${criteria.city}" based on verified film industry landmarks, heritage structures, municipal records, and location directories, strictly matching:`}
 Filmmaker Brief: "${brief}"
 Target City: "${criteria.city}"
 
-CRITICAL SCENE MATCHING INSTRUCTIONS:
-- You MUST evaluate real locations that match the filmmaker's specific genre, aesthetic, and setting:
-  * If the brief asks for an ABANDONED BUILDING, RUINS, or DILAPIDATED FACTORY (even for a horror or ghost scene in a building), you MUST recommend real abandoned mills, factory ruins, or dilapidated buildings in ${criteria.city} (e.g. Mukesh Mills Heritage Mill Compound Ruins, Shakti Mills Overgrown Ruins, Vasai Fort Ruins, St. John the Baptist Abandoned Church Ruins, or decommissioned industrial plants). DO NOT default to cemeteries unless the filmmaker explicitly asked for a cemetery or graveyard!
-  * If the brief explicitly asks for a CEMETERY, GRAVEYARD, or BURIAL scene, recommend real cemeteries and burial grounds in ${criteria.city} (e.g. Sewri Christian Cemetery, Antop Hill Cemetery, St. Thomas Cathedral Cemetery).
-  * If the brief asks for an INDUSTRIAL or WAREHOUSE scene, recommend active textile mills, container terminals, and iron yards.
-  * If the brief asks for a HOSPITAL, ASYLUM, or MEDICAL scene, recommend historic hospital wards or sanatoriums.
-  * If the brief asks for a PALACE or LUXURY scene, recommend heritage mansions or private estates.
-- Real Location Names: The "name" must be a real, verifiable landmark or facility in ${criteria.city}.
+CINEMATIC SPATIAL MATCHING PRINCIPLES:
+1. Deeply analyze the filmmaker's brief across three core dimensions:
+   - Primary Physical Environment: What is the physical structure or topography? (e.g. abandoned factory/mill, hospital ward, historic cemetery/graveyard, active warehouse, train depot, modern glass tower, rooftop, harbor dock, street alley, fortress, church ruins, library, etc.)
+   - Mood, Texture & Lighting: What is the emotional and visual aesthetic? (e.g. decayed, horror/eerie, neon cyberpunk, sterile, opulent, vintage period, rustic, flooded, shadow-drenched)
+   - Narrative Action: What happens in the space? (e.g. chase, shootout, intimate dialogue, suspense, stunt)
+2. Prioritize the Physical Environment: The candidate locations must strictly match the actual physical and architectural setting requested. (For example, an "abandoned building" scene requires an authentic building, factory, or architectural ruin, whereas a "cemetery" scene requires a burial ground, and a "hospital" scene requires a medical facility).
+3. Authenticity & Specificity: Every candidate MUST be a real, verifiable physical landmark or facility in "${criteria.city}" with its authentic neighborhood/area name.
 
-Web Sources collected:
-${JSON.stringify(rawSources.slice(0, 10), null, 2)}
-
+${hasSources ? `Web Sources collected:\n${JSON.stringify(rawSources.slice(0, 10), null, 2)}\n` : ''}
 Return a JSON array of LocationCandidate objects with:
 - id: string
 - name: string (real location name in ${criteria.city})
@@ -268,6 +256,112 @@ IMPORTANT:
     }
 
     return null;
+  }
+
+  /**
+   * Universal Agent-in-the-Loop Candidate Ranker:
+   * Uses Gemini to evaluate and rank candidate locations against the filmmaker's brief
+   * based on architectural fit, lighting, genre mood, and production feasibility.
+   * Completely eliminates any hardcoded keyword lists or mathematical string calculations.
+   */
+  public async rankCandidatesWithAgent(
+    brief: string,
+    criteria: ScoutCriteria,
+    candidates: LocationCandidate[],
+    limit: number = 5
+  ): Promise<LocationCandidate[]> {
+    if (!this.isConfigured() || candidates.length === 0) {
+      return candidates.slice(0, limit);
+    }
+
+    try {
+      const candidatesSummary = candidates.map((c, idx) => ({
+        index: idx,
+        id: c.id,
+        name: c.name,
+        area: c.area,
+        city: c.city,
+        description: c.description,
+        visualCharacteristics: c.visualCharacteristics,
+        operatingEnvironment: c.productionConsiderations?.operatingEnvironment
+      }));
+
+      const prompt = `You are SceneScout's Supervising Location Scout Agent.
+A film director has submitted this creative production brief:
+"${brief}"
+Target City: "${criteria.city}"
+
+Analyze this pool of candidate locations from our verified location guild index:
+${JSON.stringify(candidatesSummary, null, 2)}
+
+Evaluate each candidate's cinematic match for the director's specific scene requirements.
+Consider:
+1. Physical Architecture & Setting: Does the physical space match what the scene calls for? (e.g. if the director asks for an abandoned building or ruins, heavily favor real abandoned structures or mill ruins over cemeteries or modern active facilities).
+2. Atmosphere & Lighting: Does the location evoke the required aesthetic, texture, and mood?
+3. Practical Filming Logistics in ${criteria.city}.
+
+Return a JSON array of evaluated candidates, strictly sorted from BEST MATCH to WORST MATCH:
+[
+  {
+    "id": "loc-id",
+    "sceneMatchScore": 95,
+    "recommendation": "Concise 1-2 sentence rationale explaining specifically why this location fits the director's brief."
+  }
+]`;
+
+      const text = await this.generateWithFallback(prompt, { responseMimeType: "application/json" });
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      const cleanJson = jsonMatch ? jsonMatch[0] : text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+      const evaluations = JSON.parse(cleanJson);
+
+      if (Array.isArray(evaluations) && evaluations.length > 0) {
+        const evalMap = new Map<string, { sceneMatchScore: number; recommendation: string }>();
+        evaluations.forEach((item: any) => {
+          if (item?.id) {
+            evalMap.set(item.id, {
+              sceneMatchScore: typeof item.sceneMatchScore === 'number' ? item.sceneMatchScore : 85,
+              recommendation: item.recommendation || ''
+            });
+          }
+        });
+
+        // Order candidates by the Agent's ranking
+        const ranked: LocationCandidate[] = [];
+        const seenIds = new Set<string>();
+
+        for (const item of evaluations) {
+          const matchedCand = candidates.find(c => c.id === item.id);
+          if (matchedCand && !seenIds.has(matchedCand.id)) {
+            seenIds.add(matchedCand.id);
+            const score = typeof item.sceneMatchScore === 'number' ? item.sceneMatchScore : matchedCand.sceneMatchScore;
+            ranked.push({
+              ...matchedCand,
+              sceneMatchScore: score,
+              overallScore: Math.round(
+                (score * 0.4) +
+                (matchedCand.accessibilityScore * 0.2) +
+                (matchedCand.evidenceQualityScore * 0.2) +
+                ((100 - matchedCand.productionRiskScore) * 0.2)
+              ),
+              recommendation: item.recommendation || matchedCand.recommendation
+            });
+          }
+        }
+
+        // Append any remaining candidates not explicitly in the evaluation
+        for (const cand of candidates) {
+          if (!seenIds.has(cand.id)) {
+            ranked.push(cand);
+          }
+        }
+
+        return ranked.slice(0, limit);
+      }
+    } catch (err) {
+      console.warn('[Gemini Service] Agent candidate ranking fallback:', err);
+    }
+
+    return candidates.slice(0, limit);
   }
 
   /**

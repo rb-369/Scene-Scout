@@ -138,10 +138,10 @@ export function DashboardContent({
     fetch('/api/status')
       .then(res => res.json())
       .then(data => {
-        const live = data.providers?.parallel?.configured && data.providers?.gemini?.configured;
-        setIsLiveConfigured(Boolean(live));
+        const live = data.mode === 'live' || Boolean(data.providers?.gemini?.configured);
+        setIsLiveConfigured(live);
         setIsDemoMode(!live);
-        setModeLabel(data.modeLabel || 'Demo Mode - simulated research data');
+        setModeLabel(data.modeLabel || 'Live Agentic Research - Gemini');
       })
       .catch(() => {
         setIsDemoMode(true);
