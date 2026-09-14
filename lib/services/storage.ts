@@ -1,5 +1,5 @@
 import { LocationCandidate, ResearchSession } from '../types';
-import { DEMO_CANDIDATES, ADDITIONAL_SUGGESTED_CANDIDATES } from '../demoData';
+import { DEMO_CANDIDATES, ADDITIONAL_SUGGESTED_CANDIDATES, CEMETERY_HORROR_CANDIDATES } from '../demoData';
 
 const SAVED_LOCATIONS_KEY = 'scenescout_saved_locations_v1';
 const SESSIONS_HISTORY_KEY = 'scenescout_sessions_history_v1';
@@ -179,6 +179,10 @@ export const storageService = {
     // 2. Direct match in ADDITIONAL_SUGGESTED_CANDIDATES
     const foundSuggested = ADDITIONAL_SUGGESTED_CANDIDATES.find(c => c.id.toLowerCase() === resolvedId || c.id.toLowerCase() === cleanId);
     if (foundSuggested) return foundSuggested;
+
+    // 2b. Direct match in CEMETERY_HORROR_CANDIDATES
+    const foundCemetery = CEMETERY_HORROR_CANDIDATES.find(c => c.id.toLowerCase() === resolvedId || c.id.toLowerCase() === cleanId);
+    if (foundCemetery) return foundCemetery;
 
     // 3. Check active session candidates in browser storage
     const active = this.getActiveCandidates();

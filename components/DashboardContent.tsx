@@ -29,7 +29,8 @@ import {
   DEMO_STUDIO_CANDIDATES,
   ADDITIONAL_SUGGESTED_CANDIDATES,
   isStudioScenario,
-  getStudioRecommendations
+  getStudioRecommendations,
+  getCandidatesForPrompt
 } from '@/lib/demoData';
 import { storageService } from '@/lib/services/storage';
 import { 
@@ -258,17 +259,18 @@ export function DashboardContent({
         // Guaranteed fallback with studio scenario detection
         const fallbackStudioNeeded = isStudioScenario(brief);
         const fallbackStudios = getStudioRecommendations(brief);
+        const fallbackCandidates = getCandidatesForPrompt(brief, criteria.city);
         const fallbackSession: ResearchSession = {
           ...DEMO_SESSION,
           id: `session-${Date.now()}`,
           userBrief: brief,
           criteria,
-          candidates: DEMO_CANDIDATES,
+          candidates: fallbackCandidates,
           isStudioRecommended: fallbackStudioNeeded,
           studioRecommendations: fallbackStudioNeeded ? fallbackStudios : undefined
         };
         setCurrentSession(fallbackSession);
-        setCandidates(DEMO_CANDIDATES);
+        setCandidates(fallbackCandidates);
         setStudios(fallbackStudios);
         if (fallbackStudioNeeded) {
           setActiveCategory('studios');
@@ -279,8 +281,14 @@ export function DashboardContent({
       }
     } catch (err) {
       console.error('[Scout Pipeline] Pipeline execution error:', err);
-      setCurrentSession(DEMO_SESSION);
-      setCandidates(DEMO_CANDIDATES);
+      const fallbackCandidates = getCandidatesForPrompt(brief, criteria.city);
+      const errSession: ResearchSession = {
+        ...DEMO_SESSION,
+        userBrief: brief,
+        candidates: fallbackCandidates
+      };
+      setCurrentSession(errSession);
+      setCandidates(fallbackCandidates);
       setStudios(getStudioRecommendations(brief));
     } finally {
       // 5. Complete Step 10: isLoading = false marks all 10 steps green checkmarked, 100% complete!

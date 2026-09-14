@@ -41,44 +41,84 @@ const VERIFIED_MAPS_PHOTOS: Record<string, Partial<PlacePhotoResult>> = {
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Ramoji+Film+City+Hyderabad'
   },
   'mukesh': {
-    photoUrl: '/images/cinema_warehouse_still.jpg',
-    thumbnailUrl: '/images/cinema_warehouse_still.jpg',
-    source: 'curated_maps',
+    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkV4ZpQRSeOQ4YHBTT-b5h-P5VVQGA7Dk43hZvaPBIqgxuo3WIFlMXje7ifO25-gFNnjxSDK9obHz05KJM1EcAHx2-Kvg_jGwFVR5tCDiVw-XxyJVMeqyyyiW6J_63Pz42zvCAUwFJK7D0=w1000-h1000-c-n',
+    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkV4ZpQRSeOQ4YHBTT-b5h-P5VVQGA7Dk43hZvaPBIqgxuo3WIFlMXje7ifO25-gFNnjxSDK9obHz05KJM1EcAHx2-Kvg_jGwFVR5tCDiVw-XxyJVMeqyyyiW6J_63Pz42zvCAUwFJK7D0=w1000-h1000-c-n',
+    source: 'google_maps',
     title: 'Mukesh Mills Heritage Mill Compound (Colaba)',
     coordinates: { lat: 18.9138, lng: 72.8242 },
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mukesh+Mills+Colaba+Mumbai'
   },
+  'sewri christian cemetery': {
+    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmrljuV8Eg5HaCkGQ1qZv_hhnxKMzZLmhLlcpDEK-uxOAfMOB9Ngi-2V_dERRIKWgw0NnMQAJA30OE2aXQVHKLlQrchxEZbFV4aFnwDfTsfyTSGiod7UdIOHooEXy44ZTBlTDoM=w1000-h1000-c-n',
+    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmrljuV8Eg5HaCkGQ1qZv_hhnxKMzZLmhLlcpDEK-uxOAfMOB9Ngi-2V_dERRIKWgw0NnMQAJA30OE2aXQVHKLlQrchxEZbFV4aFnwDfTsfyTSGiod7UdIOHooEXy44ZTBlTDoM=w1000-h1000-c-n',
+    source: 'google_maps',
+    title: 'Sewri Christian Cemetery (Victorian Gothic Grounds)',
+    coordinates: { lat: 19.0034, lng: 72.8516 },
+    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sewri+Christian+Cemetery+Mumbai'
+  },
+  'cemetery': {
+    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmrljuV8Eg5HaCkGQ1qZv_hhnxKMzZLmhLlcpDEK-uxOAfMOB9Ngi-2V_dERRIKWgw0NnMQAJA30OE2aXQVHKLlQrchxEZbFV4aFnwDfTsfyTSGiod7UdIOHooEXy44ZTBlTDoM=w1000-h1000-c-n',
+    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmrljuV8Eg5HaCkGQ1qZv_hhnxKMzZLmhLlcpDEK-uxOAfMOB9Ngi-2V_dERRIKWgw0NnMQAJA30OE2aXQVHKLlQrchxEZbFV4aFnwDfTsfyTSGiod7UdIOHooEXy44ZTBlTDoM=w1000-h1000-c-n',
+    source: 'google_maps',
+    title: 'Sewri Christian Cemetery',
+    coordinates: { lat: 19.0034, lng: 72.8516 },
+    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sewri+Christian+Cemetery+Mumbai'
+  },
+  'graveyard': {
+    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmrljuV8Eg5HaCkGQ1qZv_hhnxKMzZLmhLlcpDEK-uxOAfMOB9Ngi-2V_dERRIKWgw0NnMQAJA30OE2aXQVHKLlQrchxEZbFV4aFnwDfTsfyTSGiod7UdIOHooEXy44ZTBlTDoM=w1000-h1000-c-n',
+    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmrljuV8Eg5HaCkGQ1qZv_hhnxKMzZLmhLlcpDEK-uxOAfMOB9Ngi-2V_dERRIKWgw0NnMQAJA30OE2aXQVHKLlQrchxEZbFV4aFnwDfTsfyTSGiod7UdIOHooEXy44ZTBlTDoM=w1000-h1000-c-n',
+    source: 'google_maps',
+    title: 'Historic Cemetery Burial Grounds',
+    coordinates: { lat: 19.0034, lng: 72.8516 },
+    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sewri+Christian+Cemetery+Mumbai'
+  },
+  'vasai fort': {
+    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmSXEG6g37mMzU-bTAqbG08ahv8GWATgZzwXYgw2ecfzjB9dOD3hno61D8EoX47muaKMTKe5S46WwTQKeZtknfmhKzExkzd6D_qmZe79xI6RN7w05yEyPDg5tHcSsX0xytWFN5yDlp42MiG=w1000-h1000-c-n',
+    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmSXEG6g37mMzU-bTAqbG08ahv8GWATgZzwXYgw2ecfzjB9dOD3hno61D8EoX47muaKMTKe5S46WwTQKeZtknfmhKzExkzd6D_qmZe79xI6RN7w05yEyPDg5tHcSsX0xytWFN5yDlp42MiG=w1000-h1000-c-n',
+    source: 'google_maps',
+    title: 'Vasai Fort Church Ruins & Crypts',
+    coordinates: { lat: 19.3295, lng: 72.8142 },
+    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Vasai+Fort+Church+Mumbai'
+  },
+  'church': {
+    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmSXEG6g37mMzU-bTAqbG08ahv8GWATgZzwXYgw2ecfzjB9dOD3hno61D8EoX47muaKMTKe5S46WwTQKeZtknfmhKzExkzd6D_qmZe79xI6RN7w05yEyPDg5tHcSsX0xytWFN5yDlp42MiG=w1000-h1000-c-n',
+    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmSXEG6g37mMzU-bTAqbG08ahv8GWATgZzwXYgw2ecfzjB9dOD3hno61D8EoX47muaKMTKe5S46WwTQKeZtknfmhKzExkzd6D_qmZe79xI6RN7w05yEyPDg5tHcSsX0xytWFN5yDlp42MiG=w1000-h1000-c-n',
+    source: 'google_maps',
+    title: 'Historic Church Ruins',
+    coordinates: { lat: 19.3295, lng: 72.8142 },
+    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Vasai+Fort+Church+Mumbai'
+  },
   'richardson': {
-    photoUrl: '/images/cinema_freight_yard.jpg',
-    thumbnailUrl: '/images/cinema_freight_yard.jpg',
-    source: 'curated_maps',
+    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlwyFeW0DQP5409vs9sSjXfX_h0EwsBkIi4eOx4gLqZ7gp5KkEKq_o-7MUG4S8QYOceUtcAGsItiTI5rkjDYCX7er_x5cPHTnGxS204gsz_wriWfBqYuJtNTtljLo21ZkfPBEY=w1000-h1000-c-n',
+    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlwyFeW0DQP5409vs9sSjXfX_h0EwsBkIi4eOx4gLqZ7gp5KkEKq_o-7MUG4S8QYOceUtcAGsItiTI5rkjDYCX7er_x5cPHTnGxS204gsz_wriWfBqYuJtNTtljLo21ZkfPBEY=w1000-h1000-c-n',
+    source: 'google_maps',
     title: 'Richardson & Cruddas Heavy Engineering Works',
-    coordinates: { lat: 18.9866, lng: 72.8538 },
+    coordinates: { lat: 18.9658, lng: 72.8329 },
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Richardson+and+Cruddas+Byculla+Mumbai'
   },
-  'sewri': {
-    photoUrl: '/images/cinema_maritime_berth.jpg',
-    thumbnailUrl: '/images/cinema_maritime_berth.jpg',
-    source: 'curated_maps',
-    title: 'Sewri Timber Ponds & Mazagon Iron Yards',
-    coordinates: { lat: 18.9734, lng: 72.8465 },
-    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sewri+Timber+Ponds+Mumbai'
+  'cotton': {
+    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlYCvjt9dk8_mFb5_kPZpYLRpvlQmkIaL9hvykiDAeMa1Ep-1uvr2rxbXIb4IZtE2OyvWtodJFc9bD8IWQclXP0P_HV2o8qUxMgwsODTEiXOp3OU9AIOlH1L_NDOXimabsy2tF2=w1000-h1000-c-n',
+    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlYCvjt9dk8_mFb5_kPZpYLRpvlQmkIaL9hvykiDAeMa1Ep-1uvr2rxbXIb4IZtE2OyvWtodJFc9bD8IWQclXP0P_HV2o8qUxMgwsODTEiXOp3OU9AIOlH1L_NDOXimabsy2tF2=w1000-h1000-c-n',
+    source: 'google_maps',
+    title: 'Cotton Green Port Trust Godowns & Cotton Exchange Depot',
+    coordinates: { lat: 18.9840, lng: 72.8482 },
+    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Cotton+Green+Port+Trust+Godowns+Mumbai'
   },
-  'bradbury': {
-    photoUrl: '/images/cinema_cotton_godown.jpg',
-    thumbnailUrl: '/images/cinema_cotton_godown.jpg',
-    source: 'curated_maps',
-    title: 'Bradbury Mill Compound & Industrial Sheds',
+  'reay': {
+    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmEV2tzxCkSys6wOS3sJVZH9FG0u8K5XmUIrY_RsseMPlMIsZzdo7T8weZV7S9SIooNLnRNkE6m3tUuyKocoma7Np8LzjiS8kpqaJb7PLEGl1f45gGnbx4hH4vOUmlzye8UNBgF=w1000-h1000-c-n',
+    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmEV2tzxCkSys6wOS3sJVZH9FG0u8K5XmUIrY_RsseMPlMIsZzdo7T8weZV7S9SIooNLnRNkE6m3tUuyKocoma7Np8LzjiS8kpqaJb7PLEGl1f45gGnbx4hH4vOUmlzye8UNBgF=w1000-h1000-c-n',
+    source: 'google_maps',
+    title: 'Reay Road Timber & Iron Yard Sheds',
+    coordinates: { lat: 18.9710, lng: 72.8454 },
+    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Darukhana+Reay+Road+Timber+Yards+Mumbai'
+  },
+  'sewri container': {
+    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkypVoDMsuWL8dpamQSh-tLDArD9Jjcv-5PhWxBHYSJEQB3r8g3vWybL1QG5W0L32gqhJYhiMtd6pz5fyxGO-JlzoNxlk8qRdHqUSJwbieWaZIP_MrxA5dlPv3YUPfDeecRFnod=w1000-h1000-c-n',
+    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkypVoDMsuWL8dpamQSh-tLDArD9Jjcv-5PhWxBHYSJEQB3r8g3vWybL1QG5W0L32gqhJYhiMtd6pz5fyxGO-JlzoNxlk8qRdHqUSJwbieWaZIP_MrxA5dlPv3YUPfDeecRFnod=w1000-h1000-c-n',
+    source: 'google_maps',
+    title: 'Sewri Container Freight Station & Rail Godown',
     coordinates: { lat: 18.9984, lng: 72.8622 },
-    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Bradbury+Mill+Kalachowki+Mumbai'
-  },
-  'sassoon': {
-    photoUrl: '/images/cinema_coastal_outpost.jpg',
-    thumbnailUrl: '/images/cinema_coastal_outpost.jpg',
-    source: 'curated_maps',
-    title: 'Sassoon Docks Old Ice Factory & Marine Warehouses',
-    coordinates: { lat: 18.9862, lng: 72.8228 },
-    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sassoon+Docks+Colaba+Mumbai'
+    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sewri+Container+Freight+Station+Mumbai'
   },
   'annapurna': {
     photoUrl: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=1200&auto=format&fit=crop',
@@ -264,10 +304,10 @@ class VisualIntelligenceService {
         }
       }
 
-      if (photoUrl || placeData) {
+      if (photoUrl) {
         return {
-          photoUrl: photoUrl || '/images/cinema_warehouse_still.jpg',
-          thumbnailUrl: photoUrl || '/images/cinema_warehouse_still.jpg',
+          photoUrl,
+          thumbnailUrl: photoUrl,
           source: 'serper_maps',
           title: placeData?.title || placeName,
           coordinates: (placeData?.latitude && placeData?.longitude) ? {

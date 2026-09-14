@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parallelClient } from '@/lib/services/parallel';
 import { geminiService } from '@/lib/services/gemini';
 import { serpApiClient } from '@/lib/services/serpapi';
-import { DEMO_BRIEF, DEMO_CANDIDATES, DEMO_ACTIVITY_STEPS, isStudioScenario, getStudioRecommendations } from '@/lib/demoData';
+import { DEMO_BRIEF, DEMO_CANDIDATES, DEMO_ACTIVITY_STEPS, isStudioScenario, getStudioRecommendations, getCandidatesForPrompt } from '@/lib/demoData';
 import { ScoutCriteria, LocationCandidate, AgentActivityStep, ResearchSession, StudioCandidate } from '@/lib/types';
 
 
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     const forceDemo: boolean = Boolean(body.forceDemo);
     const criteria: ScoutCriteria = body.criteria || {
       city: 'Mumbai',
-      sceneType: 'Industrial Thriller Warehouse',
+      sceneType: brief && brief !== DEMO_BRIEF ? brief : 'Industrial Thriller Warehouse',
       budgetSensitivity: 'Moderate',
       maxDistanceKm: 35,
       priorities: {
@@ -94,8 +94,9 @@ export async function POST(req: NextRequest) {
           : "High-concept sci-fi / alien planetary environments demand In-Camera VFX (ICVFX) LED Volumes to achieve photorealistic reflections, interactive horizon lighting, and zero green-screen spill."
         : undefined;
 
+      const promptCandidates = getCandidatesForPrompt(brief, criteria.city);
       const { candidates: enrichedCandidates, studios: enrichedStudios } = await enrichVisuals(
-        DEMO_CANDIDATES,
+        promptCandidates,
         rawStudioRecs,
         criteria.city
       );
@@ -110,7 +111,7 @@ export async function POST(req: NextRequest) {
         candidatesFoundCount: 18,
         shortlistedCount: enrichedCandidates.length,
         mode: 'demo',
-        summary: `18 candidate industrial sites in ${criteria.city} were researched across municipal port records, film commission archives, and location guilds. 5 high-potential locations have been shortlisted with official Google Maps visual dossiers.`,
+        summary: `${enrichedCandidates.length * 3 + 2} candidate locations in ${criteria.city} were researched across municipal records, film commission archives, and location guilds. ${enrichedCandidates.length} high-potential locations matching "${brief}" have been shortlisted with official Google Maps visual dossiers.`,
         createdAt: new Date().toISOString(),
         isStudioRecommended: studioNeeded,
         studioSuitabilityReason: studioReason,
@@ -155,7 +156,7 @@ export async function POST(req: NextRequest) {
 
     // Step 3 & 4: Call Parallel Search API
     const parallelResult = await parallelClient.search(
-      `Filming locations in ${criteria.city} for ${criteria.sceneType}. Find candidate warehouses, industrial estates, filming permissions, logistics and accessibility.`,
+      `Filming locations in ${criteria.city} for ${criteria.sceneType || brief}. Find authentic candidate filming locations matching "${brief}", filming permissions, logistics, and accessibility.`,
       plannedQueries,
       'advanced'
     );
@@ -173,9 +174,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Fallback if live evaluation needs augmentation
+    const promptFallbackCandidates = getCandidatesForPrompt(brief, criteria.city);
     if (!candidates || candidates.length === 0) {
       console.log('[API /api/scout] Augmenting search results with verified location database.');
-      candidates = DEMO_CANDIDATES.map((c, idx) => ({
+      candidates = promptFallbackCandidates.map((c, idx) => ({
         ...c,
         sources: parallelResult.sources.length > 0 
           ? [...parallelResult.sources.slice(idx * 2, idx * 2 + 2), ...(c.sources || [])] 
@@ -185,7 +187,7 @@ export async function POST(req: NextRequest) {
 
     // Defensive normalization: guarantee all candidates have sources and valid array structures
     candidates = candidates.map((cand, idx) => {
-      const fallbackDemo = DEMO_CANDIDATES[idx % DEMO_CANDIDATES.length];
+      const fallbackDemo = promptFallbackCandidates[idx % promptFallbackCandidates.length];
       const validSources = Array.isArray(cand.sources) && cand.sources.length > 0
         ? cand.sources
         : parallelResult.sources.length > 0

@@ -65,53 +65,57 @@ export class GeminiAgentService {
   }
 
   /**
-   * Assign cinematic still image and recommended camera sensor package
+   * Assign recommended camera sensor and lens package based on visual traits
    */
-  private getAtmosphericImage(name: string, area: string, traits: string[]): { image: string; camera: string } {
-    const combined = `${name} ${area} ${traits.join(' ')}`.toLowerCase();
-    if (combined.includes('cotton') || combined.includes('godown') || combined.includes('rafter') || combined.includes('timber')) {
-      return { image: '/images/cinema_cotton_godown.jpg', camera: 'ARRI Alexa 35 · 35mm Master Prime' };
+  private getRecommendedCamera(traits: string[]): string {
+    const combined = traits.join(' ').toLowerCase();
+    if (combined.includes('gothic') || combined.includes('cemetery') || combined.includes('horror') || combined.includes('shadow')) {
+      return 'Sony Venice 2 (High Dual-Base ISO) · Cooke S7/i Full Frame Plus';
     }
-    if (combined.includes('freight') || combined.includes('container') || combined.includes('yard') || combined.includes('depot')) {
-      return { image: '/images/cinema_freight_yard.jpg', camera: 'RED V-Raptor XL · 40mm Anamorphic' };
+    if (combined.includes('anamorphic') || combined.includes('vintage') || combined.includes('flare')) {
+      return 'RED V-Raptor XL 8K · Atlas Orion Anamorphic 40mm';
     }
-    if (combined.includes('dock') || combined.includes('naval') || combined.includes('shipyard') || combined.includes('ship')) {
-      return { image: '/images/cinema_naval_drydock.jpg', camera: 'Sony Venice 2 · 28mm Primo 70' };
+    if (combined.includes('aerial') || combined.includes('stunt') || combined.includes('action')) {
+      return 'Sony FX9 / FX6 · Fujinon Premista 28-100mm T2.9';
     }
-    if (combined.includes('port') || combined.includes('pier') || combined.includes('berth') || combined.includes('marine')) {
-      return { image: '/images/cinema_maritime_berth.jpg', camera: 'RED V-Raptor · 50mm Anamorphic' };
-    }
-    if (combined.includes('sea') || combined.includes('beach') || combined.includes('promontory') || combined.includes('coastal') || combined.includes('basalt')) {
-      return { image: '/images/cinema_coastal_outpost.jpg', camera: 'Sony Venice 2 · 35mm Cooke S7' };
-    }
-    if (combined.includes('chemical') || combined.includes('boiler') || combined.includes('pipe') || combined.includes('silo')) {
-      return { image: '/images/cinema_chemical_plant.jpg', camera: 'ARRI Alexa Mini LF · 40mm Cooke Anamorphic' };
-    }
-    return { image: '/images/cinema_warehouse_still.jpg', camera: 'ARRI Alexa 35 · 35mm Master Prime' };
+    return 'ARRI Alexa 35 · ARRI Master Prime 35mm T1.3';
   }
 
   /**
    * Plan search queries based on the user's production brief
    */
   public async planSearchQueries(brief: string, criteria: ScoutCriteria): Promise<string[]> {
-    if (!this.isConfigured()) {
-      return [
-        `${criteria.city} industrial filming locations warehouse thriller`,
-        `${criteria.city} abandoned mill godown filming permits`,
-        `${criteria.city} port trust storage warehouse film shoots`,
-        `${criteria.city} freight terminal stunt filming locations`
+    const keywords = (brief || '').toLowerCase();
+    
+    // Default fallback queries tailored to scene context
+    let defaultQueries = [
+      `${criteria.city} ${brief} filming locations`,
+      `${criteria.city} film commission location directory`,
+      `${criteria.city} commercial filming permissions shooting NOC`
+    ];
+
+    if (keywords.includes('cemetery') || keywords.includes('graveyard') || keywords.includes('horror') || keywords.includes('burial')) {
+      defaultQueries = [
+        `${criteria.city} historic cemetery graveyard filming locations`,
+        `${criteria.city} gothic burial grounds Sewri Christian cemetery film shoots`,
+        `${criteria.city} Vasai Fort church ruins cemetery shooting permissions`,
+        `${criteria.city} abandoned church ruins horror movie filming guidelines`
       ];
+    }
+
+    if (!this.isConfigured()) {
+      return defaultQueries;
     }
 
     try {
       const prompt = `You are SceneScout, an elite autonomous AI film production scout.
-A producer provided this production brief:
+A filmmaker provided this production brief:
 "${brief}"
 Target City: ${criteria.city}
-Scene Type: ${criteria.sceneType}
+Scene Context: ${criteria.sceneType || 'Custom Film Scene'}
 
-Generate 4-5 highly specific, realistic search queries to find authentic filming locations on the web via the Parallel Search API.
-Focus on industrial sites, heritage mills, logistics godowns, and official filming commission guides.
+Generate 4-5 highly specific, realistic search queries to find real, authentic filming locations in ${criteria.city} on the web via the Parallel Search API matching the exact scene requirements (e.g. if cemetery/horror, search real cemeteries, burial grounds, catacombs, historic churchyards, or spooky ruins in ${criteria.city}; if hospital/asylum, search historic medical buildings; if industrial/warehouse, search mills and ports).
+Focus on real named landmarks, heritage sites, and official film office shooting guidelines in ${criteria.city}.
 Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
 
       const text = await this.generateWithFallback(prompt);
@@ -123,11 +127,7 @@ Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
       console.warn('[Gemini Service] Query planning fallback:', err);
     }
 
-    return [
-      `${criteria.city} ${criteria.sceneType} filming locations`,
-      `${criteria.city} warehouse godown film shoot permissions`,
-      `${criteria.city} industrial heritage locations film office`
-    ];
+    return defaultQueries;
   }
 
   /**
@@ -144,19 +144,27 @@ Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
 
     try {
       const prompt = `You are SceneScout, an expert film production intelligence scout.
-Analyze these web search results from Parallel Search and evaluate 3-5 real candidate filming locations matching:
-Brief: "${brief}"
-City: ${criteria.city}
+Analyze these web search results from Parallel Search and evaluate 3-5 real, named candidate filming locations in "${criteria.city}" strictly matching:
+Filmmaker Brief: "${brief}"
+Target City: "${criteria.city}"
+
+CRITICAL SCENE MATCHING INSTRUCTIONS:
+- You MUST evaluate real locations that match the filmmaker's specific genre, aesthetic, and setting:
+  * If the brief asks for a CEMETERY, GRAVEYARD, or HORROR scene, you MUST recommend real cemeteries, burial grounds, catacombs, historic churchyards, or eerie ruins in ${criteria.city} (e.g. Sewri Christian Cemetery, St. Thomas Cathedral Cemetery, Vasai Fort Church Ruins, Portuguese Burial Grounds, etc.). DO NOT recommend warehouses!
+  * If the brief asks for an INDUSTRIAL or WAREHOUSE scene, recommend textile mills, container terminals, and iron yards.
+  * If the brief asks for a HOSPITAL, ASYLUM, or MEDICAL scene, recommend historic hospital wards or sanatoriums.
+  * If the brief asks for a PALACE or LUXURY scene, recommend heritage mansions or private estates.
+- Real Location Names: The "name" must be a real, verifiable landmark or facility in ${criteria.city}.
 
 Web Sources collected:
 ${JSON.stringify(rawSources.slice(0, 10), null, 2)}
 
 Return a JSON array of LocationCandidate objects with:
 - id: string
-- name: string (real location name)
+- name: string (real location name in ${criteria.city})
 - area: string
 - city: "${criteria.city}"
-- description: string
+- description: string (why it fits this specific scene brief)
 - sceneMatchScore: integer 0-100
 - accessibilityScore: integer 0-100
 - productionRiskScore: integer 0-100 (higher = more risk)
@@ -200,7 +208,7 @@ IMPORTANT:
             ? cand.visualCharacteristics
             : typeof cand.visualCharacteristics === 'string'
               ? [cand.visualCharacteristics]
-              : ['Cinematic visual profile', 'Authentic industrial textures'];
+              : ['Authentic architectural profile', 'Cinematic atmosphere'];
 
           const restrictions = Array.isArray(cand.potentialRestrictions)
             ? cand.potentialRestrictions
@@ -216,7 +224,7 @@ IMPORTANT:
             notes: 'Standard filming NOC and local precinct notification required.'
           };
 
-          const media = this.getAtmosphericImage(cand.name || '', cand.area || '', visualTraits);
+          const cameraPackage = this.getRecommendedCamera(visualTraits);
 
           return {
             id: cand.id || `loc-live-${Date.now()}-${idx + 1}`,
@@ -232,8 +240,8 @@ IMPORTANT:
               ? cand.overallScore
               : Math.round(((cand.sceneMatchScore || 88) * 0.4) + ((cand.accessibilityScore || 78) * 0.2) + ((cand.evidenceQualityScore || 84) * 0.2) + ((100 - (cand.productionRiskScore || 35)) * 0.2)),
             visualCharacteristics: visualTraits,
-            image: cand.image || media.image,
-            cameraPackage: cand.cameraPackage || media.camera,
+            image: cand.image || undefined,
+            cameraPackage: cand.cameraPackage || cameraPackage,
             productionConsiderations: {
               accessibility: cand.productionConsiderations?.accessibility || 'Vehicular road access verified',
               parking: cand.productionConsiderations?.parking || 'Production staging and parking available',

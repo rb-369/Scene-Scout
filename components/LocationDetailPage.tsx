@@ -286,7 +286,7 @@ export function LocationDetailPage({ locationId }: LocationDetailPageProps) {
           {viewMode === 'cinematic' ? (
             <>
               <Image
-                src={candidate.image || '/images/cinema_warehouse_still.jpg'}
+                src={candidate.image || 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkV4ZpQRSeOQ4YHBTT-b5h-P5VVQGA7Dk43hZvaPBIqgxuo3WIFlMXje7ifO25-gFNnjxSDK9obHz05KJM1EcAHx2-Kvg_jGwFVR5tCDiVw-XxyJVMeqyyyiW6J_63Pz42zvCAUwFJK7D0=w1000-h1000-c-n'}
                 alt={candidate.name}
                 fill
                 priority
