@@ -1,5 +1,5 @@
 import { LocationCandidate, ResearchSession } from '../types';
-import { DEMO_CANDIDATES, ADDITIONAL_SUGGESTED_CANDIDATES, CEMETERY_HORROR_CANDIDATES } from '../demoData';
+import { DEMO_CANDIDATES, ADDITIONAL_SUGGESTED_CANDIDATES, CEMETERY_HORROR_CANDIDATES, ABANDONED_BUILDING_CANDIDATES } from '../demoData';
 
 const SAVED_LOCATIONS_KEY = 'scenescout_saved_locations_v1';
 const SESSIONS_HISTORY_KEY = 'scenescout_sessions_history_v1';

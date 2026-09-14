@@ -1715,26 +1715,101 @@ export const CEMETERY_HORROR_CANDIDATES: LocationCandidate[] = [
 ];
 
 /**
+ * Curated abandoned buildings, ruined mills, and decommissioned factories
+ * Ideal for horror, thriller, crime, and suspense scenes in dilapidated structures
+ */
+export const ABANDONED_BUILDING_CANDIDATES: LocationCandidate[] = [
+  {
+    ...DEMO_CANDIDATES[0], // Mukesh Mills
+    description: "Iconic 1870s abandoned sea-facing textile mill ruins gutted by historic fire. Features weathered Victorian brick archways, skeletal iron rafters, cavernous roofless machine rooms, and infamous urban ghost legends. The preeminent abandoned building in Mumbai for horror, psychological thriller, and paranormal cinematography.",
+    sceneMatchScore: 98,
+    visualCharacteristics: [
+      "Roofless, crumbling Victorian brick corridors with eerie sea-breeze acoustics",
+      "Skeletal iron roof trusses casting harsh, jagged moonlight shadows",
+      "Overgrown wild ficus roots strangling 19th-century boiler masonry",
+      "High natural contrast corridors ideal for flashlight beams and sudden creature reveals"
+    ]
+  },
+  {
+    ...DEMO_CANDIDATES[4], // Shakti Mills
+    description: "Deep overgrown industrial ruins reclaiming collapsed textile spinning sheds and Victorian masonry. Uniquely eerie, claustrophobic atmosphere with dangling aerial banyan roots, rusted steel boilers, collapsed stairwells, and decaying brick chimneys. Quintessential dilapidated building backdrop for supernatural horror.",
+    sceneMatchScore: 96,
+    visualCharacteristics: [
+      "Dense banyan root curtains encasing collapsed doorways and shattered window apertures",
+      "Moss-blanketed concrete machinery foundations and damp flooded basement pits",
+      "Dark, tunnel-like passages between decayed spinning halls with zero daylight penetration",
+      "Crumbling brick smokestacks silhouetted against brooding urban night skies"
+    ]
+  },
+  CEMETERY_HORROR_CANDIDATES[2], // St. John the Baptist Abandoned Church & Structural Ruins (SEEPZ)
+  CEMETERY_HORROR_CANDIDATES[1], // Vasai Fort Church Ruins & Portuguese Crypts
+  {
+    ...ADDITIONAL_SUGGESTED_CANDIDATES[1], // Wagle Industrial Boiler Works & Chemical Godowns
+    description: "Sprawling decommissioned 1970s chemical distillation complex featuring exterior steel pipeline corridors, rusted vertical silos, and a 16,000 sq ft column-free empty warehouse hall. Ideal for slasher horror, biohazard thrillers, and abandoned containment sequences.",
+    sceneMatchScore: 92,
+    visualCharacteristics: [
+      "Extensive external labyrinth of rusty steam pipes, pressure gauges, and catwalks",
+      "Cavernous, silent column-free industrial floor with peeling paint and hazard striping",
+      "Massive industrial sliding bay doors creaking in the wind",
+      "Dramatic high overhead clerestory openings casting stark, sharp moonlight beams"
+    ]
+  }
+];
+
+/**
  * Intelligent helper: Get accurate candidates tailored to the user's specific prompt genre
  */
 export function getCandidatesForPrompt(brief: string, city: string = 'Mumbai'): LocationCandidate[] {
   const lower = (brief || '').toLowerCase();
   
-  if (
+  // 1. Check for abandoned building / factory / mill / ruins (including common typos like "abondond", "abondon", "abandan", etc.)
+  const hasAbandonedOrBuilding = 
+    lower.includes('abandon') ||
+    lower.includes('abondond') ||
+    lower.includes('abondon') ||
+    lower.includes('abandan') ||
+    lower.includes('derelict') ||
+    lower.includes('decay') ||
+    lower.includes('dilapidat') ||
+    lower.includes('ruin') ||
+    lower.includes('empty building') ||
+    lower.includes('old building') ||
+    lower.includes('creepy building') ||
+    lower.includes('haunted building') ||
+    lower.includes('factory') ||
+    lower.includes('mill') ||
+    lower.includes('boiler') ||
+    lower.includes('plant') ||
+    (lower.includes('building') && (lower.includes('horror') || lower.includes('spooky') || lower.includes('creepy') || lower.includes('thriller')));
+
+  // 2. Check for explicit cemetery / graveyard / tomb / burial
+  const hasCemetery = 
     lower.includes('cemetery') ||
     lower.includes('graveyard') ||
-    lower.includes('horror') ||
     lower.includes('tomb') ||
     lower.includes('crypt') ||
     lower.includes('grave') ||
-    lower.includes('gothic') ||
-    lower.includes('ghost') ||
-    lower.includes('supernatural') ||
-    lower.includes('burial')
-  ) {
+    lower.includes('burial') ||
+    lower.includes('mausoleum') ||
+    lower.includes('catacomb');
+
+  // If the user explicitly asks for an abandoned building/factory (even if they also say "horror scene"),
+  // prioritize abandoned buildings rather than cemeteries!
+  if (hasAbandonedOrBuilding) {
+    return ABANDONED_BUILDING_CANDIDATES;
+  }
+
+  // If user asks for cemetery / graveyard / tomb
+  if (hasCemetery) {
     return CEMETERY_HORROR_CANDIDATES;
   }
-  
+
+  // If general horror / ghost without specifying building vs cemetery:
+  if (lower.includes('horror') || lower.includes('ghost') || lower.includes('supernatural') || lower.includes('gothic')) {
+    return CEMETERY_HORROR_CANDIDATES;
+  }
+
+  // Default to industrial warehouse candidates
   return DEMO_CANDIDATES;
 }
 

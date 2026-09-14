@@ -114,7 +114,7 @@ A filmmaker provided this production brief:
 Target City: ${criteria.city}
 Scene Context: ${criteria.sceneType || 'Custom Film Scene'}
 
-Generate 4-5 highly specific, realistic search queries to find real, authentic filming locations in ${criteria.city} on the web via the Parallel Search API matching the exact scene requirements (e.g. if cemetery/horror, search real cemeteries, burial grounds, catacombs, historic churchyards, or spooky ruins in ${criteria.city}; if hospital/asylum, search historic medical buildings; if industrial/warehouse, search mills and ports).
+Generate 4-5 highly specific, realistic search queries to find real, authentic filming locations in ${criteria.city} on the web via the Parallel Search API matching the exact scene requirements (e.g. if abandoned building / factory / mill / ruins, search real abandoned mills, decaying factories, and structural ruins like Mukesh Mills or Shakti Mills in ${criteria.city}; if cemetery/graveyard, search real cemeteries, burial grounds, and crypts; if hospital/asylum, search historic medical buildings; if warehouse/industrial, search active mills and port terminals).
 Focus on real named landmarks, heritage sites, and official film office shooting guidelines in ${criteria.city}.
 Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
 
@@ -150,8 +150,9 @@ Target City: "${criteria.city}"
 
 CRITICAL SCENE MATCHING INSTRUCTIONS:
 - You MUST evaluate real locations that match the filmmaker's specific genre, aesthetic, and setting:
-  * If the brief asks for a CEMETERY, GRAVEYARD, or HORROR scene, you MUST recommend real cemeteries, burial grounds, catacombs, historic churchyards, or eerie ruins in ${criteria.city} (e.g. Sewri Christian Cemetery, St. Thomas Cathedral Cemetery, Vasai Fort Church Ruins, Portuguese Burial Grounds, etc.). DO NOT recommend warehouses!
-  * If the brief asks for an INDUSTRIAL or WAREHOUSE scene, recommend textile mills, container terminals, and iron yards.
+  * If the brief asks for an ABANDONED BUILDING, RUINS, or DILAPIDATED FACTORY (even for a horror or ghost scene in a building), you MUST recommend real abandoned mills, factory ruins, or dilapidated buildings in ${criteria.city} (e.g. Mukesh Mills Heritage Mill Compound Ruins, Shakti Mills Overgrown Ruins, Vasai Fort Ruins, St. John the Baptist Abandoned Church Ruins, or decommissioned industrial plants). DO NOT default to cemeteries unless the filmmaker explicitly asked for a cemetery or graveyard!
+  * If the brief explicitly asks for a CEMETERY, GRAVEYARD, or BURIAL scene, recommend real cemeteries and burial grounds in ${criteria.city} (e.g. Sewri Christian Cemetery, Antop Hill Cemetery, St. Thomas Cathedral Cemetery).
+  * If the brief asks for an INDUSTRIAL or WAREHOUSE scene, recommend active textile mills, container terminals, and iron yards.
   * If the brief asks for a HOSPITAL, ASYLUM, or MEDICAL scene, recommend historic hospital wards or sanatoriums.
   * If the brief asks for a PALACE or LUXURY scene, recommend heritage mansions or private estates.
 - Real Location Names: The "name" must be a real, verifiable landmark or facility in ${criteria.city}.
