@@ -1073,7 +1073,7 @@ export const DEMO_STUDIO_CANDIDATES: StudioCandidate[] = [
     },
     googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Ramoji+Film+City+Hyderabad",
     googleEarthUrl: "https://earth.google.com/web/search/Ramoji+Film+City+Hyderabad",
-    image: "/images/cinema_coastal_outpost.jpg",
+    image: "/images/google_ramoji_film_city.jpg",
     contactDetails: {
       phone: "+91 8415 246555",
       email: "filmshoots@ramojifilmcity.com",

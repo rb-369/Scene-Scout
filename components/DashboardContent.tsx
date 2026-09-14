@@ -150,33 +150,13 @@ export function DashboardContent({
     const saved = storageService.getSavedLocations();
     setSavedLocations(saved);
 
-    // If navigated via "Start a scout", auto-run the scout pipeline so user lands on pipeline first!
-    if (initialAutoStartScout) {
-      setCurrentSession(DEMO_SESSION);
-      setCandidates(DEMO_CANDIDATES);
-      storageService.cacheActiveCandidates(DEMO_CANDIDATES);
-      setTimeout(() => {
-        timelineRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        handleStartScout(
-          DEMO_BRIEF,
-          {
-            city: 'Mumbai',
-            sceneType: 'Industrial Thriller Warehouse',
-            budgetSensitivity: 'Moderate',
-            maxDistanceKm: 35,
-            priorities: { sceneMatch: 40, accessibility: 20, evidenceQuality: 20, productionRisk: 20 }
-          },
-          true
-        );
-      }, 200);
-    } else {
-      // Automatically load the pre-curated primary demo session statically
-      setCurrentSession(DEMO_SESSION);
-      setCandidates(DEMO_CANDIDATES);
-      storageService.cacheActiveCandidates(DEMO_CANDIDATES);
-      setCurrentStepIndex(DEMO_ACTIVITY_STEPS.length - 1);
-    }
-  }, [initialAutoStartScout]);
+    // Always load the pre-curated session statically in a calm, ready state
+    // Do NOT auto-run the scout prompt - scout only runs when the user explicitly clicks "Start Scout"
+    setCurrentSession(DEMO_SESSION);
+    setCandidates(DEMO_CANDIDATES);
+    storageService.cacheActiveCandidates(DEMO_CANDIDATES);
+    setCurrentStepIndex(DEMO_ACTIVITY_STEPS.length - 1);
+  }, []);
 
   // Keep active candidates cached for instant location detail page lookup
   useEffect(() => {

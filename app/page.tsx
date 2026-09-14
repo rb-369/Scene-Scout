@@ -15,19 +15,14 @@ export default function Home() {
       if (params.get('view') === 'studio') {
         setView('studio');
       }
-      if (params.get('scout') === 'start') {
-        setAutoStartScout(true);
-      }
     }
   }, []);
 
-  const handleLaunchStudio = (options?: { autoStartScout?: boolean }) => {
-    if (options?.autoStartScout) {
-      setAutoStartScout(true);
-    }
+  const handleLaunchStudio = () => {
+    setAutoStartScout(false);
     setView('studio');
     if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', options?.autoStartScout ? '?view=studio&scout=start' : '?view=studio');
+      window.history.pushState(null, '', '?view=studio');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };

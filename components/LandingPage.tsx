@@ -122,7 +122,7 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
             <a href="#method">Method</a>
             <a href="#dossiers">Dossiers</a>
             <a href="#departments">Departments</a>
-            <button onClick={() => onLaunchStudio({ autoStartScout: true })} className="btn-cinema btn-primary">
+            <button onClick={() => onLaunchStudio()} className="btn-cinema btn-primary">
               Open studio <ArrowRight size={14} />
             </button>
           </div>
@@ -137,7 +137,7 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
               <h1 id="hero-title">Find the frame before <span>you move the crew.</span></h1>
               <p>SceneScout turns a scene brief into a practical, verified location dossier for the people who have to make the day work.</p>
               <div className="scene-hero-actions">
-                <button onClick={() => onLaunchStudio({ autoStartScout: true })} className="btn-cinema btn-primary">
+                <button onClick={() => onLaunchStudio()} className="btn-cinema btn-primary">
                   <Film size={16} /> Start a scout
                 </button>
                 <a href="#dossiers" className="btn-cinema btn-secondary">View a dossier</a>
@@ -149,24 +149,24 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
                 <button 
                   type="button" 
                   className="preset-chip" 
-                  onClick={() => onLaunchStudio({ autoStartScout: true })}
-                  title="Run scout for Mumbai industrial thriller warehouse"
+                  onClick={() => onLaunchStudio()}
+                  title="Open studio for Mumbai industrial thriller warehouse"
                 >
                   <span>🎬 Industrial Thriller</span>
                 </button>
                 <button 
                   type="button" 
                   className="preset-chip" 
-                  onClick={() => onLaunchStudio({ autoStartScout: true })}
-                  title="Run scout for nocturnal dockside maritime noir"
+                  onClick={() => onLaunchStudio()}
+                  title="Open studio for nocturnal dockside maritime noir"
                 >
                   <span>⚓ Maritime Berth Noir</span>
                 </button>
                 <button 
                   type="button" 
                   className="preset-chip" 
-                  onClick={() => onLaunchStudio({ autoStartScout: true })}
-                  title="Run scout for sunset coastal standoff on basalt outcrops"
+                  onClick={() => onLaunchStudio()}
+                  title="Open studio for sunset coastal standoff on basalt outcrops"
                 >
                   <span>🌊 Basalt Coastal Standoff</span>
                 </button>

@@ -10,7 +10,7 @@ import {
   Maximize2, 
   Phone, 
   Mail, 
-  Globe, 
+  Globe,
   Volume2
 } from 'lucide-react';
 import { StudioCandidate } from '@/lib/types';
@@ -21,12 +21,8 @@ interface StudioCardProps {
 }
 
 export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
-  const [viewMode, setViewMode] = useState<'still' | 'satellite'>('still');
   const [showContact, setShowContact] = useState<boolean>(false);
 
-  const lat = studio.coordinates.lat;
-  const lng = studio.coordinates.lng;
-  const satelliteEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
   const mapsUrl = studio.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${studio.name}, ${studio.city}`)}`;
   const earthUrl = studio.googleEarthUrl || `https://earth.google.com/web/search/${encodeURIComponent(`${studio.name} ${studio.city}`)}`;
 
@@ -39,162 +35,85 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)'
       }}
     >
-      {/* 16:9 Viewfinder Cinematic Still or Real Google Satellite Embed */}
+      {/* 16:9 Viewfinder - Google Maps Building Photo Thumbnail */}
       <div 
         className="location-card-viewport"
         style={{ position: 'relative', overflow: 'hidden' }}
       >
-        {viewMode === 'still' ? (
-          <>
-            <Image
-              src={studio.image || '/images/cinema_warehouse_still.jpg'}
-              alt={studio.name}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="location-card-still"
-            />
-            <div className="location-card-reticle" aria-hidden="true">
-              <span className="reticle-tl">+</span>
-              <span className="reticle-tr">+</span>
-              <span className="reticle-bl">+</span>
-              <span className="reticle-br">+</span>
-              <span className="reticle-center">✛</span>
-              <span className="reticle-sensor">
-                <span className="rec-dot animate-pulse-subtle" />
-                VIRTUAL PRODUCTION / SOUNDSTAGE
-              </span>
-              <span className="reticle-format">ICVFX · STAGECRAFT</span>
-            </div>
-          </>
-        ) : (
-          <div style={{ position: 'relative', width: '100%', height: '100%', background: '#000' }}>
-            <iframe
-              src={satelliteEmbedUrl}
-              title={`Google Maps Satellite View of ${studio.name}`}
-              width="100%"
-              height="100%"
-              style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.08) brightness(0.95)' }}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-            {/* Satellite Recon Overlay HUD */}
-            <div 
-              style={{
-                position: 'absolute',
-                top: '10px',
-                left: '10px',
-                background: 'rgba(9, 12, 12, 0.88)',
-                backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(245, 158, 11, 0.4)',
-                borderRadius: '6px',
-                padding: '3px 8px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '0.68rem',
-                fontFamily: 'var(--font-mono)',
-                color: '#fbbf24',
-                zIndex: 3,
-                pointerEvents: 'none'
-              }}
-            >
-              <Globe size={11} />
-              <span>{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
-            </div>
+        <Image
+          src={studio.image || '/images/cinema_warehouse_still.jpg'}
+          alt={studio.name}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="location-card-still"
+        />
+        <div className="location-card-reticle" aria-hidden="true">
+          <span className="reticle-tl">+</span>
+          <span className="reticle-tr">+</span>
+          <span className="reticle-bl">+</span>
+          <span className="reticle-br">+</span>
+          <span className="reticle-center">✛</span>
+          <span className="reticle-sensor">
+            <span className="rec-dot animate-pulse-subtle" />
+            VIRTUAL PRODUCTION / SOUNDSTAGE
+          </span>
+          <span className="reticle-format">ICVFX · STAGECRAFT</span>
+        </div>
 
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                position: 'absolute',
-                bottom: '10px',
-                right: '10px',
-                background: 'rgba(9, 12, 12, 0.92)',
-                backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '6px',
-                padding: '4px 10px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                fontSize: '0.7rem',
-                fontWeight: 600,
-                color: '#ffffff',
-                textDecoration: 'none',
-                zIndex: 3,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
-              }}
-              title="Open full interactive map on Google Maps"
-            >
-              <span>Live Maps</span>
-              <ExternalLink size={11} color="#fbbf24" />
-            </a>
-          </div>
-        )}
-
-        {/* View Toggle Pill (Cinematic Still vs Real Google Earth Satellite) */}
+        {/* Google Maps Building View Badge */}
         <div 
-          onClick={(e) => e.stopPropagation()}
           style={{
             position: 'absolute',
             bottom: '10px',
             left: '10px',
-            zIndex: 4,
+            zIndex: 3,
             display: 'flex',
             alignItems: 'center',
-            background: 'rgba(9, 12, 12, 0.85)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: '20px',
-            padding: '2px',
-            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.6)'
+            gap: '5px',
+            background: 'rgba(9, 12, 12, 0.88)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(245, 158, 11, 0.4)',
+            borderRadius: '6px',
+            padding: '3px 8px',
+            fontSize: '0.68rem',
+            fontFamily: 'var(--font-mono)',
+            color: '#fbbf24'
           }}
         >
-          <button
-            type="button"
-            onClick={() => setViewMode('still')}
-            style={{
-              background: viewMode === 'still' ? '#d38a45' : 'transparent',
-              color: viewMode === 'still' ? '#ffffff' : '#94a3b8',
-              border: 'none',
-              borderRadius: '16px',
-              padding: '3px 9px',
-              fontSize: '0.68rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'all 0.15s ease'
-            }}
-            title="Switch to Stage Facility View"
-          >
-            <span>🎬 Facility Still</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode('satellite')}
-            style={{
-              background: viewMode === 'satellite' ? '#0284c7' : 'transparent',
-              color: viewMode === 'satellite' ? '#ffffff' : '#94a3b8',
-              border: 'none',
-              borderRadius: '16px',
-              padding: '3px 9px',
-              fontSize: '0.68rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'all 0.15s ease'
-            }}
-            title="Switch to Real Google Maps / Earth Satellite View"
-          >
-            <span>🛰️ Google Earth</span>
-          </button>
+          <MapPin size={11} color="#fbbf24" />
+          <span>Google Maps Building Photo</span>
         </div>
+
+        {/* Direct Open in Google Maps Link */}
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'absolute',
+            bottom: '10px',
+            right: '10px',
+            zIndex: 3,
+            background: 'rgba(9, 12, 12, 0.92)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.25)',
+            borderRadius: '6px',
+            padding: '4px 10px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '0.7rem',
+            fontWeight: 600,
+            color: '#ffffff',
+            textDecoration: 'none',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+          }}
+          title="Open exact studio complex in Google Maps"
+        >
+          <span>Google Maps</span>
+          <ExternalLink size={11} color="#fbbf24" />
+        </a>
       </div>
 
       {/* Topline Badge */}
@@ -207,31 +126,39 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
         </span>
       </header>
 
-      {/* Title & Google Maps Link */}
-      <div className="location-card-title-row">
-        <div style={{ flex: 1 }}>
-          <h3 style={{ fontSize: '1.12rem', color: '#ffffff', lineHeight: 1.3 }}>{studio.name}</h3>
-          <a
-            href={mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="location-place-link"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              color: '#38bdf8',
-              textDecoration: 'none',
-              fontSize: '0.82rem',
-              marginTop: '4px'
-            }}
-            title="Open exact studio complex in Google Maps"
-          >
-            <MapPin size={13} />
-            <span>{studio.city}, {studio.country}</span>
-            <ExternalLink size={11} style={{ opacity: 0.8 }} />
-          </a>
-        </div>
+      {/* Title & Google Maps Link - Fixed full width & natural text flow */}
+      <div style={{ padding: '0 0 14px 0', width: '100%' }}>
+        <h3 style={{ 
+          fontSize: '1.25rem', 
+          fontWeight: 800, 
+          color: '#ffffff', 
+          lineHeight: 1.25, 
+          margin: '0 0 6px 0',
+          letterSpacing: '-0.02em',
+          wordBreak: 'normal',
+          overflowWrap: 'break-word'
+        }}>
+          {studio.name}
+        </h3>
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="location-place-link"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            color: '#38bdf8',
+            textDecoration: 'none',
+            fontSize: '0.82rem'
+          }}
+          title="Open exact studio complex in Google Maps"
+        >
+          <MapPin size={13} color="#38bdf8" />
+          <span>{studio.city}, {studio.country}</span>
+          <ExternalLink size={11} style={{ opacity: 0.8 }} />
+        </a>
       </div>
 
       {/* Why Studio Recommended Card */}

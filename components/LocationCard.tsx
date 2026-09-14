@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { 
   Bookmark, 
@@ -11,8 +11,7 @@ import {
   MapPin, 
   MessageSquare, 
   AlertTriangle,
-  ExternalLink,
-  Globe
+  ExternalLink
 } from 'lucide-react';
 import { LocationCandidate } from '@/lib/types';
 
@@ -56,7 +55,6 @@ export function LocationCard({
   onAskAbout,
   rankIndex,
 }: LocationCardProps) {
-  const [viewMode, setViewMode] = useState<'cinematic' | 'satellite'>('cinematic');
   const trust = trustMeta(candidate.trustStatus);
   const risk = riskMeta(candidate.productionRiskScore);
   const TrustIcon = trust.Icon;
@@ -64,10 +62,7 @@ export function LocationCard({
   const fallbackImage = candidate.image || '/images/cinema_warehouse_still.jpg';
   const cameraLabel = candidate.cameraPackage || 'ARRI Alexa 35 · 35mm Prime';
 
-  const lat = candidate.coordinates?.lat || 18.9138;
-  const lng = candidate.coordinates?.lng || 72.8242;
   const mapsUrl = candidate.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${candidate.name}, ${candidate.area}, ${candidate.city}`)}`;
-  const satelliteEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <article 
@@ -75,7 +70,7 @@ export function LocationCard({
       onDoubleClick={() => onViewDetails(candidate)}
       title="Double click to view full location dossier"
     >
-      {/* 16:9 Viewfinder Cinematic or Google Maps Satellite Thumbnail */}
+      {/* 16:9 Viewfinder - Google Maps Building Photo Thumbnail */}
       <div 
         className="location-card-viewport"
         onClick={() => onViewDetails(candidate)}
@@ -85,157 +80,80 @@ export function LocationCard({
         title="Click to view full dossier"
         style={{ position: 'relative', overflow: 'hidden' }}
       >
-        {viewMode === 'cinematic' ? (
-          <>
-            <Image
-              src={fallbackImage}
-              alt={candidate.name}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="location-card-still"
-            />
-            <div className="location-card-reticle" aria-hidden="true">
-              <span className="reticle-tl">+</span>
-              <span className="reticle-tr">+</span>
-              <span className="reticle-bl">+</span>
-              <span className="reticle-br">+</span>
-              <span className="reticle-center">✛</span>
-              <span className="reticle-sensor">
-                <span className="rec-dot animate-pulse-subtle" />
-                {cameraLabel}
-              </span>
-              <span className="reticle-format">2.39:1 · REC</span>
-            </div>
-          </>
-        ) : (
-          <div style={{ position: 'relative', width: '100%', height: '100%', background: '#000' }}>
-            <iframe
-              src={satelliteEmbedUrl}
-              title={`Google Maps Satellite View of ${candidate.name}`}
-              width="100%"
-              height="100%"
-              style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.08) brightness(0.95)' }}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-            {/* Satellite Recon Overlay HUD */}
-            <div 
-              style={{
-                position: 'absolute',
-                top: '10px',
-                left: '10px',
-                background: 'rgba(9, 12, 12, 0.88)',
-                backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
-                borderRadius: '6px',
-                padding: '3px 8px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '0.68rem',
-                fontFamily: 'var(--font-mono)',
-                color: '#38bdf8',
-                zIndex: 3,
-                pointerEvents: 'none'
-              }}
-            >
-              <Globe size={11} />
-              <span>{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
-            </div>
+        <Image
+          src={fallbackImage}
+          alt={candidate.name}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="location-card-still"
+        />
+        <div className="location-card-reticle" aria-hidden="true">
+          <span className="reticle-tl">+</span>
+          <span className="reticle-tr">+</span>
+          <span className="reticle-bl">+</span>
+          <span className="reticle-br">+</span>
+          <span className="reticle-center">✛</span>
+          <span className="reticle-sensor">
+            <span className="rec-dot animate-pulse-subtle" />
+            {cameraLabel}
+          </span>
+          <span className="reticle-format">2.39:1 · REC</span>
+        </div>
 
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                position: 'absolute',
-                bottom: '10px',
-                right: '10px',
-                background: 'rgba(9, 12, 12, 0.92)',
-                backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '6px',
-                padding: '4px 10px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                fontSize: '0.7rem',
-                fontWeight: 600,
-                color: '#ffffff',
-                textDecoration: 'none',
-                zIndex: 3,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
-              }}
-              title="Open full interactive map on Google Maps"
-            >
-              <span>Live Maps</span>
-              <ExternalLink size={11} color="#38bdf8" />
-            </a>
-          </div>
-        )}
-
-        {/* View Toggle Pill (Cinematic Still vs Real Google Earth Satellite) */}
+        {/* Google Maps Location Building View Badge */}
         <div 
-          onClick={(e) => e.stopPropagation()}
           style={{
             position: 'absolute',
             bottom: '10px',
             left: '10px',
-            zIndex: 4,
+            zIndex: 3,
             display: 'flex',
             alignItems: 'center',
-            background: 'rgba(9, 12, 12, 0.85)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: '20px',
-            padding: '2px',
-            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.6)'
+            gap: '5px',
+            background: 'rgba(9, 12, 12, 0.88)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
+            borderRadius: '6px',
+            padding: '3px 8px',
+            fontSize: '0.68rem',
+            fontFamily: 'var(--font-mono)',
+            color: '#38bdf8'
           }}
         >
-          <button
-            type="button"
-            onClick={() => setViewMode('cinematic')}
-            style={{
-              background: viewMode === 'cinematic' ? '#d38a45' : 'transparent',
-              color: viewMode === 'cinematic' ? '#ffffff' : '#94a3b8',
-              border: 'none',
-              borderRadius: '16px',
-              padding: '3px 9px',
-              fontSize: '0.68rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'all 0.15s ease'
-            }}
-            title="Switch to Cinematic Camera Still"
-          >
-            <span>🎬 Still</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode('satellite')}
-            style={{
-              background: viewMode === 'satellite' ? '#0284c7' : 'transparent',
-              color: viewMode === 'satellite' ? '#ffffff' : '#94a3b8',
-              border: 'none',
-              borderRadius: '16px',
-              padding: '3px 9px',
-              fontSize: '0.68rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'all 0.15s ease'
-            }}
-            title="Switch to Real Google Maps / Earth Satellite View"
-          >
-            <span>🛰️ Google Earth</span>
-          </button>
+          <MapPin size={11} color="#38bdf8" />
+          <span>Google Maps Location Photo</span>
         </div>
+
+        {/* Direct Open in Google Maps Link */}
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'absolute',
+            bottom: '10px',
+            right: '10px',
+            zIndex: 3,
+            background: 'rgba(9, 12, 12, 0.92)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.25)',
+            borderRadius: '6px',
+            padding: '4px 10px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '0.7rem',
+            fontWeight: 600,
+            color: '#ffffff',
+            textDecoration: 'none',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+          }}
+          title="Open exact location on Google Maps"
+        >
+          <span>Google Maps</span>
+          <ExternalLink size={11} color="#38bdf8" />
+        </a>
       </div>
 
       <header className="location-card-topline">
@@ -245,8 +163,8 @@ export function LocationCard({
 
       <div className="location-card-title-row">
         <span className={`location-rank ${rankIndex === 0 ? 'is-top' : ''}`}>{String(rankIndex + 1).padStart(2, '0')}</span>
-        <div style={{ flex: 1 }}>
-          <h3 onClick={() => onViewDetails(candidate)} style={{ cursor: 'pointer' }}>{candidate.name}</h3>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h3 onClick={() => onViewDetails(candidate)} style={{ cursor: 'pointer', overflowWrap: 'break-word', wordBreak: 'normal', lineHeight: 1.25 }}>{candidate.name}</h3>
           <a
             href={mapsUrl}
             target="_blank"
