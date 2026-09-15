@@ -88,32 +88,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Top Header & Branding */}
       <div>
         {/* Logo, Wordmark and Close Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', paddingLeft: '4px' }}>
-          <div style={{
-            position: 'relative',
-            width: '38px',
-            height: '38px',
-            borderRadius: '8px',
-            overflow: 'hidden',
-            border: '1px solid rgba(245, 158, 11, 0.4)',
-            boxShadow: '0 0 14px rgba(245, 158, 11, 0.25)',
-            flexShrink: 0
-          }}>
-            <Image 
-              src="/logo.png" 
-              alt="SceneScout" 
-              fill 
-              sizes="38px"
-              style={{ objectFit: 'cover' }} 
-              priority
-            />
-          </div>
-          <div>
-            <h1 className="font-display" style={{ fontSize: '1.22rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#ffffff' }}>
-              Scene<span style={{ color: '#fbbf24' }}>Scout</span>
-            </h1>
-            <div style={{ fontSize: '0.64rem', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600 }}>
-              Find Stories Around You
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          gap: '10px', 
+          marginBottom: '18px', 
+          padding: '2px 4px' 
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '11px', minWidth: 0 }}>
+            <div style={{
+              position: 'relative',
+              width: '38px',
+              height: '38px',
+              borderRadius: '8px',
+              overflow: 'hidden',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              boxShadow: '0 0 14px rgba(245, 158, 11, 0.25)',
+              flexShrink: 0
+            }}>
+              <Image 
+                src="/logo.png" 
+                alt="SceneScout" 
+                fill 
+                sizes="38px"
+                style={{ objectFit: 'cover' }} 
+                priority
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <h1 className="font-display" style={{ margin: 0, padding: 0, lineHeight: 1.15, fontSize: '1.22rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#ffffff' }}>
+                Scene<span style={{ color: '#fbbf24' }}>Scout</span>
+              </h1>
+              <div style={{ margin: 0, marginTop: '3px', lineHeight: 1, fontSize: '0.62rem', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                Find Stories Around You
+              </div>
             </div>
           </div>
           {onToggle && (
@@ -123,14 +132,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="btn-cinema btn-ghost"
               style={{
                 marginLeft: 'auto',
-                padding: '6px',
+                width: '32px',
+                height: '32px',
+                padding: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 borderRadius: '6px',
-                color: '#94a3b8'
+                border: '1px solid rgba(148, 163, 184, 0.18)',
+                background: 'rgba(255, 255, 255, 0.04)',
+                color: '#94a3b8',
+                flexShrink: 0,
+                cursor: 'pointer'
               }}
               title="Close sidebar"
               aria-label="Close sidebar"
             >
-              <PanelLeftClose size={18} />
+              <PanelLeftClose size={16} />
             </button>
           )}
         </div>

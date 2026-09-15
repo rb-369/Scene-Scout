@@ -80,7 +80,7 @@ export function LocationCard({
       onDoubleClick={() => onViewDetails(candidate)}
       title="Double click to view full location dossier"
     >
-      {/* 16:9 Viewfinder - Official Google Maps Photo or Satellite Recon */}
+      {/* 16:9 Viewfinder - Official Location Photo */}
       <div 
         className="location-card-viewport"
         onClick={() => onViewDetails(candidate)}
@@ -90,11 +90,10 @@ export function LocationCard({
         title="Click to view full dossier"
         style={{ position: 'relative', overflow: 'hidden', height: '220px', background: '#0a0d12' }}
       >
-        {activeMode === 'photo' && candidate.image ? (
-          /* Official Google Maps Building / Place Photo */
+        {candidate.image ? (
           <img
             src={candidate.image}
-            alt={`Official Google Maps photo of ${candidate.name}`}
+            alt={`Official photo of ${candidate.name}`}
             style={{
               width: '100%',
               height: '100%',
@@ -103,98 +102,11 @@ export function LocationCard({
               display: 'block'
             }}
             loading="lazy"
-            onError={() => {
-              setImgFailed(true);
-              setViewMode('satellite');
-            }}
           />
         ) : (
-          /* Google Maps Satellite Recon Embed */
-          <iframe
-            src={satelliteEmbedUrl}
-            title={`Google Maps Satellite View of ${candidate.name}`}
-            width="100%"
-            height="100%"
-            style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.08) brightness(0.95)' }}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        )}
-
-        {/* Visual Mode Overlay HUD */}
-        <div 
-          style={{
-            position: 'absolute',
-            top: '10px',
-            left: '10px',
-            background: 'rgba(9, 12, 12, 0.88)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(56, 189, 248, 0.35)',
-            borderRadius: '6px',
-            padding: '3px 8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '0.68rem',
-            fontFamily: 'var(--font-mono)',
-            color: '#38bdf8',
-            zIndex: 3,
-            pointerEvents: 'none'
-          }}
-        >
-          {activeMode === 'photo' ? (
-            <>
-              <Camera size={11} />
-              <span>Google Maps Place Photo</span>
-            </>
-          ) : (
-            <>
-              <Globe size={11} />
-              <span>{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
-            </>
-          )}
-        </div>
-
-        {/* View Switcher Toggle: Photo <-> Satellite */}
-        {hasPhoto && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setViewMode(activeMode === 'photo' ? 'satellite' : 'photo');
-            }}
-            style={{
-              position: 'absolute',
-              bottom: '10px',
-              left: '10px',
-              zIndex: 3,
-              background: 'rgba(9, 12, 12, 0.88)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(56, 189, 248, 0.3)',
-              borderRadius: '6px',
-              padding: '4px 8px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              fontSize: '0.68rem',
-              fontWeight: 600,
-              color: '#cbd5e1',
-              cursor: 'pointer'
-            }}
-            title={activeMode === 'photo' ? 'Switch to Satellite Recon' : 'Switch to Official Place Photo'}
-          >
-            {activeMode === 'photo' ? (
-              <>
-                <Globe size={11} color="#38bdf8" />
-                <span>Satellite</span>
-              </>
-            ) : (
-              <>
-                <Camera size={11} color="#38bdf8" />
-                <span>Building</span>
-              </>
-            )}
-          </button>
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0d12', color: '#64748b', fontSize: '0.8rem' }}>
+            <span>Location Production Dossier</span>
+          </div>
         )}
 
         {/* Direct Open in Google Maps Link */}
@@ -296,13 +208,27 @@ export function LocationCard({
         </div>
       </div>
 
-      <footer className="location-card-actions">
-        <div className="location-card-utilities">
+      <footer className="location-card-actions" style={{
+        marginTop: 'auto',
+        paddingTop: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '10px',
+        flexWrap: 'wrap'
+      }}>
+        <div className="location-card-utilities" style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          flexWrap: 'wrap'
+        }}>
           <button 
             type="button"
             className={isCompared ? 'is-active' : ''} 
             onClick={(e) => { e.stopPropagation(); onToggleCompare(candidate); }} 
             aria-pressed={isCompared}
+            style={{ height: '32px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
             title={isCompared ? 'Remove from comparison' : 'Add to side-by-side comparison'}
           >
             <Layers size={13} />
@@ -313,6 +239,7 @@ export function LocationCard({
             className={isSaved ? 'is-active' : ''} 
             onClick={(e) => { e.stopPropagation(); onToggleSave(candidate); }} 
             aria-pressed={isSaved}
+            style={{ height: '32px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
             title={isSaved ? 'Remove from saved locations' : 'Save location to shortlist'}
           >
             <Bookmark size={13} fill={isSaved ? 'currentColor' : 'none'} />
@@ -328,7 +255,8 @@ export function LocationCard({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
-              padding: '6px 10px',
+              height: '32px',
+              padding: '0 10px',
               borderRadius: '6px',
               background: 'rgba(56, 189, 248, 0.1)',
               border: '1px solid rgba(56, 189, 248, 0.25)',
@@ -346,6 +274,7 @@ export function LocationCard({
             type="button"
             className="location-ask-btn"
             onClick={(e) => { e.stopPropagation(); onAskAbout(candidate); }} 
+            style={{ height: '32px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
             title="Ask agent specific questions about this location"
           >
             <MessageSquare size={13} />
@@ -356,6 +285,7 @@ export function LocationCard({
           type="button"
           className="location-open-dossier" 
           onClick={(e) => { e.stopPropagation(); onViewDetails(candidate); }}
+          style={{ height: '32px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           title="View full location dossier in new page"
         >
           View <Eye size={13} />

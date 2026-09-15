@@ -28,10 +28,12 @@ import {
   DEMO_SESSION,
   DEMO_STUDIO_CANDIDATES,
   ADDITIONAL_SUGGESTED_CANDIDATES,
+  ALL_INDEXED_CANDIDATES,
   isStudioScenario,
   getStudioRecommendations,
   getCandidatesForPrompt
 } from '@/lib/demoData';
+import { rankCandidatesBySemanticRelevance } from '@/lib/services/semanticMatcher';
 import { storageService } from '@/lib/services/storage';
 import { 
   Layers, 
@@ -428,14 +430,19 @@ export function DashboardContent({
     setSuggestionFeedback(null);
 
     try {
-      // Identify candidate locations from reserve pool not currently in active list
+      // If user is currently filtering on 'studios', switch to 'all' so the newly added location cards are rendered
+      if (activeCategory === 'studios') {
+        setActiveCategory('all');
+      }
+
+      // Identify candidate locations from the full indexed knowledge base not currently in active list
       const currentIds = new Set(candidates.map(c => c.id));
-      const unlisted = ADDITIONAL_SUGGESTED_CANDIDATES.filter(c => !currentIds.has(c.id));
+      const unlisted = ALL_INDEXED_CANDIDATES.filter(c => !currentIds.has(c.id));
 
       if (unlisted.length === 0) {
-        // If all 9 curated pool locations have already been added, notify user & guide to AI chat
+        // If all indexed pool locations have already been added, notify user & guide to AI chat
         await new Promise(resolve => setTimeout(resolve, 800));
-        setSuggestionFeedback('All 9 curated Mumbai industrial locations are already in your shortlist. Use "Ask SceneScout" below to explore other cities or custom scene styles!');
+        setSuggestionFeedback('All indexed locations are already in your shortlist. Use "Ask SceneScout" below to explore other cities or custom scene styles!');
         setTimeout(() => {
           conversationalRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 1200);
@@ -445,8 +452,15 @@ export function DashboardContent({
       // Simulate the agent querying, verifying access, and synthesizing next batch
       await new Promise(resolve => setTimeout(resolve, 1100));
 
-      // Append next 2 locations from reserve
-      const nextBatch = unlisted.slice(0, 2);
+      // Rank unlisted candidates against current user brief for maximum scene synergy
+      const rankedUnlisted = rankCandidatesBySemanticRelevance(
+        currentSession?.userBrief || DEMO_BRIEF,
+        unlisted,
+        unlisted.length
+      );
+
+      // Append next 2 locations from ranked reserve
+      const nextBatch = rankedUnlisted.slice(0, 2);
       const updatedCandidates = [...candidates, ...nextBatch];
       
       setCandidates(updatedCandidates);

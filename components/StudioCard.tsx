@@ -8,11 +8,10 @@ import {
   ExternalLink, 
   Sparkles, 
   Maximize2, 
+  Volume2,
   Phone, 
   Mail, 
-  Globe,
-  Volume2,
-  Camera
+  MessageSquare
 } from 'lucide-react';
 import { StudioCandidate } from '@/lib/types';
 
@@ -23,19 +22,8 @@ interface StudioCardProps {
 
 export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
   const [showContact, setShowContact] = useState<boolean>(false);
-  const [imgFailed, setImgFailed] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<'photo' | 'satellite'>(
-    studio.image && !imgFailed ? 'photo' : 'satellite'
-  );
 
-  const lat = studio.coordinates.lat;
-  const lng = studio.coordinates.lng;
-  const satelliteEmbedUrl = `https://maps.google.com/maps?q=${lat},${lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
   const mapsUrl = studio.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${studio.name}, ${studio.city}`)}`;
-  const earthUrl = studio.googleEarthUrl || `https://earth.google.com/web/search/${encodeURIComponent(`${studio.name} ${studio.city}`)}`;
-
-  const hasPhoto = Boolean(studio.image && !imgFailed);
-  const activeMode = hasPhoto ? viewMode : 'satellite';
 
   return (
     <article 
@@ -46,13 +34,12 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)'
       }}
     >
-      {/* 16:9 Viewfinder - Official Google Maps Photo or Satellite Recon */}
+      {/* 16:9 Viewfinder - Official Studio Image */}
       <div 
         className="location-card-viewport"
         style={{ position: 'relative', overflow: 'hidden', height: '220px', background: '#0a0d12' }}
       >
-        {activeMode === 'photo' && studio.image ? (
-          /* Official Google Maps Building / Complex Photo */
+        {studio.image ? (
           <img
             src={studio.image}
             alt={`Official photo of ${studio.name}`}
@@ -64,98 +51,11 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
               display: 'block'
             }}
             loading="lazy"
-            onError={() => {
-              setImgFailed(true);
-              setViewMode('satellite');
-            }}
           />
         ) : (
-          /* Google Maps Satellite Recon Embed */
-          <iframe
-            src={satelliteEmbedUrl}
-            title={`Google Maps Satellite View of ${studio.name}`}
-            width="100%"
-            height="100%"
-            style={{ border: 0, width: '100%', height: '100%', filter: 'contrast(1.08) brightness(0.95)' }}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        )}
-
-        {/* Visual Mode Overlay HUD */}
-        <div 
-          style={{
-            position: 'absolute',
-            top: '10px',
-            left: '10px',
-            background: 'rgba(9, 12, 12, 0.88)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(245, 158, 11, 0.4)',
-            borderRadius: '6px',
-            padding: '3px 8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '0.68rem',
-            fontFamily: 'var(--font-mono)',
-            color: '#fbbf24',
-            zIndex: 3,
-            pointerEvents: 'none'
-          }}
-        >
-          {activeMode === 'photo' ? (
-            <>
-              <Camera size={11} />
-              <span>Official Google Maps Photo</span>
-            </>
-          ) : (
-            <>
-              <Globe size={11} />
-              <span>{lat.toFixed(4)}°N, {lng.toFixed(4)}°E</span>
-            </>
-          )}
-        </div>
-
-        {/* View Switcher Toggle: Photo <-> Satellite */}
-        {hasPhoto && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setViewMode(activeMode === 'photo' ? 'satellite' : 'photo');
-            }}
-            style={{
-              position: 'absolute',
-              bottom: '10px',
-              left: '10px',
-              zIndex: 3,
-              background: 'rgba(9, 12, 12, 0.88)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(245, 158, 11, 0.35)',
-              borderRadius: '6px',
-              padding: '4px 8px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              fontSize: '0.68rem',
-              fontWeight: 600,
-              color: '#cbd5e1',
-              cursor: 'pointer'
-            }}
-            title={activeMode === 'photo' ? 'Switch to Satellite Recon' : 'Switch to Official Complex Photo'}
-          >
-            {activeMode === 'photo' ? (
-              <>
-                <Globe size={11} color="#fbbf24" />
-                <span>Satellite</span>
-              </>
-            ) : (
-              <>
-                <Camera size={11} color="#fbbf24" />
-                <span>Complex</span>
-              </>
-            )}
-          </button>
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0d12', color: '#64748b', fontSize: '0.8rem' }}>
+            <span>Studio Production Stage</span>
+          </div>
         )}
 
         {/* Direct Open in Google Maps Link */}
@@ -191,11 +91,23 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
       </div>
 
       {/* Topline Badge */}
-      <header className="location-card-topline">
-        <span className="badge badge-gold" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>
-          <Building2 size={11} /> {studio.stageType}
+      <header className="location-card-topline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '14px' }}>
+        <span className="badge badge-gold" style={{ 
+          fontSize: '0.66rem', 
+          padding: '4px 8px', 
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '5px',
+          flex: '1 1 auto',
+          minWidth: 0,
+          maxWidth: 'calc(100% - 90px)'
+        }}>
+          <Building2 size={12} style={{ flexShrink: 0 }} />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {studio.stageType}
+          </span>
         </span>
-        <span className="location-overall" style={{ color: '#fbbf24' }}>
+        <span className="location-overall" style={{ color: '#fbbf24', flexShrink: 0, marginLeft: 'auto' }}>
           <span>Rating</span><strong>A+</strong>
         </span>
       </header>
@@ -328,8 +240,21 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
       )}
 
       {/* Actions Footer */}
-      <footer className="location-card-actions" style={{ marginTop: '12px' }}>
-        <div className="location-card-utilities">
+      <footer className="location-card-actions" style={{ 
+        marginTop: 'auto', 
+        paddingTop: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '12px',
+        flexWrap: 'wrap'
+      }}>
+        <div className="location-card-utilities" style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '10px',
+          flexWrap: 'wrap'
+        }}>
           <a
             href={mapsUrl}
             target="_blank"
@@ -337,44 +262,23 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '4px',
-              padding: '6px 12px',
-              borderRadius: '6px',
+              gap: '6px',
+              height: '34px',
+              padding: '0 13px',
+              borderRadius: '7px',
               background: 'rgba(56, 189, 248, 0.12)',
-              border: '1px solid rgba(56, 189, 248, 0.3)',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
               color: '#38bdf8',
-              fontSize: '0.75rem',
+              fontSize: '0.78rem',
               fontWeight: 600,
-              textDecoration: 'none'
+              textDecoration: 'none',
+              transition: 'all 0.15s ease'
             }}
             title="Open studio on Google Maps"
           >
-            <MapPin size={12} />
+            <MapPin size={13} />
             <span>Open Maps</span>
-            <ExternalLink size={10} />
-          </a>
-
-          <a
-            href={earthUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: '6px 10px',
-              borderRadius: '6px',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              color: '#ffffff',
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              textDecoration: 'none'
-            }}
-            title="Explore studio complex in Google Earth 3D"
-          >
-            <Globe size={12} />
-            <span>Earth 3D</span>
+            <ExternalLink size={11} />
           </a>
 
           <button
@@ -383,18 +287,20 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '4px',
-              padding: '6px 10px',
-              borderRadius: '6px',
-              background: showContact ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-              border: `1px solid ${showContact ? '#f59e0b' : 'rgba(255, 255, 255, 0.15)'}`,
+              gap: '6px',
+              height: '34px',
+              padding: '0 13px',
+              borderRadius: '7px',
+              background: showContact ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+              border: `1px solid ${showContact ? '#f59e0b' : 'rgba(255, 255, 255, 0.18)'}`,
               color: showContact ? '#fbbf24' : '#ffffff',
-              fontSize: '0.75rem',
+              fontSize: '0.78rem',
               fontWeight: 600,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
             }}
           >
-            <Phone size={12} />
+            <Phone size={13} />
             <span>{showContact ? 'Hide Liaison' : 'Stage Contact'}</span>
           </button>
         </div>
@@ -402,10 +308,25 @@ export function StudioCard({ studio, onAskAboutStudio }: StudioCardProps) {
         {onAskAboutStudio && (
           <button
             type="button"
-            className="location-ask-btn"
             onClick={() => onAskAboutStudio(studio)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              height: '34px',
+              padding: '0 14px',
+              borderRadius: '7px',
+              background: 'rgba(245, 158, 11, 0.12)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              color: '#fbbf24',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
             title="Ask agent questions about this studio stage"
           >
+            <MessageSquare size={13} />
             <span>Ask</span>
           </button>
         )}
