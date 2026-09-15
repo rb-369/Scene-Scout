@@ -145,6 +145,30 @@ export function extractLocationFromPrompt(brief: string, fallbackCity: string = 
     }
   }
 
+  // 4. If not specified in prompt, resolve fallbackCity (e.g. "Any in India", "India", "Mumbai", "Berlin")
+  if (fallbackCity && fallbackCity.trim()) {
+    const fbLower = fallbackCity.toLowerCase();
+    for (const [key, val] of Object.entries(GLOBAL_CITIES)) {
+      if (new RegExp(`\\b${key}\\b`, 'i').test(fbLower)) {
+        return {
+          targetLocation: val.city,
+          isSpecified: false,
+          country: val.country,
+          city: val.city
+        };
+      }
+    }
+    for (const [key, countryName] of Object.entries(GLOBAL_COUNTRIES)) {
+      if (new RegExp(`\\b${key}\\b`, 'i').test(fbLower)) {
+        return {
+          targetLocation: countryName,
+          isSpecified: false,
+          country: countryName
+        };
+      }
+    }
+  }
+
   return { targetLocation: fallbackCity, isSpecified: false };
 }
 

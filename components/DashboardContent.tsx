@@ -201,7 +201,7 @@ export function DashboardContent({
     const fetchScoutPromise = (async () => {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 14000);
+        const timeoutId = setTimeout(() => controller.abort(), 75000); // 75s allowance for deep web research & AI verification
 
         const response = await fetch('/api/scout', {
           method: 'POST',

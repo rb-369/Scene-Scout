@@ -40,10 +40,10 @@ export class GeminiAgentService {
     if (!genAI) throw new Error('Google Generative AI client is not initialized');
 
     const candidateModels = Array.from(new Set([
-      'gemini-2.5-flash',
-      this.modelName,
-      'gemini-2.5-flash-lite',
       'gemini-flash-latest',
+      this.modelName,
+      'gemini-2.5-flash',
+      'gemini-2.5-flash-lite',
       'gemini-2.5-pro'
     ].filter(Boolean) as string[]));
 
@@ -96,15 +96,17 @@ export class GeminiAgentService {
     }
 
     try {
+      const targetGeo = criteria.city || 'India';
       const prompt = `You are SceneScout, an elite autonomous AI film production scout.
 A filmmaker provided this exact production brief (GIVE THIS MAXIMUM PRIORITY):
 "${brief}"
 Scene Context / Preferences: ${criteria.sceneType || 'Authentic Film Scene'}
+Target Geographic Region / Country: ${targetGeo}
 
 Generate 4-5 highly specific, realistic web search queries to find real, authentic filming locations on the web via the Parallel Search API strictly matching the scene requirements.
-- Identify any country, region, or city mentioned in the brief (e.g. Germany, Japan, London, Mumbai, etc.) and direct all search queries to that specific geography.
-- If no specific country or city is mentioned, formulate queries to find the most iconic authentic real-world locations globally matching the architectural and textural needs.
-- Include queries targeting official film commissions, heritage preservation registries, and authentic movie location databases.
+- Identify the target country, region, or city (${targetGeo}) and direct all search queries specifically to that geography.
+- If the user asks for a specific physical setting or structure (e.g. "construction site", "abandoned hospital", "coastal fort", "railway yard"), EVERY search query MUST focus on finding authentic real-world examples of THAT specific physical environment in ${targetGeo}.
+- Include queries targeting official film commissions, municipal filming permits, location scouting agency directories, and news reports for that structure in ${targetGeo}.
 Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
 
       const text = await this.generateWithFallback(prompt);
@@ -133,6 +135,7 @@ Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
     }
 
     try {
+      const targetGeo = criteria.city || 'India';
       const hasSources = Array.isArray(rawSources) && rawSources.length > 0;
       const prompt = `You are SceneScout, an elite AI Location Scout and Supervising Production Designer Agent.
 ${hasSources 
@@ -141,11 +144,13 @@ ${hasSources
 
 FILMMAKER PRODUCTION BRIEF (HIGHEST PRIORITY - ABSOLUTE TRUTH):
 "${brief}"
+TARGET GEOGRAPHY: ${targetGeo}
+SCENE GENRE / ARCHETYPE: ${criteria.sceneType || 'Authentic Film Scene'}
 
 CRITICAL SPATIAL & GEOGRAPHIC PRINCIPLES:
-1. GEOGRAPHIC RESPECT: Extract any country, state, or city explicitly mentioned in the brief (e.g. if the filmmaker asks for "Germany", all candidates MUST be authentic real locations in Germany such as Rothenburg ob der Tauber, Bamberg, Regensburg, Heidelberg, Görlitz, Quedlinburg, etc. Do NOT default or substitute any other city/country).
-2. PHYSICAL ENVIRONMENT FIRST: The candidate locations must strictly match the physical architecture and texture requested (e.g., ancient medieval walled towns, gothic stone ruins, industrial mills, or historic hospitals).
-3. REAL-WORLD AUTHENTICITY: Every candidate MUST be a real, verifiable physical landmark or historic site with its accurate name, area/state, city, and country.
+1. GEOGRAPHIC RESPECT: Every candidate location MUST be situated within ${targetGeo} (e.g., if ${targetGeo} is India, all locations must be in India such as Mumbai, Delhi, Bengaluru, Hyderabad, etc. If Germany, all must be in Germany).
+2. PHYSICAL ENVIRONMENT STRICTNESS: The candidate locations must strictly match the primary physical environment and architecture requested in the brief (e.g. if the user asks for a "construction site", ALL candidates MUST be real construction sites, unfinished high-rise superstructures, major infrastructure works, or industrial construction zones. NEVER suggest cemeteries, crypts, churches, or unrelated places unless explicitly requested).
+3. REAL-WORLD AUTHENTICITY: Every candidate MUST be a real, verifiable physical site or project with its accurate name, area/state, city, and country.
 
 ${hasSources ? `Web Sources collected:\n${JSON.stringify(rawSources.slice(0, 10), null, 2)}\n` : ''}
 Return a JSON array of LocationCandidate objects with:

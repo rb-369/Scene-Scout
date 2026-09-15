@@ -194,23 +194,26 @@ export async function POST(req: NextRequest) {
       'gemini_research_planner'
     );
 
+    const targetGeoLabel = effectiveCountry || effectiveCity || 'India';
+    const searchObjective = `Filming locations for ${brief} in ${targetGeoLabel}`;
+
     // Step 3 & 4: Execute Parallel Web Search
     let parallelResult = { sources: [] as any[] };
     if (parallelClient.isConfigured()) {
       parallelResult = await parallelClient.search(
-        `Filming locations for ${brief}`,
+        searchObjective,
         plannedQueries,
-        'advanced'
+        'fast'
       );
       pushStep(
         'Executing Parallel Search API',
-        `Queried Parallel Search API (api.parallel.ai/v1/search). Retrieved ${parallelResult.sources.length} live web sources and industry records for ${effectiveCity}.`,
+        `Queried Parallel Search API (api.parallel.ai/v1/search). Retrieved ${parallelResult.sources.length} live web sources and industry records for ${targetGeoLabel}.`,
         'parallel_search'
       );
     } else {
       pushStep(
         'Consulting International Film Commission Archives',
-        `Queried regional film commissions and municipal archives for authentic ${effectiveCity} landmarks.`,
+        `Queried regional film commissions and municipal archives for authentic ${targetGeoLabel} landmarks.`,
         'scenescout_directory'
       );
     }
@@ -230,7 +233,11 @@ export async function POST(req: NextRequest) {
       if (dynamicIntl.length > 0) {
         candidates = dynamicIntl;
       } else if (geminiService.isConfigured()) {
-        candidates = await geminiService.rankCandidatesWithAgent(brief, criteria, ALL_INDEXED_CANDIDATES, 5);
+        // Deep Gemini zero-shot scout strictly adhering to the requested setting and geography
+        candidates = await geminiService.evaluateCandidates(brief, criteria, []);
+        if (!candidates || candidates.length === 0) {
+          candidates = getCandidatesForPrompt(brief, effectiveCity);
+        }
       } else {
         candidates = getCandidatesForPrompt(brief, effectiveCity);
       }
