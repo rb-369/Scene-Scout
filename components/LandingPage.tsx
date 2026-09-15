@@ -177,8 +177,8 @@ export function LandingPage({ onLaunchStudio }: LandingPageProps) {
                 <div className="scene-meta-card animate-card-drop" style={{ animationDelay: '0.3s' }}><span>Proof</span><strong>Sources and contacts</strong></div>
               </div>
             </div>
-            <div className="scene-hero-visual" aria-label="Industrial warehouse location preview">
-              <Image src="/images/cinema_warehouse_still.jpg" alt="Industrial warehouse prepared for a film shoot" fill priority sizes="(max-width: 1024px) 100vw, 55vw" />
+            <div className="scene-hero-visual" aria-label="Mukesh Textile Compound real location preview">
+              <Image src="/images/cinema_warehouse_still.jpg" alt="Mukesh Textile Compound, Colaba — Real location scouting photograph" fill priority sizes="(max-width: 1024px) 100vw, 55vw" />
               <div className="scene-hero-viewfinder-reticle" aria-hidden="true">
                 <span className="reticle-tl">+</span>
                 <span className="reticle-tr">+</span>
