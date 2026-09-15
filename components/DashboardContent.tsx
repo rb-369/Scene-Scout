@@ -33,6 +33,7 @@ import {
   getStudioRecommendations,
   getCandidatesForPrompt
 } from '@/lib/demoData';
+import { extractLocationFromPrompt, getDynamicInternationalCandidates } from '@/lib/services/geoExtractor';
 import { rankCandidatesBySemanticRelevance } from '@/lib/services/semanticMatcher';
 import { storageService } from '@/lib/services/storage';
 import { 
@@ -258,15 +259,19 @@ export function DashboardContent({
         }
         storageService.saveSession(data.session, user?.id);
       } else {
-        // Guaranteed fallback with studio scenario detection
+        // Dynamic fallback respecting the user's raw prompt location
+        const geoDetection = extractLocationFromPrompt(brief, criteria.city);
+        const dynamicIntl = getDynamicInternationalCandidates(brief, geoDetection);
         const fallbackStudioNeeded = isStudioScenario(brief);
         const fallbackStudios = getStudioRecommendations(brief);
-        const fallbackCandidates = getCandidatesForPrompt(brief, criteria.city);
+        const fallbackCandidates = dynamicIntl.length > 0 
+          ? dynamicIntl 
+          : getCandidatesForPrompt(brief, criteria.city);
         const fallbackSession: ResearchSession = {
           ...DEMO_SESSION,
           id: `session-${Date.now()}`,
           userBrief: brief,
-          criteria,
+          criteria: { ...criteria, city: geoDetection.isSpecified ? geoDetection.targetLocation : criteria.city },
           candidates: fallbackCandidates,
           isStudioRecommended: fallbackStudioNeeded,
           studioRecommendations: fallbackStudioNeeded ? fallbackStudios : undefined
@@ -283,7 +288,11 @@ export function DashboardContent({
       }
     } catch (err) {
       console.error('[Scout Pipeline] Pipeline execution error:', err);
-      const fallbackCandidates = getCandidatesForPrompt(brief, criteria.city);
+      const geoDetection = extractLocationFromPrompt(brief, criteria.city);
+      const dynamicIntl = getDynamicInternationalCandidates(brief, geoDetection);
+      const fallbackCandidates = dynamicIntl.length > 0 
+        ? dynamicIntl 
+        : getCandidatesForPrompt(brief, criteria.city);
       const errSession: ResearchSession = {
         ...DEMO_SESSION,
         userBrief: brief,

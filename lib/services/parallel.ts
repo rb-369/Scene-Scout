@@ -52,9 +52,13 @@ export class ParallelSearchClient {
     try {
       console.log(`[Parallel Service] Calling ${this.baseUrl} with objective: "${objective.slice(0, 80)}..."`);
       
+      const effectiveQueries = searchQueries && searchQueries.length > 0
+        ? searchQueries
+        : [objective, `${objective} filming locations`];
+
       const payload = {
         objective,
-        search_queries: searchQueries.length > 0 ? searchQueries : undefined,
+        search_queries: effectiveQueries,
         mode
       };
 

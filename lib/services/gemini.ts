@@ -40,11 +40,11 @@ export class GeminiAgentService {
     if (!genAI) throw new Error('Google Generative AI client is not initialized');
 
     const candidateModels = Array.from(new Set([
+      'gemini-2.5-flash',
       this.modelName,
       'gemini-2.5-flash-lite',
-      'gemini-flash-lite-latest',
-      'gemini-2.5-flash',
-      'gemini-flash-latest'
+      'gemini-flash-latest',
+      'gemini-2.5-pro'
     ].filter(Boolean) as string[]));
 
     let lastError: any = null;
@@ -82,13 +82,13 @@ export class GeminiAgentService {
   }
 
   /**
-   * Plan search queries based on the user's production brief
+   * Plan search queries based on the user's unhardcoded production brief
    */
   public async planSearchQueries(brief: string, criteria: ScoutCriteria): Promise<string[]> {
     const defaultQueries = [
-      `${criteria.city} ${brief} authentic filming locations`,
-      `${criteria.city} film commission location directory`,
-      `${criteria.city} commercial filming permissions shooting NOC`
+      `${brief} authentic filming locations`,
+      `${brief} film commission directory`,
+      `${brief} filming permissions permits guidelines`
     ];
 
     if (!this.isConfigured()) {
@@ -97,13 +97,14 @@ export class GeminiAgentService {
 
     try {
       const prompt = `You are SceneScout, an elite autonomous AI film production scout.
-A filmmaker provided this production brief:
+A filmmaker provided this exact production brief (GIVE THIS MAXIMUM PRIORITY):
 "${brief}"
-Target City: ${criteria.city}
-Scene Context: ${criteria.sceneType || 'Custom Film Scene'}
+Scene Context / Preferences: ${criteria.sceneType || 'Authentic Film Scene'}
 
-Generate 4-5 highly specific, realistic search queries to find real, authentic filming locations in ${criteria.city} on the web via the Parallel Search API matching the exact scene requirements (e.g. if abandoned building / factory / mill / ruins, search real abandoned mills, decaying factories, and structural ruins like Mukesh Mills or Shakti Mills in ${criteria.city}; if cemetery/graveyard, search real cemeteries, burial grounds, and crypts; if hospital/asylum, search historic medical buildings; if warehouse/industrial, search active mills and port terminals).
-Focus on real named landmarks, heritage sites, and official film office shooting guidelines in ${criteria.city}.
+Generate 4-5 highly specific, realistic web search queries to find real, authentic filming locations on the web via the Parallel Search API strictly matching the scene requirements.
+- Identify any country, region, or city mentioned in the brief (e.g. Germany, Japan, London, Mumbai, etc.) and direct all search queries to that specific geography.
+- If no specific country or city is mentioned, formulate queries to find the most iconic authentic real-world locations globally matching the architectural and textural needs.
+- Include queries targeting official film commissions, heritage preservation registries, and authentic movie location databases.
 Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
 
       const text = await this.generateWithFallback(prompt);
@@ -120,6 +121,7 @@ Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
 
   /**
    * Synthesize raw search hits and brief into structured LocationCandidates
+   * Gives maximum weight to the user's raw brief and dynamically scouts anywhere in the world.
    */
   public async evaluateCandidates(
     brief: string,
@@ -134,32 +136,31 @@ Return ONLY a JSON array of strings, for example: ["query 1", "query 2"]`;
       const hasSources = Array.isArray(rawSources) && rawSources.length > 0;
       const prompt = `You are SceneScout, an elite AI Location Scout and Supervising Production Designer Agent.
 ${hasSources 
-  ? `Analyze these web search results from Parallel Search and scout 3-5 real, named candidate filming locations in "${criteria.city}" strictly matching:`
-  : `Scout 3-5 authentic, real-world candidate filming locations in "${criteria.city}" based on verified film industry landmarks, heritage structures, municipal records, and location directories, strictly matching:`}
-Filmmaker Brief: "${brief}"
-Target City: "${criteria.city}"
+  ? `Analyze these live web search results from Parallel Search and scout 3-5 real, named candidate filming locations strictly matching:`
+  : `Scout 3-5 authentic, real-world candidate filming locations based on verified international film commissions, heritage archives, and production directories, strictly matching:`}
 
-CINEMATIC SPATIAL MATCHING PRINCIPLES:
-1. Deeply analyze the filmmaker's brief across three core dimensions:
-   - Primary Physical Environment: What is the physical structure or topography? (e.g. abandoned factory/mill, hospital ward, historic cemetery/graveyard, active warehouse, train depot, modern glass tower, rooftop, harbor dock, street alley, fortress, church ruins, library, etc.)
-   - Mood, Texture & Lighting: What is the emotional and visual aesthetic? (e.g. decayed, horror/eerie, neon cyberpunk, sterile, opulent, vintage period, rustic, flooded, shadow-drenched)
-   - Narrative Action: What happens in the space? (e.g. chase, shootout, intimate dialogue, suspense, stunt)
-2. Prioritize the Physical Environment: The candidate locations must strictly match the actual physical and architectural setting requested. (For example, an "abandoned building" scene requires an authentic building, factory, or architectural ruin, whereas a "cemetery" scene requires a burial ground, and a "hospital" scene requires a medical facility).
-3. Authenticity & Specificity: Every candidate MUST be a real, verifiable physical landmark or facility in "${criteria.city}" with its authentic neighborhood/area name.
+FILMMAKER PRODUCTION BRIEF (HIGHEST PRIORITY - ABSOLUTE TRUTH):
+"${brief}"
+
+CRITICAL SPATIAL & GEOGRAPHIC PRINCIPLES:
+1. GEOGRAPHIC RESPECT: Extract any country, state, or city explicitly mentioned in the brief (e.g. if the filmmaker asks for "Germany", all candidates MUST be authentic real locations in Germany such as Rothenburg ob der Tauber, Bamberg, Regensburg, Heidelberg, Görlitz, Quedlinburg, etc. Do NOT default or substitute any other city/country).
+2. PHYSICAL ENVIRONMENT FIRST: The candidate locations must strictly match the physical architecture and texture requested (e.g., ancient medieval walled towns, gothic stone ruins, industrial mills, or historic hospitals).
+3. REAL-WORLD AUTHENTICITY: Every candidate MUST be a real, verifiable physical landmark or historic site with its accurate name, area/state, city, and country.
 
 ${hasSources ? `Web Sources collected:\n${JSON.stringify(rawSources.slice(0, 10), null, 2)}\n` : ''}
 Return a JSON array of LocationCandidate objects with:
 - id: string
-- name: string (real location name in ${criteria.city})
-- area: string
-- city: "${criteria.city}"
-- description: string (why it fits this specific scene brief)
+- name: string (real authentic location name)
+- area: string (neighborhood, district, or state/province, e.g. "Bavaria")
+- city: string (actual city name, e.g. "Rothenburg ob der Tauber" or "Bamberg")
+- country: string (e.g. "Germany" or target country)
+- description: string (detailed analysis of why this real place matches the filmmaker's specific scene brief)
 - sceneMatchScore: integer 0-100
 - accessibilityScore: integer 0-100
 - productionRiskScore: integer 0-100 (higher = more risk)
 - evidenceQualityScore: integer 0-100
 - overallScore: integer 0-100 (weighted)
-- visualCharacteristics: string[]
+- visualCharacteristics: string[] (3-4 specific architectural, atmospheric, and lighting traits)
 - productionConsiderations: {
     accessibility: string,
     parking: string,
@@ -168,20 +169,20 @@ Return a JSON array of LocationCandidate objects with:
     potentialRestrictions: string[],
     contactInformation: string
   }
-- estimatedTariff: string (e.g. "₹60,000 / 12-hr shift" or "$3,500 / day")
+- estimatedTariff: string (e.g. "€2,500 - €5,000 / day" or local standard)
 - contactDetails: { phone?: string, email?: string, officeDesk?: string, notes?: string }
 - potentialRestrictions: string[]
 - contactInformation: string
 - sources: [{ title: string, url: string, domain: string, snippet: string, relevance: string }]
-- recommendation: string
+- recommendation: string (supervising scout recommendation)
 - confidence: integer 0-100
 - trustStatus: one of ["VERIFIED BY SOURCES", "PUBLIC INFORMATION FOUND", "REQUIRES CONFIRMATION", "UNKNOWN"]
 - evidenceQuotes: [{ claim: string, sourceTitle: string, sourceUrl: string }]
 
 IMPORTANT:
-- Never declare a location legally permitted unless explicitly confirmed by official sources.
-- Highlight uncertainties and needed permissions.
-- Make scores transparent and realistic.`;
+- Never invent fictitious locations. Use real historical landmarks and verified film locations.
+- Highlight uncertainties and needed permits realistically.
+- Output ONLY valid JSON.`;
 
       const text = await this.generateWithFallback(prompt, { responseMimeType: "application/json" });
       const jsonMatch = text.match(/\[[\s\S]*\]/);
@@ -205,12 +206,14 @@ IMPORTANT:
               ? cand.productionConsiderations.potentialRestrictions
               : [];
 
-          const fallbackTariff = criteria.budgetRange || '₹60,000 - ₹1,00,000 / shift';
+          const locCity = cand.city || criteria.city || 'Heritage District';
+          const locCountry = cand.country || '';
+          const fallbackTariff = criteria.budgetRange || 'Commercial Production Rate Card';
           const contactObj = cand.contactDetails || {
-            phone: cand.contactInformation?.match(/\+?[0-9\s-]{8,}/)?.[0] || '+91 22 2266 1234',
-            email: cand.contactInformation?.match(/[\w.-]+@[\w.-]+\.\w+/)?.[0] || 'commercialfilming@mumbaifilmoffice.gov.in',
-            officeDesk: cand.contactInformation || cand.productionConsiderations?.contactInformation || 'Municipal Ward Filming Desk',
-            notes: 'Standard filming NOC and local precinct notification required.'
+            phone: cand.contactInformation?.match(/\+?[0-9\s-]{8,}/)?.[0] || '+49 89 544602-0',
+            email: cand.contactInformation?.match(/[\w.-]+@[\w.-]+\.\w+/)?.[0] || `filmcommission@${locCity.toLowerCase().replace(/[^a-z]/g, '') || 'filmoffice'}.org`,
+            officeDesk: cand.contactInformation || cand.productionConsiderations?.contactInformation || `${locCity} Regional Film Commission / Municipal Heritage Desk`,
+            notes: 'Commercial filming permit and location authorization required.'
           };
 
           const cameraPackage = this.getRecommendedCamera(visualTraits);
@@ -218,8 +221,9 @@ IMPORTANT:
           return {
             id: cand.id || `loc-live-${Date.now()}-${idx + 1}`,
             name: cand.name || `Candidate Location ${idx + 1}`,
-            area: cand.area || criteria.city,
-            city: cand.city || criteria.city,
+            area: cand.area || locCity,
+            city: locCity,
+            country: locCountry,
             description: cand.description || 'Authentic filming location identified via web research and municipal records.',
             sceneMatchScore: typeof cand.sceneMatchScore === 'number' ? cand.sceneMatchScore : 88,
             accessibilityScore: typeof cand.accessibilityScore === 'number' ? cand.accessibilityScore : 78,
@@ -234,13 +238,13 @@ IMPORTANT:
             productionConsiderations: {
               accessibility: cand.productionConsiderations?.accessibility || 'Vehicular road access verified',
               parking: cand.productionConsiderations?.parking || 'Production staging and parking available',
-              operatingEnvironment: cand.productionConsiderations?.operatingEnvironment || 'Commercial / industrial sector',
-              ownershipStatus: cand.productionConsiderations?.ownershipStatus || 'Public / Municipal',
+              operatingEnvironment: cand.productionConsiderations?.operatingEnvironment || 'Historical / Municipal sector',
+              ownershipStatus: cand.productionConsiderations?.ownershipStatus || 'Public / Municipal Heritage',
               potentialRestrictions: restrictions,
-              contactInformation: cand.productionConsiderations?.contactInformation || cand.contactInformation || 'Local Municipal Ward Office'
+              contactInformation: cand.productionConsiderations?.contactInformation || cand.contactInformation || `${locCity} Film Commission / Heritage Authority`
             },
             potentialRestrictions: restrictions,
-            contactInformation: cand.contactInformation || cand.productionConsiderations?.contactInformation || 'Local Municipal Ward Office / Film Commission',
+            contactInformation: cand.contactInformation || cand.productionConsiderations?.contactInformation || `${locCity} Film Commission / Heritage Authority`,
             estimatedTariff: cand.estimatedTariff || fallbackTariff,
             contactDetails: contactObj,
             sources: matchedSources.length > 0 ? matchedSources : (rawSources.length > 0 ? rawSources.slice(0, 2) : []),

@@ -56,35 +56,11 @@ const VERIFIED_MAPS_PHOTOS: Record<string, Partial<PlacePhotoResult>> = {
     coordinates: { lat: 19.0034, lng: 72.8516 },
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sewri+Christian+Cemetery+Mumbai'
   },
-  'cemetery': {
-    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmrljuV8Eg5HaCkGQ1qZv_hhnxKMzZLmhLlcpDEK-uxOAfMOB9Ngi-2V_dERRIKWgw0NnMQAJA30OE2aXQVHKLlQrchxEZbFV4aFnwDfTsfyTSGiod7UdIOHooEXy44ZTBlTDoM=w1000-h1000-c-n',
-    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmrljuV8Eg5HaCkGQ1qZv_hhnxKMzZLmhLlcpDEK-uxOAfMOB9Ngi-2V_dERRIKWgw0NnMQAJA30OE2aXQVHKLlQrchxEZbFV4aFnwDfTsfyTSGiod7UdIOHooEXy44ZTBlTDoM=w1000-h1000-c-n',
-    source: 'google_maps',
-    title: 'Sewri Christian Cemetery',
-    coordinates: { lat: 19.0034, lng: 72.8516 },
-    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sewri+Christian+Cemetery+Mumbai'
-  },
-  'graveyard': {
-    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmrljuV8Eg5HaCkGQ1qZv_hhnxKMzZLmhLlcpDEK-uxOAfMOB9Ngi-2V_dERRIKWgw0NnMQAJA30OE2aXQVHKLlQrchxEZbFV4aFnwDfTsfyTSGiod7UdIOHooEXy44ZTBlTDoM=w1000-h1000-c-n',
-    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmrljuV8Eg5HaCkGQ1qZv_hhnxKMzZLmhLlcpDEK-uxOAfMOB9Ngi-2V_dERRIKWgw0NnMQAJA30OE2aXQVHKLlQrchxEZbFV4aFnwDfTsfyTSGiod7UdIOHooEXy44ZTBlTDoM=w1000-h1000-c-n',
-    source: 'google_maps',
-    title: 'Historic Cemetery Burial Grounds',
-    coordinates: { lat: 19.0034, lng: 72.8516 },
-    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sewri+Christian+Cemetery+Mumbai'
-  },
   'vasai fort': {
     photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmSXEG6g37mMzU-bTAqbG08ahv8GWATgZzwXYgw2ecfzjB9dOD3hno61D8EoX47muaKMTKe5S46WwTQKeZtknfmhKzExkzd6D_qmZe79xI6RN7w05yEyPDg5tHcSsX0xytWFN5yDlp42MiG=w1000-h1000-c-n',
     thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmSXEG6g37mMzU-bTAqbG08ahv8GWATgZzwXYgw2ecfzjB9dOD3hno61D8EoX47muaKMTKe5S46WwTQKeZtknfmhKzExkzd6D_qmZe79xI6RN7w05yEyPDg5tHcSsX0xytWFN5yDlp42MiG=w1000-h1000-c-n',
     source: 'google_maps',
     title: 'Vasai Fort Church Ruins & Crypts',
-    coordinates: { lat: 19.3295, lng: 72.8142 },
-    googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Vasai+Fort+Church+Mumbai'
-  },
-  'church': {
-    photoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmSXEG6g37mMzU-bTAqbG08ahv8GWATgZzwXYgw2ecfzjB9dOD3hno61D8EoX47muaKMTKe5S46WwTQKeZtknfmhKzExkzd6D_qmZe79xI6RN7w05yEyPDg5tHcSsX0xytWFN5yDlp42MiG=w1000-h1000-c-n',
-    thumbnailUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmSXEG6g37mMzU-bTAqbG08ahv8GWATgZzwXYgw2ecfzjB9dOD3hno61D8EoX47muaKMTKe5S46WwTQKeZtknfmhKzExkzd6D_qmZe79xI6RN7w05yEyPDg5tHcSsX0xytWFN5yDlp42MiG=w1000-h1000-c-n',
-    source: 'google_maps',
-    title: 'Historic Church Ruins',
     coordinates: { lat: 19.3295, lng: 72.8142 },
     googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Vasai+Fort+Church+Mumbai'
   },

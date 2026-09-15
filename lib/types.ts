@@ -38,6 +38,7 @@ export interface LocationCandidate {
   name: string;
   area: string;
   city: string;
+  country?: string;
   description: string;
   
   // Transparent 0-100 scores

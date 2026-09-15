@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { ScoutCriteria } from '@/lib/types';
 import { DEMO_BRIEF } from '@/lib/demoData';
+import { extractLocationFromPrompt } from '@/lib/services/geoExtractor';
 import { useAuth } from '@/contexts/AuthContext';
 import { FilmmakerType } from '@/lib/supabase/types';
 
@@ -89,9 +90,13 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
     e.preventDefault();
     if (!brief.trim()) return;
 
+    // Highest priority to filmmaker's prompt: extract target location if specified
+    const detected = extractLocationFromPrompt(brief, city);
+    const effectiveCity = detected.isSpecified ? detected.targetLocation : city;
+
     const criteria: ScoutCriteria = {
-      city,
-      sceneType,
+      city: effectiveCity,
+      sceneType: detected.isSpecified ? brief : sceneType,
       budgetSensitivity,
       budgetRange,
       maxDistanceKm: maxDistance,
@@ -210,7 +215,14 @@ export const BriefInput: React.FC<BriefInputProps> = ({ onStartScout, isLoading 
             <textarea
               rows={4}
               value={brief}
-              onChange={(e) => setBrief(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setBrief(val);
+                const detected = extractLocationFromPrompt(val, city);
+                if (detected.isSpecified && detected.targetLocation !== city) {
+                  setCity(detected.targetLocation);
+                }
+              }}
               placeholder="e.g. Find 5 industrial warehouse filming locations in Mumbai suitable for a high-intensity thriller chase..."
               style={{
                 width: '100%',
